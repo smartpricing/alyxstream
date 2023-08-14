@@ -1,0 +1,1973 @@
+[
+  {
+    "__docId__": 1,
+    "kind": "external",
+    "name": "Infinity",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Infinity",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 2,
+    "kind": "external",
+    "name": "NaN",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~NaN",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 3,
+    "kind": "external",
+    "name": "undefined",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~undefined",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 4,
+    "kind": "external",
+    "name": "null",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~null",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 5,
+    "kind": "external",
+    "name": "Object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Object",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 6,
+    "kind": "external",
+    "name": "object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~object",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 7,
+    "kind": "external",
+    "name": "Function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Function",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 8,
+    "kind": "external",
+    "name": "function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~function",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 9,
+    "kind": "external",
+    "name": "Boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Boolean",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 10,
+    "kind": "external",
+    "name": "boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~boolean",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 11,
+    "kind": "external",
+    "name": "Symbol",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Symbol",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 12,
+    "kind": "external",
+    "name": "Error",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Error",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 13,
+    "kind": "external",
+    "name": "EvalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~EvalError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 14,
+    "kind": "external",
+    "name": "InternalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/InternalError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~InternalError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 15,
+    "kind": "external",
+    "name": "RangeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~RangeError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 16,
+    "kind": "external",
+    "name": "ReferenceError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~ReferenceError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 17,
+    "kind": "external",
+    "name": "SyntaxError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~SyntaxError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 18,
+    "kind": "external",
+    "name": "TypeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~TypeError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 19,
+    "kind": "external",
+    "name": "URIError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~URIError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 20,
+    "kind": "external",
+    "name": "Number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Number",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 21,
+    "kind": "external",
+    "name": "number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~number",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 22,
+    "kind": "external",
+    "name": "Date",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Date",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 23,
+    "kind": "external",
+    "name": "String",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~String",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 24,
+    "kind": "external",
+    "name": "string",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~string",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 25,
+    "kind": "external",
+    "name": "RegExp",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~RegExp",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 26,
+    "kind": "external",
+    "name": "Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 27,
+    "kind": "external",
+    "name": "Int8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Int8Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 28,
+    "kind": "external",
+    "name": "Uint8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Uint8Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 29,
+    "kind": "external",
+    "name": "Uint8ClampedArray",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Uint8ClampedArray",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 30,
+    "kind": "external",
+    "name": "Int16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Int16Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 31,
+    "kind": "external",
+    "name": "Uint16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Uint16Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 32,
+    "kind": "external",
+    "name": "Int32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Int32Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 33,
+    "kind": "external",
+    "name": "Uint32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Uint32Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 34,
+    "kind": "external",
+    "name": "Float32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Float32Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 35,
+    "kind": "external",
+    "name": "Float64Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Float64Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 36,
+    "kind": "external",
+    "name": "Map",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Map",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 37,
+    "kind": "external",
+    "name": "Set",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Set",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 38,
+    "kind": "external",
+    "name": "WeakMap",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~WeakMap",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 39,
+    "kind": "external",
+    "name": "WeakSet",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~WeakSet",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 40,
+    "kind": "external",
+    "name": "ArrayBuffer",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~ArrayBuffer",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 41,
+    "kind": "external",
+    "name": "DataView",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~DataView",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 42,
+    "kind": "external",
+    "name": "JSON",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~JSON",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 43,
+    "kind": "external",
+    "name": "Promise",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Promise",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 44,
+    "kind": "external",
+    "name": "Generator",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Generator",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 45,
+    "kind": "external",
+    "name": "GeneratorFunction",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~GeneratorFunction",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 46,
+    "kind": "external",
+    "name": "Reflect",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Reflect",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 47,
+    "kind": "external",
+    "name": "Proxy",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Proxy",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 48,
+    "kind": "file",
+    "name": "src/config/constant.js",
+    "content": "'use strict'\n\n/** Watermark default prefix */\nexport const WatermarkPrefix = process.env.WATERMARK_PREFIX || 'watermark.'\n/** Window Metadata default prefix */\nexport const WindowMetadataPrefix = process.env.WINDOW_METADATA_PREFIX || 'metadata.'",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/config/constant.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 49,
+    "kind": "variable",
+    "name": "WatermarkPrefix",
+    "memberof": "src/config/constant.js",
+    "static": true,
+    "longname": "src/config/constant.js~WatermarkPrefix",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/config/constant.js",
+    "importStyle": "{WatermarkPrefix}",
+    "description": "Watermark default prefix",
+    "lineNumber": 4,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 50,
+    "kind": "variable",
+    "name": "WindowMetadataPrefix",
+    "memberof": "src/config/constant.js",
+    "static": true,
+    "longname": "src/config/constant.js~WindowMetadataPrefix",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/config/constant.js",
+    "importStyle": "{WindowMetadataPrefix}",
+    "description": "Window Metadata default prefix",
+    "lineNumber": 6,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 51,
+    "kind": "file",
+    "name": "src/config/rest.js",
+    "content": "'use strict'\n\n/** Rest default port */\nexport const RestDefaultConfig = {\n  port: 9876\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/config/rest.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 52,
+    "kind": "variable",
+    "name": "RestDefaultConfig",
+    "memberof": "src/config/rest.js",
+    "static": true,
+    "longname": "src/config/rest.js~RestDefaultConfig",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/config/rest.js",
+    "importStyle": "{RestDefaultConfig}",
+    "description": "Rest default port",
+    "lineNumber": 4,
+    "type": {
+      "types": [
+        "{\"port\": number}"
+      ]
+    }
+  },
+  {
+    "__docId__": 53,
+    "kind": "file",
+    "name": "src/config/storage.js",
+    "content": "'use strict'\n\n/** Redis default config */\nexport const RedisDefaultConfig = {\n    port: 6379,\n    host: \"127.0.0.1\",\n    db: 0\n}\n\n/** Cassandra default config */\nexport const CassandraDefaultConfig = {\n    contactPoints: ['localhost:9042'],\n    localDataCenter: 'datacenter1',\n    keyspace: 'nks'\n  }",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/config/storage.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 54,
+    "kind": "variable",
+    "name": "RedisDefaultConfig",
+    "memberof": "src/config/storage.js",
+    "static": true,
+    "longname": "src/config/storage.js~RedisDefaultConfig",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/config/storage.js",
+    "importStyle": "{RedisDefaultConfig}",
+    "description": "Redis default config",
+    "lineNumber": 4,
+    "type": {
+      "types": [
+        "{\"port\": number, \"host\": string, \"db\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 55,
+    "kind": "variable",
+    "name": "CassandraDefaultConfig",
+    "memberof": "src/config/storage.js",
+    "static": true,
+    "longname": "src/config/storage.js~CassandraDefaultConfig",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/config/storage.js",
+    "importStyle": "{CassandraDefaultConfig}",
+    "description": null,
+    "lineNumber": 11,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"contactPoints\": *, \"localDataCenter\": string, \"keyspace\": string}"
+      ]
+    }
+  },
+  {
+    "__docId__": 56,
+    "kind": "file",
+    "name": "src/kafka/admin.js",
+    "content": "'use strict'\n\nimport { Kafka } from 'kafkajs'\n\n/** Kafkajs admi client */\nexport default async function (kafkaClient) {\n\tconst admin = kafkaClient.admin()\n\tawait admin.connect()\n\treturn admin\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/kafka/admin.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 57,
+    "kind": "function",
+    "name": "admin",
+    "memberof": "src/kafka/admin.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/kafka/admin.js~admin",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/kafka/admin.js",
+    "importStyle": "admin",
+    "description": "Kafkajs admi client",
+    "lineNumber": 6,
+    "params": [
+      {
+        "name": "kafkaClient",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 58,
+    "kind": "file",
+    "name": "src/kafka/client.js",
+    "content": "'use strict'\n\nimport { Kafka } from 'kafkajs'\n\n/** Kafkajs client */\nexport default function (clientConfig) {\n\treturn new Kafka(clientConfig)\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/kafka/client.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 59,
+    "kind": "function",
+    "name": "client",
+    "memberof": "src/kafka/client.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/kafka/client.js~client",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/kafka/client.js",
+    "importStyle": "client",
+    "description": "Kafkajs client",
+    "lineNumber": 6,
+    "params": [
+      {
+        "name": "clientConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 60,
+    "kind": "file",
+    "name": "src/kafka/commit.js",
+    "content": "'use strict'\n\nimport Log from '../logger/default.js'\n\n/** Commit kafka offset \n *  @params {kafkaConsumer<kafkaConsumer>, value<object>} \n *  \n */\nexport default function (kafkaConsumer, value) {\n\tconst newOffset = (parseInt(value.offset) + 1).toString()\n\tkafkaConsumer.commitOffsets([\n\t  { topic: value.topic, partition: value.partition, offset: newOffset }\n\t])\n\tLog('debug', ['Commit kafka offset', value.topic, value.partition, newOffset ])\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/kafka/commit.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 61,
+    "kind": "function",
+    "name": "commit",
+    "memberof": "src/kafka/commit.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/kafka/commit.js~commit",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/kafka/commit.js",
+    "importStyle": "commit",
+    "description": "Commit kafka offset ",
+    "lineNumber": 9,
+    "unknown": [
+      {
+        "tagName": "@params",
+        "tagValue": "{kafkaConsumer<kafkaConsumer>, value<object>} \n "
+      }
+    ],
+    "params": [
+      {
+        "name": "kafkaConsumer",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "value",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": null
+  },
+  {
+    "__docId__": 62,
+    "kind": "file",
+    "name": "src/kafka/rekey.js",
+    "content": "'use strict'\n\nimport { \n\tmap,\n\tmergeAll\n} from 'rxjs'\n\nexport default function (kafkaSource, rekeyFunction, kafkaSink, sinkTopic, sinkDataFunction) {\n\tkafkaSource.stream().subscribe((s) => {\n\t\ts.key = rekeyFunction(s)\n\t\tconst message = sinkDataFunction(s)\n\t\tlet data = [message]\n\t\tkafkaSink.send({\n\t\t\ttopic: sinkTopic,\n\t\t\tmessages: data\n\t\t})\n\t})\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/kafka/rekey.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 63,
+    "kind": "function",
+    "name": "rekey",
+    "memberof": "src/kafka/rekey.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/kafka/rekey.js~rekey",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/kafka/rekey.js",
+    "importStyle": "rekey",
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "params": [
+      {
+        "name": "kafkaSource",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "rekeyFunction",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "kafkaSink",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "sinkTopic",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "sinkDataFunction",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": null
+  },
+  {
+    "__docId__": 64,
+    "kind": "file",
+    "name": "src/kafka/sink.js",
+    "content": "'use strict'\n\nimport { \n\tmerge,\n\tObservable\n} from 'rxjs'\n\nexport default async function (kafkaClient, producerConfig = null) {\n\tlet producer = null\n \tif (producerConfig == null) {\n \t\tproducer = kafkaClient.producer()\n\t} else {\n\t\tproducer = kafkaClient.producer(producerConfig)\n\t}\n\tawait producer.connect()\n\treturn producer\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/kafka/sink.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 65,
+    "kind": "function",
+    "name": "sink",
+    "memberof": "src/kafka/sink.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/kafka/sink.js~sink",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/kafka/sink.js",
+    "importStyle": "sink",
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "params": [
+      {
+        "name": "kafkaClient",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "producerConfig",
+        "optional": true,
+        "types": [
+          "undefined"
+        ],
+        "defaultValue": "undefined"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 66,
+    "kind": "file",
+    "name": "src/kafka/source.js",
+    "content": "'use strict'\n\nimport { \n\tmerge,\n\tObservable\n} from 'rxjs'\n\nexport default async function (kafkaClient, consumerConfig) {\n\tconst topics = consumerConfig.topics\n\tconst observables = []\n\t\n\tlet consumer = await kafkaClient.consumer({groupId: consumerConfig.groupId})\n\tfor (const topic of topics) {\n\t\tawait consumer.subscribe({ topic: topic.topic, fromBeginning: topic.fromBeginning })\t\n\t}\n\tawait consumer.connect()\n\t// consumer.on(consumer.events.GROUP_JOIN, (event) => {\n\t// \tconsole.log(\"------->\", event, event.payload.memberAssignment)\n\t// })\n\n\tfor (const t of topics) {\n\t\tconst payloadParser = typeof t.parseWith == 'function' ? t.parseWith : (v) => { return JSON.parse(v) }\n\t\tconst observable = new Observable(function (subscriber) {\n\t\t\tconsumer.run({\n\t\t\t\tautoCommit: t.autoCommit == false ? false : true,\n\t\t  \t\teachMessage: ({ topic, partition, message }) => {\n\t\t  \t\t\tsubscriber.next({\n\t\t  \t\t\t\ttopic: topic, \n\t\t  \t\t\t\toffset: message.offset,\n\t\t  \t\t\t\tpartition: partition, \n\t\t  \t\t\t\theaders: message.headers,\n\t\t  \t\t\t\tkey: message.key.toString(),\n\t\t  \t\t\t\tvalue: payloadParser(message.value)\n\t\t  \t\t\t})\n\t\t  \t\t},\n\t\t\t})\n\t\t})\t\n\t\tobservables.push(observable)\t\t\t\t\n\t}\n\treturn {\n\t\tstream: () => { return merge(...observables) },\n\t\tconsumer: () => { return consumer }\n\t}\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/kafka/source.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 67,
+    "kind": "function",
+    "name": "source",
+    "memberof": "src/kafka/source.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/kafka/source.js~source",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/kafka/source.js",
+    "importStyle": "source",
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "params": [
+      {
+        "name": "kafkaClient",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "consumerConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"stream\": *, \"consumer\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 68,
+    "kind": "file",
+    "name": "src/loaders/json-newline.js",
+    "content": "'use strict'\n\nimport fs from 'fs'\n\n// 'datasets/pms.json'\nexport default function (file) {\n\tconst data = fs.readFileSync(file, 'utf8')\n\treturn data.split('\\n').map(d => JSON.parse(d))\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/loaders/json-newline.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 69,
+    "kind": "function",
+    "name": "jsonnewline",
+    "memberof": "src/loaders/json-newline.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/loaders/json-newline.js~jsonnewline",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/loaders/json-newline.js",
+    "importStyle": "jsonnewline",
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true,
+    "params": [
+      {
+        "name": "file",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 70,
+    "kind": "file",
+    "name": "src/logger/default.js",
+    "content": "'use strict'\n\nconst appLogLevel = process.env.VS_LOG_LEVEL == undefined ? 'info' : process.env.VS_LOG_LEVEL\n\nexport default function (level, itemsAry) {\n\tswitch (level) {\n\t\tcase 'info':\n\t\t\tif (appLogLevel == 'info' || appLogLevel == 'debug') {\n\t\t\t\tconsole.log(new Date(), '#>', ...itemsAry)\n\t\t\t}\n\t\t\tbreak\n\t\tcase 'warning':\n\t\t\tif (appLogLevel == 'info' || appLogLevel == 'warning' || appLogLevel == 'debug') {\n\t\t\t\tconsole.log(new Date(), '#>', ...itemsAry)\n\t\t\t}\n\t\t\tbreak\n\t\tcase 'debug':\n\t\t\tif (appLogLevel == 'debug') {\n\t\t\t\tconsole.log(new Date(), '#>', ...itemsAry)\n\t\t\t}\n\t\t\tbreak\t\t\t\n\t\tdefault:\n\t\t\tbreak\n\t}\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/logger/default.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 71,
+    "kind": "variable",
+    "name": "appLogLevel",
+    "memberof": "src/logger/default.js",
+    "static": true,
+    "longname": "src/logger/default.js~appLogLevel",
+    "access": "public",
+    "export": false,
+    "importPath": "@dev.smartpricing/verostream/src/logger/default.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 72,
+    "kind": "function",
+    "name": "default",
+    "memberof": "src/logger/default.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/logger/default.js~default",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/logger/default.js",
+    "importStyle": "default",
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true,
+    "params": [
+      {
+        "name": "level",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "itemsAry",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": null
+  },
+  {
+    "__docId__": 73,
+    "kind": "file",
+    "name": "src/operators/base.js",
+    "content": "'use strict'\n\nimport { \n    Subject\n} from 'rxjs'\n\nexport const withMetadata = {\n    _metadata: {\n        id: null,\n    },\n    setMetadata (id) {\n        this._metadata.id = id\n        return this\n    },\n    getMetadata () {\n        return this._metadata\n    }\n}\n\nexport const withDefaultKey = {\n    withDefaultKey (cb) {\n        const subject = new Subject()\n        this.lastObservable().subscribe((s) => {\n            s._key = 'default'\n            subject.next(s)\n        })\n        this.setNextObservable(subject)\n        return this\n    }\n}\n\nexport const keyBy = {\n    keyBy (cb) {\n        const subject = new Subject()\n        this.lastObservable().subscribe((s) => {\n            s._key = cb(s)\n            subject.next(s)\n        })\n        this.setNextObservable(subject)\n        return this\n    }\n}\n\nexport const filter = {\n    filter (cb) {\n        const subject = new Subject()\n        this.lastObservable().subscribe((s) => {\n            if (cb(s) === true) {\n                subject.next(s)\n            }\n        })\n        this.setNextObservable(subject)\n        return this\n    }\n}\n\nexport const withEventTime = {\n    withEventTime (cb) {\n        const subject = new Subject()\n        this.lastObservable().subscribe((s) => {\n            s._eventTime = cb(s)\n            subject.next(s)\n        })\n        this.setNextObservable(subject)\n        return this\n    }\n}\n\nexport const print = {\n    print (str = null) {\n        const subject = new Subject()\n        this.lastObservable().subscribe((s) => {\n            if (str == null) {\n                console.log(s)\n            } else {\n                console.log(str, s)\n            }\n            subject.next(s)\n        })  \n        this.setNextObservable(subject)\n        return this\n    }\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/operators/base.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 74,
+    "kind": "variable",
+    "name": "withMetadata",
+    "memberof": "src/operators/base.js",
+    "static": true,
+    "longname": "src/operators/base.js~withMetadata",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/base.js",
+    "importStyle": "{withMetadata}",
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"_metadata\": *, \"setMetadata\": function, \"getMetadata\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 75,
+    "kind": "variable",
+    "name": "withDefaultKey",
+    "memberof": "src/operators/base.js",
+    "static": true,
+    "longname": "src/operators/base.js~withDefaultKey",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/base.js",
+    "importStyle": "{withDefaultKey}",
+    "description": null,
+    "lineNumber": 20,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"withDefaultKey\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 76,
+    "kind": "variable",
+    "name": "keyBy",
+    "memberof": "src/operators/base.js",
+    "static": true,
+    "longname": "src/operators/base.js~keyBy",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/base.js",
+    "importStyle": "{keyBy}",
+    "description": null,
+    "lineNumber": 32,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"keyBy\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 77,
+    "kind": "variable",
+    "name": "filter",
+    "memberof": "src/operators/base.js",
+    "static": true,
+    "longname": "src/operators/base.js~filter",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/base.js",
+    "importStyle": "{filter}",
+    "description": null,
+    "lineNumber": 44,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"filter\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 78,
+    "kind": "variable",
+    "name": "withEventTime",
+    "memberof": "src/operators/base.js",
+    "static": true,
+    "longname": "src/operators/base.js~withEventTime",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/base.js",
+    "importStyle": "{withEventTime}",
+    "description": null,
+    "lineNumber": 57,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"withEventTime\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 79,
+    "kind": "variable",
+    "name": "print",
+    "memberof": "src/operators/base.js",
+    "static": true,
+    "longname": "src/operators/base.js~print",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/base.js",
+    "importStyle": "{print}",
+    "description": null,
+    "lineNumber": 69,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"print\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 80,
+    "kind": "file",
+    "name": "src/operators/custom.js",
+    "content": "'use strict'\n\nimport { \n    Subject\n} from 'rxjs'\n\nexport const customFunction = {\n    customFunction (cb) {\n        const subject = new Subject()\n        this.lastObservable().subscribe((s) => {\n        \tconst trigger = (ss) => subject.next(ss)\n            cb(s, trigger)\n        })\n        this.setNextObservable(subject)\n        return this\n    }\n}\n",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/operators/custom.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 81,
+    "kind": "variable",
+    "name": "customFunction",
+    "memberof": "src/operators/custom.js",
+    "static": true,
+    "longname": "src/operators/custom.js~customFunction",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/custom.js",
+    "importStyle": "{customFunction}",
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"customFunction\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 82,
+    "kind": "file",
+    "name": "src/operators/shared.js",
+    "content": "'use strict'\n\nimport { eventEmitter } from '../shared/event-emitter.js'\n\nexport const withSharedEventEmitter = {\n\t_sharedEventEmitter: eventEmitter,\n\n\temitSharedEvent (event, value) {\n\t\tthis._sharedEventEmitter.emit(event, value)\n\t},\n\n\tonSharedEvent (event, cb) {\n\t\tthis._sharedEventEmitter.on(event, cb)\n\t},\n\n\tsharedEventEmitter () {\n\t\treturn this._sharedEventEmitter\n\t}\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/operators/shared.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 83,
+    "kind": "variable",
+    "name": "withSharedEventEmitter",
+    "memberof": "src/operators/shared.js",
+    "static": true,
+    "longname": "src/operators/shared.js~withSharedEventEmitter",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/shared.js",
+    "importStyle": "{withSharedEventEmitter}",
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"_sharedEventEmitter\": *, \"emitSharedEvent\": function, \"onSharedEvent\": function, \"sharedEventEmitter\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 84,
+    "kind": "file",
+    "name": "src/operators/sink.js",
+    "content": "'use strict'\n\nimport { \n    Subject\n} from 'rxjs'\n\nexport const toKafka = {\n    toKafka (sink, topic, cb = null) {\n        const subject = new Subject()\n        this.lastObservable().subscribe((s) => {\n        \tlet data = cb == null ? s : cb(s)\n        \tdata = Array.isArray(data) == true ? data : [data]\n\t\t\tsink.send({\n\t\t\t\ttopic: topic,\n\t\t\t\tmessages: data\n\t\t\t})\n            subject.next(s)\n        })\n        this.setNextObservable(subject)\n        return this\n    }\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/operators/sink.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 85,
+    "kind": "variable",
+    "name": "toKafka",
+    "memberof": "src/operators/sink.js",
+    "static": true,
+    "longname": "src/operators/sink.js~toKafka",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/sink.js",
+    "importStyle": "{toKafka}",
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"toKafka\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 86,
+    "kind": "file",
+    "name": "src/operators/source.js",
+    "content": "'use strict'\n\nimport EventEmitter from 'events'\n\nimport { \n    fromEvent as rxFromEvent,\n    from as rxFromArray,\n    Observable\n} from 'rxjs'\n\nexport const fromStream = {\n    fromStream (stream) {\n        this._obs.push(\n            new Observable(function (subscriber) {\n                stream.subscribe((s) => {\n                    subscriber.next(s)\n                })             \n            })   \n        )\n        return this\n    }\n}\n\nexport const fromKafka = {\n    fromKafka (source) {\n        this._obs.push(\n            new Observable(function (subscriber) {\n                source.stream().subscribe((s) => {\n                    subscriber.next(s)\n                })             \n            })   \n        )\n        return this\n    }\n}\n\nexport const fromEvent = {\n    fromEvent (eventEmitter, eventName) {\n        this._obs.push(\n            new Observable(function (subscriber) {\n                rxFromEvent(eventEmitter, eventName).subscribe((s) => {\n                    subscriber.next(s)\n                })             \n            })   \n        )\n        return this\n    }\n}\n\nexport const fromSharedEvent = {\n    fromSharedEvent (eventName) {\n        const sharedEventEmitter = this.sharedEventEmitter()\n        this._obs.push(\n            new Observable(function (subscriber) {\n                rxFromEvent(sharedEventEmitter, eventName).subscribe((s) => {\n                    subscriber.next(s)\n                })             \n            })   \n        )\n        return this\n    }\n}\n\nexport const fromArray = {\n    fromArray (array) {\n        const sharedEventEmitter = this.sharedEventEmitter()\n        this._obs.push(\n            new Observable(function (subscriber) {\n                rxFromArray(array).subscribe((s) => {\n                    subscriber.next(s)\n                })             \n            })   \n        )\n        return this\n    }\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/operators/source.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 87,
+    "kind": "variable",
+    "name": "fromStream",
+    "memberof": "src/operators/source.js",
+    "static": true,
+    "longname": "src/operators/source.js~fromStream",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/source.js",
+    "importStyle": "{fromStream}",
+    "description": null,
+    "lineNumber": 11,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"fromStream\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 88,
+    "kind": "variable",
+    "name": "fromKafka",
+    "memberof": "src/operators/source.js",
+    "static": true,
+    "longname": "src/operators/source.js~fromKafka",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/source.js",
+    "importStyle": "{fromKafka}",
+    "description": null,
+    "lineNumber": 24,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"fromKafka\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 89,
+    "kind": "variable",
+    "name": "fromEvent",
+    "memberof": "src/operators/source.js",
+    "static": true,
+    "longname": "src/operators/source.js~fromEvent",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/source.js",
+    "importStyle": "{fromEvent}",
+    "description": null,
+    "lineNumber": 37,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"fromEvent\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 90,
+    "kind": "variable",
+    "name": "fromSharedEvent",
+    "memberof": "src/operators/source.js",
+    "static": true,
+    "longname": "src/operators/source.js~fromSharedEvent",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/source.js",
+    "importStyle": "{fromSharedEvent}",
+    "description": null,
+    "lineNumber": 50,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"fromSharedEvent\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 91,
+    "kind": "variable",
+    "name": "fromArray",
+    "memberof": "src/operators/source.js",
+    "static": true,
+    "longname": "src/operators/source.js~fromArray",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/source.js",
+    "importStyle": "{fromArray}",
+    "description": null,
+    "lineNumber": 64,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"fromArray\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 92,
+    "kind": "file",
+    "name": "src/operators/window.js",
+    "content": "'use strict'\n\nimport { \n    fromEvent,\n    from,\n    Observable,\n    Subject\n} from 'rxjs'\n\nimport EventEmitter from 'events'\n\nimport WindowCount from '../window/tumblingWindowCountStateful.js'\nimport WindowTime from '../window/tumblingWindowTimeStateful.js'\nimport WindowSession from '../window/windowSessionStateful.js'\n\nexport const tumblingWindowCount = {\n    tumblingWindowCount (storage, countLength) {\n        const subject = new Subject()\n        \n        let win = WindowCount(\n            storage, \n            this.lastObservable(), \n            s => s._key, \n            countLength,\n            s => s._eventTime)\n\n        win.subscribe((res) => {\n            subject.next(res)\n        })\n        \n        this.setNextObservable(subject)\n        return this\n    }\n}\n\nexport const tumblingWindowTime = {\n    tumblingWindowTime (storage, timeLengthMilliSeconds, inactivityTimeMilliseconds = null) {\n        const subject = new Subject()\n        \n        let win = WindowTime(\n            storage, \n            this.lastObservable(), \n            s => s._key, \n            s => s._eventTime, \n            timeLengthMilliSeconds,\n            inactivityTimeMilliseconds)\n\n        win.subscribe((res) => {\n            subject.next(res)\n        })\n        \n        this.setNextObservable(subject)\n        return this\n    }\n}\n\nexport const sessionWindowTime = {\n    sessionWindowTime (storage, inactivityTimeMilliseconds) {\n        const subject = new Subject()\n\n        let win = WindowSession(\n            storage, \n            this.lastObservable(), \n            s => s._key, \n            s => s._eventTime, \n            inactivityTimeMilliseconds )\n        \n        win.subscribe((res) => {\n            subject.next(res)\n        })\n        \n        this.setNextObservable(subject)\n        return this\n    }\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/operators/window.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 93,
+    "kind": "variable",
+    "name": "tumblingWindowCount",
+    "memberof": "src/operators/window.js",
+    "static": true,
+    "longname": "src/operators/window.js~tumblingWindowCount",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/window.js",
+    "importStyle": "{tumblingWindowCount}",
+    "description": null,
+    "lineNumber": 16,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"tumblingWindowCount\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 94,
+    "kind": "variable",
+    "name": "tumblingWindowTime",
+    "memberof": "src/operators/window.js",
+    "static": true,
+    "longname": "src/operators/window.js~tumblingWindowTime",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/window.js",
+    "importStyle": "{tumblingWindowTime}",
+    "description": null,
+    "lineNumber": 36,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"tumblingWindowTime\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 95,
+    "kind": "variable",
+    "name": "sessionWindowTime",
+    "memberof": "src/operators/window.js",
+    "static": true,
+    "longname": "src/operators/window.js~sessionWindowTime",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/operators/window.js",
+    "importStyle": "{sessionWindowTime}",
+    "description": null,
+    "lineNumber": 57,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"sessionWindowTime\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 96,
+    "kind": "file",
+    "name": "src/rest/state.js",
+    "content": "'use strict'\n\nimport express from 'express'\n\nimport { RestDefaultConfig } from '../config/rest.js'\n\nexport function ExposeStorageState (storageMap, config = {}) {\n\tconst app = express()\n\n\tObject.keys(storageMap).forEach((prefix) => {\n\t\tapp.get('/api/v1/state/:prefix/:keys', async function (req, res) {\n\t\t\tif (storageMap[req.params.prefix] == undefined) {\n\t\t\t\tres.sendStatus(404)\n\t\t\t\treturn\n\t\t\t}\n\t\t\tconst keys = req.params.keys.split(',')\n\t\t\tlet response = []\n\t\t\tfor (const key of keys) {\n\t\t\t\tresponse.push(await storageMap[req.params.prefix].get(key))\n\t\t\t}\n\t\t  \tres.json(response)\n\t\t})\n\t})\n\n\tapp.listen(config.port || RestDefaultConfig.port)\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/rest/state.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 97,
+    "kind": "function",
+    "name": "ExposeStorageState",
+    "memberof": "src/rest/state.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/rest/state.js~ExposeStorageState",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/rest/state.js",
+    "importStyle": "{ExposeStorageState}",
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true,
+    "params": [
+      {
+        "name": "storageMap",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "config",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "return": null
+  },
+  {
+    "__docId__": 98,
+    "kind": "file",
+    "name": "src/shared/event-emitter.js",
+    "content": "'use strict'\n\nimport EventEmitter from 'events'\n\nconst _eventEmitter = new EventEmitter()\n\nexport const eventEmitter = _eventEmitter",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/shared/event-emitter.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 99,
+    "kind": "variable",
+    "name": "_eventEmitter",
+    "memberof": "src/shared/event-emitter.js",
+    "static": true,
+    "longname": "src/shared/event-emitter.js~_eventEmitter",
+    "access": "private",
+    "export": false,
+    "importPath": "@dev.smartpricing/verostream/src/shared/event-emitter.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 100,
+    "kind": "variable",
+    "name": "eventEmitter",
+    "memberof": "src/shared/event-emitter.js",
+    "static": true,
+    "longname": "src/shared/event-emitter.js~eventEmitter",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/shared/event-emitter.js",
+    "importStyle": "{eventEmitter}",
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 101,
+    "kind": "file",
+    "name": "src/storage/cassandra.js",
+    "content": "/**\nCREATE KEYSPACE vs WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};\n\ncreate table vs.storage (\n\tid text,\n\tkey text,\n    value text,\n    s_uuid uuid,\n    PRIMARY KEY (id, key)\n);\n\ncreate table vs.liststorage (\n\tid text,\n\tkey text,\n\ts_uuid uuid,\n    value text,\n    PRIMARY KEY (id, key, s_uuid)\n) with clustering order by (key asc, s_uuid asc);\n**/\n\n'use strict'\n\nimport { v4 as uuidv4 } from 'uuid'\nimport cassandra from 'cassandra-driver'\nimport { CassandraDefaultConfig } from '../config/storage.js'\n\nexport function Make (config, id) {\n\tconst _config = config == null ? CassandraDefaultConfig : config \n\tconst db = new cassandra.Client(_config)\t\n\tconst composeKey = (key) => {\n\t\treturn id + '.' + key\n\t}  \n\treturn {\n\n\t\tset: async function (key, value) {\n\t\t\tawait db.execute(`UPDATE storage SET value=?, s_uuid=uuid() WHERE id=? AND key=?`,\n\t\t\t\t[JSON.stringify(value), id, key], \n\t\t\t\t{ prepare: true })\n\t\t},\t\n\n\t\tget: async function (key) {\n\t\t\tconst result = await db.execute(`SELECT id, key, value from storage WHERE id=? AND key=?`,\n\t\t\t\t[id, key], \n\t\t\t\t{ prepare: true })\t\t\t\n\t\t\tif (result.rows.length == 1) {\n\t\t\t\treturn result.rows.map((r) => { return JSON.parse(r.value) })[0]\n\t\t\t} if (result.rows.length == 0) {\n\t\t\t\treturn null\n\t\t \t} else {\n\t\t\t\treturn result.rows.map((r) => { return JSON.parse(r.value) })\n\t\t\t}\n\t\t},\n\n\t\tpush: async function (key, value) {\n\t\t\tawait db.execute(`INSERT INTO liststorage (id, key, s_uuid, value) VALUES (?,?,uuid(),?)`,\n\t\t\t\t[id, key, JSON.stringify(value)], \n\t\t\t\t{ prepare: true })\n\t\t},\n\n\t\tgetList: async function (key) {\n\t\t\tconst result = await db.execute(`SELECT id, key, value from liststorage WHERE id=? AND key=?`,\n\t\t\t\t[id, key], \n\t\t\t\t{ prepare: true })\n\t\t\treturn result.rows.map((r) => { return JSON.parse(r.value) })\t\t\t\n\t\t},\n\n\t\tflush: async function (key) {\n\t\t\tawait db.execute(`DELETE from liststorage WHERE id=? AND key=?`,\n\t\t\t\t[id, key],\n\t\t\t\t{ prepare: true })\n\t\t}\n\n\t}\n}\n",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/storage/cassandra.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 102,
+    "kind": "function",
+    "name": "Make",
+    "memberof": "src/storage/cassandra.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/storage/cassandra.js~Make",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/storage/cassandra.js",
+    "importStyle": "{Make}",
+    "description": null,
+    "lineNumber": 27,
+    "undocument": true,
+    "params": [
+      {
+        "name": "config",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "id",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"set\": *, \"get\": *, \"push\": *, \"getList\": *, \"flush\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 103,
+    "kind": "file",
+    "name": "src/storage/interface.js",
+    "content": "'use strict'\n\nimport * as Memory from './memory.js'\nimport * as Level from './level.js'\nimport * as Redis from './redis.js'\nimport * as Cassandra from './cassandra.js'\n\nexport function Make (kind, config = null, id = null) {\n\tswitch (kind) {\n\t\tcase 'Memory':\n\t\t\treturn Memory.Make()\n\t\t\n\t\tcase 'Level':\n\t\t\tif (id == null || typeof id !== 'string') {\n\t\t\t\tthrow 'Id cannot be null and have to be a String'\t\n\t\t\t}\n\t\t\treturn Level.Make(config, id)\n\n\t\tcase 'Redis':\n\t\t\tif (id == null || typeof id !== 'string') {\n\t\t\t\tthrow 'Id cannot be null and have to be a String'\t\n\t\t\t}\n\t\t\treturn Redis.Make(config, id)\n\n\t\tcase 'Redis':\n\t\t\tif (id == null || typeof id !== 'string') {\n\t\t\t\tthrow 'Id cannot be null and have to be a String'\t\n\t\t\t}\n\t\t\treturn Redis.Make(config, id)\n\n\t\tcase 'Cassandra':\n\t\t\tif (id == null || typeof id !== 'string') {\n\t\t\t\tthrow 'Id cannot be null and have to be a String'\t\n\t\t\t}\n\t\t\treturn Cassandra.Make(config, id)\n\n\t\tdefault:\n\t\t\tthrow 'Unknown storage kind'\n\t}\n}\n\nexport const Kind = {\n\tMemory: 'Memory',\n\tLevel:  'Level',\n\tRedis:  'Redis',\n\tCassandra: 'Cassandra'\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/storage/interface.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 104,
+    "kind": "function",
+    "name": "Make",
+    "memberof": "src/storage/interface.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/storage/interface.js~Make",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/storage/interface.js",
+    "importStyle": "{Make}",
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "params": [
+      {
+        "name": "kind",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "config",
+        "optional": true,
+        "types": [
+          "undefined"
+        ],
+        "defaultValue": "undefined"
+      },
+      {
+        "name": "id",
+        "optional": true,
+        "types": [
+          "undefined"
+        ],
+        "defaultValue": "undefined"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 105,
+    "kind": "variable",
+    "name": "Kind",
+    "memberof": "src/storage/interface.js",
+    "static": true,
+    "longname": "src/storage/interface.js~Kind",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/storage/interface.js",
+    "importStyle": "{Kind}",
+    "description": null,
+    "lineNumber": 42,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"Memory\": string, \"Level\": string, \"Redis\": string, \"Cassandra\": string}"
+      ]
+    }
+  },
+  {
+    "__docId__": 106,
+    "kind": "file",
+    "name": "src/storage/level.js",
+    "content": "'use strict'\n\nimport { Level } from 'level'\n\nexport function Make (config, id) {\n\tlet _config = {\n\t\tpath: 'localdb'\n\t}\n\tif (config !== null && config.path !== undefined && config.path !== null) {\n\t\t_config.path = config.path\n\t}\n\n\tlet db = new Level(_config.path + '/' + id, { valueEncoding: 'json' })\n\tdb.open()\n\tconst composeKey = (key) => {\n\t\treturn id + '-' + key\n\t}  \t\n\treturn {\n\n\t\tset: async function (key, value) {\n\t\t\t//console.log(composeKey(key), value)\n\t\t\tawait db.put(composeKey(key), value)\n\t\t},\t\t\n\n\t\tget: async function (key) {\n\t\t\tlet values = null\n\t\t\ttry {\n\t\t\t\tvalues = await db.get(composeKey(key))\n\t\t\t} catch (error) {}\t\t\t\n\t\t\treturn values\n\t\t},\t\t\n\n\t\tpush: async function (key, value) {\n\t\t\tlet values = []\n\t\t\ttry {\n\t\t\t\tvalues = await db.get(composeKey(key))\n\t\t\t} catch (error) {}\n\n\t\t\tvalues.push(value)\n\t\t\tawait db.put(composeKey(key), values)\n\t\t},\n\n\t\tgetList: async function (key) {\n\t\t\tlet values = []\n\t\t\ttry {\n\t\t\t\tvalues = await db.get(composeKey(key))\n\t\t\t} catch (error) {}\t\t\t\n\t\t\treturn values\n\t\t},\n\n\t\tflush: async function (key) {\n\t\t\tdb.del(composeKey(key))\n\t\t}\n\n\t}\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/storage/level.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 107,
+    "kind": "function",
+    "name": "Make",
+    "memberof": "src/storage/level.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/storage/level.js~Make",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/storage/level.js",
+    "importStyle": "{Make}",
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true,
+    "params": [
+      {
+        "name": "config",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "id",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"set\": *, \"get\": *, \"push\": *, \"getList\": *, \"flush\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 108,
+    "kind": "file",
+    "name": "src/storage/memory.js",
+    "content": "'use strict'\n\nexport function Make () {\n\treturn {\n\t\tstate: {},\n\n\t\tset: async function (key, value) {\n\t\t\tthis.state[key] = value\n\t\t},\n\n\t\tget: async function (key) {\n\t\t\tconst val = this.state[key]\n\t\t\tif (val == undefined) {\n\t\t\t\treturn null\n\t\t\t} \n\t\t\treturn val\n\t\t},\n\n\t\tpush: async function (key, value) {\n\t\t\tif (this.state[key] == undefined) {\n\t\t\t\tthis.state[key] = []\n\t\t\t}\n\t\t\tthis.state[key].push(value)\n\t\t},\n\n\t\tgetList: async function (key) {\n\t\t\tconst val = this.state[key]\n\t\t\tif (val == undefined) {\n\t\t\t\treturn null\n\t\t\t} \n\t\t\treturn val\n\t\t},\n\n\t\tflush: async function (key) {\n\t\t\tdelete this.state[key]\n\t\t}\n\n\t}\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/storage/memory.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 109,
+    "kind": "function",
+    "name": "Make",
+    "memberof": "src/storage/memory.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/storage/memory.js~Make",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/storage/memory.js",
+    "importStyle": "{Make}",
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "params": [],
+    "return": {
+      "types": [
+        "{\"state\": *, \"set\": *, \"get\": *, \"push\": *, \"getList\": *, \"flush\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 110,
+    "kind": "file",
+    "name": "src/storage/redis.js",
+    "content": "'use strict'\n\nimport Redis from 'ioredis'\nimport { RedisDefaultConfig } from '../config/storage.js'\n\nexport function Make (config, id) {\n\tconst db = new Redis.default(config == null ? RedisDefaultConfig : config)\n\tconst composeKey = (key) => {\n\t\treturn id + '.' + key\n\t}  \n\treturn {\n\n\t\tset: async function (key, value) {\n\t\t\tawait db.set(composeKey(key), JSON.stringify(value))\n\t\t},\t\n\n\t\tget: async function (key, value) {\n\t\t\treturn JSON.parse(await db.get(composeKey(key)))\n\t\t},\n\n\t\tpush: async function (key, value) {\n\t\t\tawait db.rpush(composeKey(key), JSON.stringify(value))\n\t\t},\n\n\t\tgetList: async function (key) {\n\t\t\treturn (await db.lrange(composeKey(key), 0, -1)).map((v) => { return JSON.parse(v) })\n\t\t},\n\n\t\tflush: async function (key) {\n\t\t\tdb.del(composeKey(key))\n\t\t}\n\n\t}\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/storage/redis.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 111,
+    "kind": "function",
+    "name": "Make",
+    "memberof": "src/storage/redis.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/storage/redis.js~Make",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/storage/redis.js",
+    "importStyle": "{Make}",
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true,
+    "params": [
+      {
+        "name": "config",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "id",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"set\": *, \"get\": *, \"push\": *, \"getList\": *, \"flush\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 112,
+    "kind": "file",
+    "name": "src/task/task.js",
+    "content": "'use strict'\n\nimport * as SourceOperators from '../operators/source.js'\nimport * as SinkOperators from '../operators/sink.js'\nimport * as BaseOperators from '../operators/base.js'\nimport * as WindowOperators from '../operators/window.js'\nimport * as ArrayOperators from '../operators/array.js'\nimport * as ObjectOperators from '../operators/object.js'\nimport * as CustomOperators from '../operators/custom.js'\nimport * as SharedOperators from '../operators/shared.js'\nimport * as StorageOperators from '../operators/storage.js'\n\nexport default function () {\n\tlet task = {\n\t\t_obs: [] // Observable array\n\t}\n\n\ttask.lastObservable = () => task._obs[task._obs.length - 1]\n\ttask.setNextObservable = (next) => task._obs.push(next)\n\n\ttask.self = (cb) => {\n\t\tcb(task)\n\t\treturn task\n\t} \n\n\tObject.assign(\n\t\ttask, \n\t\tSourceOperators.fromStream,\n\t\tSourceOperators.fromKafka,\n\t\tSourceOperators.fromEvent,\n\t\tSourceOperators.fromSharedEvent,\n\t\tSourceOperators.fromArray,\n\t\tSinkOperators.toKafka,\n\t\tBaseOperators.withMetadata,\n\t\tBaseOperators.keyBy, \n\t\tBaseOperators.withDefaultKey,\n\t\tBaseOperators.withEventTime,\n\t\tWindowOperators.tumblingWindowCount,\n\t\tWindowOperators.tumblingWindowTime,\n\t\tWindowOperators.sessionWindowTime,\n\t\tBaseOperators.filter,\n\t\tArrayOperators.groupBy,\n\t\tArrayOperators.each,\n\t\tArrayOperators.count,\n\t\tArrayOperators.flat,\n\t\tArrayOperators.reduce,\n\t\tCustomOperators.customFunction,\n\t\tObjectOperators.sumMap,\n\t\tObjectOperators.aggregate,\n\t\tBaseOperators.print,\n\t\tSharedOperators.withSharedEventEmitter,\n\t\tStorageOperators.withStorage,\n\t)\n\n\treturn task\n}\n",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/task/task.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 113,
+    "kind": "function",
+    "name": "task",
+    "memberof": "src/task/task.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/task/task.js~task",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/task/task.js",
+    "importStyle": "task",
+    "description": null,
+    "lineNumber": 13,
+    "undocument": true,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 114,
+    "kind": "file",
+    "name": "src/watermark/watermark.js",
+    "content": "'use strict'\n\nimport { WatermarkPrefix } from '../config/constant.js'\n\nexport function Watermark (storage) {\n    const keyWatermarkPrefix = (key) => { return WatermarkPrefix + key }\n\n    return {\n        _watermarks: storage,\n    \n        async setWatermark (key, timestamp) {\n            await this._watermarks.set(keyWatermarkPrefix(key), timestamp)\n            return this\n        },\n    \n        async getWatermark (key) {\n            return await this._watermarks.get(keyWatermarkPrefix(key))\n        },\n        \n        async clearWatermark (key) {\n            await this._watermarks.flush(keyWatermarkPrefix(key))\n        }\n    }\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/watermark/watermark.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 115,
+    "kind": "function",
+    "name": "Watermark",
+    "memberof": "src/watermark/watermark.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/watermark/watermark.js~Watermark",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/watermark/watermark.js",
+    "importStyle": "{Watermark}",
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true,
+    "params": [
+      {
+        "name": "storage",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 116,
+    "kind": "file",
+    "name": "src/window/window.js",
+    "content": "'use strict'\n\nimport { WindowMetadataPrefix } from '../config/constant.js'\nimport Log from '../logger/default.js'\n\nexport function MakeWindow (storage) {\n\treturn {\n\t\t_storage: storage,\n\n\t\t// Loaded from storage on window open,\n\t\t// then updated in memory\n\t\t_bufferSize: 0,\n\n\t\t// In case of persistent storages\n\t\t// this cache allow to store\n\t\t// metadata once in each event\n\t\t// processing\n\t\t_cacheMetadata: null,\n\n\t\t// You must call this method each time you change a key\n\t\tloadMetadata: async function (key) {\n\t\t\tthis._cacheMetadata = await this._storage.get(this.metadataKey(key))\n\t\t},\n\n\t\tbuffer: async function (key) {\n\t\t\treturn this._cacheMetadata == null ? [] : await this._storage.getList(key)\n\t\t},\n\n\t\tbufferSize: async function (key) {\n\t\t\treturn this._bufferSize\t\n\t\t},\t\t\n\n\t\tpush: async function (key, value) {\n\t\t\tawait this._storage.push(key, value)\n\t\t\t//await this._storage.set('kafka-offset.' + value.topic, {offset: value.offset, partition: value.partition, topic: value.topic})\n\t\t\tthis._bufferSize += 1\n\t\t},\n\n\t\tisOpen: async function (key) {\n\t\t\treturn this._cacheMetadata == null ? false : this._cacheMetadata.open\n\t\t},\t\n\n\t\thasBeenClosed: async function (key) {\n\t\t\treturn this._cacheMetadata == null ? false : this._cacheMetadata.endTime !== null && this._cacheMetadata.open == false\n\t\t},\t\t\t\n\n\t\tstartTime: async function (key) {\n\t\t\treturn this._cacheMetadata == null ? null : this._cacheMetadata.startTime\n\t\t},\t\n\n\t\topen: async function (key, startTime) {\n\t\t\tconst elements = (await this._storage.getList(key))\n\t\t\tthis._bufferSize = elements !== null ? elements.length : 0\n\t\t\tconst metadata = {\n\t\t\t\topen: true,\n\t\t\t\tstartTime: startTime,\n\t\t\t\tendTime: null\t\t\n\t\t\t}\n\t\t\tthis._cacheMetadata = metadata\n\t\t\tawait this._storage.set(this.metadataKey(key), metadata)\n\t\t\tLog('info', ['Window open', key, metadata.startTime, metadata.endTime])\n\t\t},\n\n\t\tclose: async function (key, endTime) {\n\t\t\tlet metadata = await this._storage.get(this.metadataKey(key))\n\t\t\tmetadata.open = false\n\t\t\tmetadata.endTime = endTime\n\t\t\tthis._cacheMetadata = metadata\n\n\t\t\tconst windowData = await this._storage.getList(key)\n\t\t\tif (windowData !== null) {\n\t\t\t\twindowData.map((wd) => {\n\t\t\t\t\twd._windowKey = key \n\t\t\t\t\twd._starTime = metadata.startTime\n\t\t\t\t\twd._endTime = metadata.endTime \n\t\t\t\t})\n\t\t\t}\n\t\t\tLog('info', ['Window close', key, metadata.startTime, metadata.endTime])\n\t\t\tthis.onClose(key, windowData)\n\t\t\tthis._storage.flush(key)\n\t\t\tthis._storage.set(this.metadataKey(key), metadata)\n\t\t},\n\n\t\tonClose: function (self) { console.log('to override') },\n\n\t\tmetadataKey: function (key) {\n\t\t\treturn WindowMetadataPrefix + key\n\t\t}\n\t}\n}",
+    "static": true,
+    "longname": "/Users/as/Work/sm/verostream/src/window/window.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 117,
+    "kind": "function",
+    "name": "MakeWindow",
+    "memberof": "src/window/window.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/window/window.js~MakeWindow",
+    "access": "public",
+    "export": true,
+    "importPath": "@dev.smartpricing/verostream/src/window/window.js",
+    "importStyle": "{MakeWindow}",
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true,
+    "params": [
+      {
+        "name": "storage",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"_storage\": *, \"_bufferSize\": *, \"_cacheMetadata\": *, \"loadMetadata\": *, \"buffer\": *, \"bufferSize\": *, \"push\": *, \"isOpen\": *, \"hasBeenClosed\": *, \"startTime\": *, \"open\": *, \"close\": *, \"onClose\": *, \"metadataKey\": *}"
+      ]
+    }
+  },
+  {
+    "kind": "index",
+    "content": "# VeroStream\n\n## Install\n\n```sh\nnpm install --save @dev.smartpricing/verostream\n```\n\n## Example usage\n\nSee the dev folder to get more complete (and functional) examples.\n\n```js\nimport { \n\tTask, \n\tStorageKind, \n\tKafkaClient, \n\tKafkaSource, \n\tMakeStorage,\n\tKafkaSink \n} from '@dev.smartpricing/verostream'\n\n// Setup local kafkajs client\nconst localClient = KafkaClient({\n\tclientId: 'nsp-test-loc-1',\n\tbrokers: ['localhost:9092']  \n})\n\n// Set source topic and parsing function\nconst sourceSessionLog = await KafkaSource(localClient, {\n\tgroupId: 'nps-consumer-1',\n\ttopics: [{\n\t\ttopic: 't-session-test', \n\t\tfromBeginning: false\n\t}]\n})\n\n// Process stream\nTask()\n.setMetadata('mywinkafka')\n.fromKafka(sourceSessionLog)\n.keyBy(mex => mex.value.pmsId)\n.tumblingWindowCount(MakeStorage(StorageKind.Memory), 5)\n.each((element) => {  \n\telement.value.warnings = element.value.warnings * 10\n\treturn element\n})\n.reduce((element) => {\n\treturn element.value.warnings\n})\n.print()\n```\n\n## Doc\n\n### Kafka\n\nWraps directly KafkaJs package.\n\n```js\nimport { \n\tKafkaClient, \n\tKafkaSource, \n\tKafkaSink \n} from '@dev.smartpricing/verostream'\n\n// Client, same options as KafkaJs\nconst client = KafkaClient({\n\tclientId: 'nsp-test-loc-1',\n\tbrokers: ['localhost:9092']  \n})\n\n// Consumer as source\nconst source = await KafkaSource(client, {\n\tgroupId: 'nps-consumer-1',\n\ttopics: [{\n\t\ttopic: 't-session-test', \n\t\tfromBeginning: false,\n\t\tautoCommit: false // Default true \n\t}]\n})\n\n// Producer as sink\nconst sink = await KafkaSink(client)\n\n// Rekey\nawait KafkaRekey(source, s => s.newKey, sink, (s) => { return { key: s.key, value: JSON.stringify(s.value)} })\n```\n\n### Windows\n\nEmbedded inside tasks\n\n```js\n\nimport { \n\tTask,\n\tStorageKind\n} from '@dev.smartpricing/verostream'\n\nTask(). <source> .tumblingWindowTime(MakeStorage(StorageKind.Memory, null, \"1\"),  1000 * 60 * 5) // 5 minutes window\nTask(). <source> .tumblingWindowCount(MakeStorage(StorageKind.Memory, null, \"1\"), 50) // 50 elements window\nTask(). <source> .sessionWindowTime(MakeStorage(StorageKind.Memory, null, \"1\"), 10 * 1000) // 10 seconds inactivity time\n\n```\n\n### Operators\n\nEmbedded inside tasks\n\n```js\n\n// Attach a source stream to a task\nTask().fromStream(STREAM_SOURCE)\n\nTask().fromKafka(KAFKA_SOURCE)\n\nTask().fromSharedEvent(EVENT_NAME)\n\nTask().fromEvent(EVENT_EMITTER, EVENT_NAME)\n\nTask().fromArray(ARRAY)\n\n// Emit shared event\nTask().emitSharedEvent(EVENT_NAME, DATA)\n\n// Set an ID to a task\nTask().setMetadata(ID)\n\n// Split task by item key, must return a string\nTask().keyBy(m => m.myKey)\n\n// Set event time function, must return a valid JS date\n// if not setted, the system will use processing time\nTask().withEventTime(m => new Date(m.timestamp))\n\n// Tumbling by window size\nTask().tumblingWindowCount(STORAGE, MAX_SIZE)\n\n// Tumbling by window time\nTask().tumblingWindowTime(STORAGE, WINDOW_TIME_MILLISECONDS, INACTIVITY_TIME_MILLISECONDS = null)\n\n// Session window\nTask().sessionWindowTime(STORAGE, INACTIVITY_TIME_MILLISECONDS)\n\n// Filter message one by one\nTask().filter(m => m.name == 'alice')\n\n// Group by array, returns object with keys/array of grouped elements\nTask().groupBy(m => m.groupByThisValue)\n\n// Manage array items one by one\nTask().each()\n\n// Array length\nTask().count()\n\n// Flat array of arrays\nTask().flat()\n\n// Sum values array for each object key \nTask().sumMap()\n\n// Reduce\nTask().reduce(m => m.warnings)\n\n// Reduce\nTask().customFunction((element, trigger) => {\n\t// process element\n\ttrigger(element)\n})\n\nTask().aggregate(STORAGE, NAME, AGGREGATE_FUNCTION)\n\n// Save data to storage\nTask().toStorage(s => s.key)\n// Append to the current processing array data from storage\nTask().fromStorage(s => [(parseInt(s.key) - 1]).toString())\n\n// Print pipeline state\nTask().print()\n```\n\n### Expose storage via REST\n\n```js\n\nimport { \n\tStorageKind,\n\tMakeStorage,\n\tExposeStorageState\n} from '@dev.smartpricing/verostream'\n\nExposeStorageState({'result': MakeStorage(StorageKind.Redis, null, 'result')})\n```\n\n### Kafka manual commit\n\n```js\nimport { \n\tKafkaClient,\n\tKafkaSource,\n\tKafkaCommit,\n\tStorageKind,\n\tMakeStorage\n} from '@dev.smartpricing/verostream'\n\nconst localClient = KafkaClient({\n\tclientId: 'nsp-test-loc-1',\n\tbrokers: ['localhost:9092']  \n})\n\nconst source = await KafkaSource(localClient, {\n\tgroupId: 'nps-consumer-1',\n\ttopics: [{\n\t\ttopic: 't-session-test-2', \n\t\tfromBeginning: false,\n\t\tautoCommit: false\n\t}]\n})\n\nTask()\n.fromKafka(source)\n.customFunction((s, t) => {\n\tKafkaCommit(source.consumer(), s)\n\tt({key: s.key, value: JSON.stringify(s.value)})\n})\n.print(\">\")\n```\n\n### Kafka sink\n\n```js\nimport { \n\tKafkaClient,\n\tKafkaSource,\n\tKafkaCommit,\n\tStorageKind,\n\tMakeStorage\n} from '@dev.smartpricing/verostream'\n\nconst localClient = KafkaClient({\n\tclientId: 'nsp-test-loc-1',\n\tbrokers: ['localhost:9092']  \n})\n\nconst source = await KafkaSource(localClient, {\n\tgroupId: 'nps-consumer-1',\n\ttopics: [{\n\t\ttopic: 't-session-test-2', \n\t\tfromBeginning: false,\n\t\tautoCommit: false\n\t}]\n})\n\nlet sink = await KafkaSink(localClient)\n\nTask()\n.fromKafka(source)\n.toKafka(sink, 't-session-test-out')\n.print(\">\")\n```\n\n### Available storages\n\nMemory, Level, Redis, Cassandra\n\nFor Cassandra, you have to manually create the keyspace and the tables on your DB:\n\n```cql\nCREATE KEYSPACE vs WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};\n\nCREATE TABLE vs.storage (\n\tid text,\n\tkey text,\n    value text,\n    s_uuid uuid,\n    PRIMARY KEY (id, key)\n);\n\nCREATE TABLE vs.liststorage (\n\tid text,\n\tkey text,\n\ts_uuid uuid,\n    value text,\n    PRIMARY KEY (id, key, s_uuid)\n) WITH CLUSTERING ORDER BY (key asc, s_uuid asc);\n```",
+    "longname": "/Users/as/Work/sm/verostream/README.md",
+    "name": "./README.md",
+    "static": true,
+    "access": "public"
+  },
+  {
+    "kind": "packageJSON",
+    "content": "{\n  \"name\": \"@dev.smartpricing/verostream\",\n  \"version\": \"0.2.0\",\n  \"description\": \"\",\n  \"main\": \"index.js\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"VS_LOG_LEVEL='-' node --experimental-vm-modules ./node_modules/.bin/jest --rootDir=tests\"\n  },\n  \"author\": \"Alice Setti @ Smartpricing\",\n  \"license\": \"ISC\",\n  \"dependencies\": {\n    \"cassandra-driver\": \"^4.6.4\",\n    \"express\": \"^4.18.2\",\n    \"ioredis\": \"^5.2.4\",\n    \"kafkajs\": \"^2.2.2\",\n    \"level\": \"^8.0.0\",\n    \"rxjs\": \"^7.5.7\",\n    \"rxjs-for-await\": \"^1.0.0\",\n    \"uuid\": \"^9.0.0\"\n  },\n  \"devDependencies\": {\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"jest\": \"^29.3.1\"\n  }\n}\n",
+    "longname": "/Users/as/Work/sm/verostream/package.json",
+    "name": "package.json",
+    "static": true,
+    "access": "public"
+  }
+]

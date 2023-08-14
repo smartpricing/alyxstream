@@ -1,5 +1,3 @@
-<img src="misc/logo.png" alt="Alyxstream temp logo" width="150">
-
 # Alyxstream
 
 Alyxstream is a library that simplify stream processing in Node.js. We use it in production to make real time logs analysis, errors detection, parallel job processing, using mainly Kafka as source and Cassandra and Redis as sinks. Although it's not perfect and still under active development, this library could help you to solve a lot of processing problems, with a nice dataflow syntax.

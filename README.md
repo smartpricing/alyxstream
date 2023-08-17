@@ -2,6 +2,8 @@
 
 Alyxstream is a library that simplify stream processing in Node.js. We use it in production to make real time logs analysis, errors detection, parallel job processing, using mainly Kafka as source and Cassandra and Redis as sinks. Although it's not perfect and still under active development, this library could help you to solve a lot of processing problems, with a nice dataflow syntax.
 
+Working usage examples are in the *usage-examples* folder.
+
 ## Table of contents
 
 1. [Introduction](#introduction)
@@ -19,7 +21,7 @@ Alyxstream is a library that simplify stream processing in Node.js. We use it in
 Install it:
 
 ```sh
-npm install alyxstream
+npm install @dev.smartpricing/alyxstream
 ```
 
 ```js
@@ -29,24 +31,27 @@ import {
 	StorageKind, 
 	KafkaClient, 
 	KafkaSource 
-} from 'alyxstream'
+} from '@dev.smartpricing/alyxstream'
 
 const kafkaSource = KafkaSource(KafkaClient())
 
 await Task()
 .withStorage(MakeStorage(StorageKind.Cassandra, null, 'hotel.errors.count'))
 .fromKafka(kafkaSource)
+.setLocalKV('kafka-mex', x => x)
+.withEventTime(x => x.eventTime)
+.keyBy(x => x.partition)
 .map(x => x.value)
 .filter(x => x.warningLevel == 'error')
-.keyBy(x => x.partition)
-.withEventTime(x => x.eventTime)
 .slidingWindowTime(MakeStorage(StorageKind.Redis, null, 'my.window'), 5 * 60 * 1000, 60 * 1000)
 .groupBy(x => x.hotelName)
 .sumMap()
 .toStorage(x => 'result', x => x)
+.getLocalKV('kafka-mex')
 .kafkaCommit(kafkaSource)
 .close()
 ```
+
 ## Stream/batch sources  <a name="sources"></a>
 
 Alyxstream supports multiple sources by default, both for streaming and batch processing. It'also very easy to build your custom sources.
@@ -59,7 +64,7 @@ import {
 	Task, 	
 	KafkaClient, 
 	KafkaSource
-} from 'Alyxstream'
+} from '@dev.smartpricing/alyxstream'
 ```
 
 *For every Task, remember to call the **close** method at the end of the task pipeline. The close method signal the Task that it can start to process the data stream*
@@ -233,24 +238,17 @@ await Task()
 // }
 ```
 
-TODO
-*objectGroupBy* take an array and returns an object
+### Aggregate
 
 ```js
-await Task()
-.fromObject([ {name: 'Alice'}, {name: 'Andrea'}, {name: 'Paolo'}, {name: 'Alice'} ])
-.objectGroupBy(x => x.name)
-.print() 
-.close()
-// {
-// 	Alice: 2,
-// 	Paolo: 1,
-// 	Andrea: 1
-// }
-```
+const storage = MakeStorage(StorageKind.Memory, null, 'example')
 
-TODO
-*aggregate*
+const t = await Task()
+.fromArray(['hello', 'hello', 'alice'])
+.aggregate(storage, 'ex', x => x)
+.sumMap()
+.print('> step result:')
+```
 
 ## Custom functions <a name="custom"></a>
 
@@ -328,7 +326,7 @@ import {
 	Task, 
 	MakeStorage, 
 	StorageKind
-} from 'alyxstream'
+} from '@dev.smartpricing/alyxstream'
 
 const redisConfig = {} // default to localhost:6379
 const exampleWindowStorage = MakeStorage(StorageKind.Redis, redisConfig, 'windowStorageId')
@@ -386,7 +384,7 @@ KafkaClient:
 ```js
 import { 
 	KafkaClient
-} from 'alyxstream'
+} from '@dev.smartpricing/alyxstream'
 
 const kafkaClient = KafkaClient({
 	clientId: 'my-client'
@@ -405,7 +403,7 @@ KafkaSource:
 ```js
 import { 
 	KafkaSource
-} from 'alyxstream'
+} from '@dev.smartpricing/alyxstream'
 
 const topic = {
 	topic: 'my-topic',
@@ -422,8 +420,10 @@ const kafkaSource = KafkaSource(kafkaClient, {
 
 ## Redis queue <a name="redisqueue"></a>
 
+Redis queue use Redis list with BRPOP command in order to distrubute jobs between workers:
+
 ```js
-import { Task, MakeStorage, StorageKind } from 'alyxstream'
+import { Task, MakeStorage, StorageKind } from '@dev.smartpricing/alyxstream'
 
 const queueStorage = MakeStorage(StorageKind.Redis, null, 'my-queue')
 
@@ -473,7 +473,7 @@ Alyxstream supports out of the box three kind of storage: memory, Redis and Cass
 Memory and Redis storage are suitable for windows state storage.
 
 ```js
-import { MakeStorage, StorageKind } from 'alyxstream'
+import { MakeStorage, StorageKind } from '@dev.smartpricing/alyxstream'
 
 const memStorage = MakeStorage(StorageKind.Memory, null, 'storage-1')
 
@@ -498,7 +498,7 @@ const cassandraStorageClient = cassandraStorage.db() // cassandra-driver
 
 
 ```js
-import { Task } from 'alyxstream'
+import { Task } from '@dev.smartpricing/alyxstream'
 
 await Task()
 .withLocalKVStorage()
@@ -512,7 +512,7 @@ await Task()
 You can create your custom functions and call the functions from a task:
 
 ```js
-import { Task, ExtendTask, ExtendTaskRaw } from 'alyxstream'
+import { Task, ExtendTask, ExtendTaskRaw } from '@dev.smartpricing/alyxstream'
 
 export const multiplyBy = ExtendTask('multiplyBy', async function (x, multiplier) {
     return x * multiplier

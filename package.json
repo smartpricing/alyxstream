@@ -1,6 +1,6 @@
 {
   "name": "@dev.smartpricing/alyxstream",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -26,5 +26,6 @@
     "esdoc-standard-plugin": "^1.0.0",
     "jest": "^29.3.1",
     "ts": "^0.2.2"
-  }
+  },
+  "keywords": ["stream", "streamprocessing", "kafka", "dataflow", "kafka stream", "batch", "stream processing"]
 }

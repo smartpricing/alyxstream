@@ -15,7 +15,7 @@ function _kafkaCommit (kafkaConsumer, value) {
  *  
  */
 
-export default async function KafkaCommit (x, kafkaSource) {
+export default async function kafkaCommit (kafkaSource, x) {
 	const partition = x.partition
 	const offset = x.offset
 	const topic = x.topic

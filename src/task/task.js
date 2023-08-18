@@ -108,6 +108,7 @@ export default function (id) {
 		SourceOperators.fromReadableStream,
 
 		SinkOperators.toKafka,
+		SinkOperators.kafkaCommit,
 
 		WindowOperators.tumblingWindowTime,
 		WindowOperators.tumblingWindowCount,

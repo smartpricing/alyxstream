@@ -1,6 +1,6 @@
 'use strict'
 
-const appLogLevel = process.env.VS_LOG_LEVEL == undefined ? 'info' : process.env.VS_LOG_LEVEL
+const appLogLevel = process.env.ALYXSTREAM_LOG_LEVEL == undefined ? 'info' : process.env.ALYXSTREAM_LOG_LEVEL
 
 export default function (level, itemsAry) {
 	switch (level) {

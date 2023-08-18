@@ -36,6 +36,7 @@ import {
 const kafkaSource = KafkaSource(KafkaClient())
 
 await Task()
+.withLocalKVStorage()
 .withStorage(MakeStorage(StorageKind.Cassandra, null, 'hotel.errors.count'))
 .fromKafka(kafkaSource)
 .setLocalKV('kafka-mex', x => x)

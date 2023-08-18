@@ -19,7 +19,6 @@ export default async function KafkaCommit (x, kafkaSource) {
 	const partition = x.partition
 	const offset = x.offset
 	const topic = x.topic
-	Interface.LogStandard('Committed', topic, partition, offset)
 	_kafkaCommit(kafkaSource.consumer(), {
 		topic: topic,
 		partition: partition,

@@ -12,6 +12,8 @@ import * as QueueOperators from '../operators/queue.js'
 import * as CustomOperators from '../operators/custom.js'
 import * as StorageOperators from '../operators/storage.js'
 import * as LocalStorageOperators from '../task-storage/task-storage.js'
+import * as ParallelProcess from '../parallel/process.js'
+
 
 export default function (id) {
 	let task = {
@@ -114,7 +116,9 @@ export default function (id) {
 		WindowOperators.tumblingWindowCount,
 		WindowOperators.slidingWindowCount,
 		WindowOperators.slidingWindowTime,
-		WindowOperators.sessionWindowTime
+		WindowOperators.sessionWindowTime,
+
+		ParallelProcess.parallel
 	)
 
 	Object.assign(task, extensions)

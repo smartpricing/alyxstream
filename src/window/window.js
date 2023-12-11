@@ -199,7 +199,15 @@ export function MakeWindowSlidingCount (storage) {
 		const size = await baseWindow.size(key)
 		if (size == windowMetadata.maxSize) {
 			const winres = (await this._storage.getList(key))
-			return winres
+			return { payload: winres, metadata: {
+				windowKey: key,
+				startTime: null,
+				endTime: null,
+				windowTimeInSeconds: null,
+				windowTimeInMinutes: null,
+				windowTimeInHours: null,
+				windowElements: winres
+			}}
 		} else if (size == windowMetadata.maxSize + windowMetadata.slideSize) {
 			// remove windowMetadata.slideSize elements from head
 			const winres = (await this._storage.sliceCountAndGet(key, windowMetadata.slideSize))

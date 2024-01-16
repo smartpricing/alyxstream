@@ -9,7 +9,7 @@ export const queueSize = {
         const index = task._nextIndex()
         task._setNext(async (s) => {
         	const res = await Queue.queueSize(storage)
-            await task._nextAtIndex(index)(Message(res, null, null))
+            await task._nextAtIndex(index)(Message(res))
         })
         return task
     }
@@ -34,7 +34,7 @@ export const dequeue = {
         task._setNext(async (s) => {
         	while (true) {
             	const mex = await Queue.dequeue(storage)
-            	await task._nextAtIndex(index)(Message(mex, null, null))
+            	await task._nextAtIndex(index)(Message(mex))
         	}
         })
         return task

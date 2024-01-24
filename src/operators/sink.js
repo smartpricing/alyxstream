@@ -7,7 +7,7 @@ export const toKafka = {
         const task = this
         const index = task._nextIndex()
         task._setNext(async (s) => {
-            let data = cb == null ? s : cb(s)
+            let data = cb == null ? s.payload : cb(s.payload)
             data = Array.isArray(data) == true ? data : [data]
             sink.send({
                 topic: topic,

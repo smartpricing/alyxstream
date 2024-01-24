@@ -15,6 +15,8 @@ Working usage examples are in the *usage-examples* folder.
 7. [Redis queues](#redisqueue)
 8. [Storage](#storage)
 9. [Extend the library](#extend)
+10. [Kafka Exchange Mode](#exchange)
+11. [Multiprocess/Parallel Mode](#parallel)
 
 ## Introduction <a name="introduction"></a>
 
@@ -529,3 +531,65 @@ await Task()
 .inject(3) // output 12
 ```
 
+## Kafka Exchange Mode <a name="exchange"></a>
+
+Alyxstream contains a wrapper around itself in order to simplify a special use case of Kafka communication between microservices. It's called Exchange and allow bidirectional communication between two (or more) services.
+
+```js
+import { 
+	Exchange,
+	KafkaClient
+} from '@dev.smartpricing/alyxstream'
+
+const client = KafkaClient({
+	clientId: 'my-client-1',
+	brokers: ['localhost:9092'], 		
+})
+
+let mex = {
+	kind: 'TestObject',
+	metadata: {
+		key: '1'
+	},
+	spec: {
+		value: 1
+	}
+}
+
+/** Exchange(KafkaClient, topicName, groupId, sourceoptions as kafka js options) */
+const ex1 = await Exchange(client, 'alyxstream-exchange-01', 'ae-01', {autoCommit: false})
+const ex2 = await Exchange(client, 'alyxstream-exchange-02', 'ae-02', {autoCommit: false})
+
+await ex1.emit(mex)
+await ex1.on(async (messagge) => {
+	console.log('sub', messagge)
+	messagge.spec.value += 1
+	await ex2.emit(messagge)
+})
+```
+
+In order to override the default key parser and messagge validator:
+
+```js
+const ex1 = await Exchange(client, 'alyxstream-exchange-01', 'ae-01', {autoCommit: false})
+ex1.setKeyParser(x => x.metadata.myKey)
+ex1.setValidationFunction(x => {
+	if (x.spec.myValue == undefined) {
+		return false
+	}
+	return true
+})
+```
+
+## Multiprocess/Parallel Mode <a name="parallel"></a>
+
+You can process a stream of data using multiple Node.js process:
+
+```js
+import { Task } from '@dev.smartpricing/alyxstream'
+
+await Task()
+.parallel(3)
+.dequeue(STORAGE)
+.close()
+```

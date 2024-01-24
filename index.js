@@ -8,6 +8,10 @@
 import task from './src/task/task.js'
 export const Task = task
 
+/** Exchange */
+import exchange from './src/exchange/exchange.js'
+export const Exchange = exchange
+
 import { set as ExtendTaskSet, setRaw as ExtendTaskSetRaw } from './src/task/extend.js'
 export const ExtendTask = ExtendTaskSet
 export const ExtendTaskRaw = ExtendTaskSetRaw

@@ -1,4 +1,5 @@
 export const Task: typeof task;
+export const Exchange: typeof exchange;
 export const ExtendTask: typeof ExtendTaskSet;
 export const ExtendTaskRaw: typeof ExtendTaskSetRaw;
 export const MakeStorage: typeof storageMake;
@@ -26,6 +27,7 @@ export const ArrayOperators: typeof arrayOperators;
 export const CustomOperators: typeof customOperators;
 export const SinkOperators: typeof sinkOperators;
 import task from "./src/task/task.js";
+import exchange from "./src/exchange/exchange.js";
 import { set as ExtendTaskSet } from "./src/task/extend.js";
 import { setRaw as ExtendTaskSetRaw } from "./src/task/extend.js";
 import { Make as storageMake } from "./src/storage/interface.js";

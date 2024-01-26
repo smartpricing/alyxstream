@@ -7,7 +7,7 @@ import {
 	KafkaSink
 } from '../../index.js';
 
-export default async function (client, topic, groupId, sourceOptions = {}) {
+export default async function (client, topic, groupId, sourceOptions = {}, sinkOptions = {}) {
 	const source = await KafkaSource(client, {
 		groupId: groupId,
 		topics: [{
@@ -64,7 +64,7 @@ export default async function (client, topic, groupId, sourceOptions = {}) {
 				throw 'Messagge format invalid'
 			}
 			return await Task()
-			.toKafka(sink, topic)
+			.toKafka(sink, topic, null, sinkOptions)
 			.inject({key: keyFromMex(mex), value: JSON.stringify(mex)})		
 		}
 	}

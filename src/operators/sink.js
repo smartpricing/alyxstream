@@ -1,6 +1,6 @@
 'use strict'
 
-import CompressionTypes from 'kafkajs'
+import { CompressionTypes } from 'kafkajs'
 import KafkaCommit from '../kafka/commit.js'
 
 export const toKafka = {
@@ -16,13 +16,14 @@ export const toKafka = {
             }
             if (options !== null && options.compressionType !== null && options.compressionType !== undefined) {
                 obj.compression = CompressionTypes[options.compressionType] // CompressionTypes.GZIP
-            }
-            sink.send()
+            }            
+            await sink.send(obj)
             await task._nextAtIndex(index)(s)
         })
         return task
     }
 }
+
 
 export const kafkaCommit = {
     kafkaCommit (kafkaSource, commitParams = null) {

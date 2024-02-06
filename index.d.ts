@@ -27,7 +27,7 @@ export declare interface TaskBase<I, T> {
     readline: Function/*TBD*/
 
     //custom
-    fn: Function/*TBD*/
+    fn: <R>(callback: (x: T) => R) => TaskTypeHelper<I, R> /*TO CHECK*/
     fnRaw: Function/*TBD*/
     customFunction: Function/*TBD*/
     customAsyncFunction: Function/*TBD*/

@@ -1,4 +1,10 @@
-import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin } from "kafkajs"
+import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin, Consumer, Producer } from "kafkajs"
+import { ReadStream, PathLike } from "fs"
+
+
+type TaskTypeHelper<T> = T extends (infer U)[] 
+    ? U extends any[] ? TaskOfMultiArray<U[]> : TaskOfArray<U[]>
+    : TaskOfObject<T>;
 
 export declare interface TaskBase<T> {
     //base
@@ -53,26 +59,33 @@ export declare interface TaskBase<T> {
     kafkaCommit: Function/*TBD*/
 
     //source
-    fromKafka: Function/*TBD*/
-    fromArray: (array: T[]) => TaskOfArray<T[]>
-    fromObject: Function/*TBD*/
-    fromString: Function/*TBD*/
-    fromInterval: Function/*TBD*/
-    fromReadableStream: Function/*TBD*/
+    fromKafka: <R = any>(source: KSource) => TaskTypeHelper<KMessage<R>>
+    fromArray: <R>(array: R[]) => TaskTypeHelper<R[]>
+    fromObject: <R>(object: R) => TaskTypeHelper<R>
+    fromString: (string: string) => TaskTypeHelper<string>
+    fromInterval: <R = number>(intervalMs: number, generatorFunc?: (counter: number) => R, maxSize?: number) => TaskTypeHelper<R>/*TBD*/
+    fromReadableStream: (filePath: PathLike, useZlib?: boolean) => TaskTypeHelper<ReadStream>
+
+    injext: (data: T) => Promise<TaskTypeHelper<T>>
 
     [x: string]: any 
 }
 
-export declare interface TaskOfArray<T extends any[]> extends TaskBase<T>, TaskOfObject<T> {
-    map: <R>(func: (x: ElemOfArray<T>) => R) => TaskBase<R>
+export declare interface TaskOfArray<T extends any[]> extends TaskOfObject<T> {
+    map: <R>(func: (x: ElemOfArr<T>) => R) => TaskTypeHelper<R>
     each: Function/*TBD*/ //bug? the callback is never called
-    filterArray: (func: (x: ElemOfArray<T>) => boolean) => TaskOfArray<T>
-    flat: Function/*TBD*/
-    reduce: <R>(func: (prev: ElemOfArray<T>, curr: ElemOfArray<T>, currIdx?: number) => R, initialValue?: R) => TaskBase<R>
+    filterArray: (func: (x: ElemOfArr<T>) => boolean) => TaskTypeHelper<T>
+    reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => TaskTypeHelper<R>
     countInArray: Function/*TBD*/ //*???
-    length: () => TaskBase<number>
-    groupBy: (func: (elem: T, index: number, array: T[]) => any) => TaskOfObject<{[x in string | number]: T[]}> // TO CHECK
+    length: () => TaskTypeHelper<number>
+    groupBy: (func: (elem: T, index: number, array: T[]) => any) => TaskTypeHelper<{ [x in string | number]: T[] }> // TO CHECK
 
+    [x: string]: any
+}
+
+export declare interface TaskOfMultiArray<T extends any[][]> extends TaskOfArray<T>, TaskOfObject<T> {
+    flat: () => TaskTypeHelper<ElemOfArr<ElemOfArr<T>>[]>
+    
     [x: string]: any
 }
 
@@ -84,7 +97,7 @@ export declare interface TaskOfObject<T> extends TaskBase<T> {
     [x: string]: any
 }
 
-export declare function Task<T = any>(id: any): TaskBase<T>
+export declare function Task<T = any>(id?: any): TaskTypeHelper<T>
 
 export declare interface Exch {
     setKeyParser: (fn: any) => any;/*TBD*/
@@ -125,10 +138,29 @@ export declare function ExposeStorageState(storageMap: any /*TBD*/, config: any 
 export declare function KafkaClient(config: KafkaConfig): Kafka
 export declare function KafkaAdmin(client: Kafka): Promise<Admin>
 
+export declare interface KMessage<T> {
+    topic: string, 
+    offset: number,
+    partition: number, 
+    headers: any, /*TBD*/
+    key: string,
+    value: T
+}
+
+export declare interface KSource {
+    stream: (cb: any) => Promise<void> /*TBD*/
+    consumer: () => Consumer
+}
+
+export declare interface KSink extends Producer {}
+
+export declare function KafkaSource(client: Kafka, config: ConsumerConfig): Promise<KSource>
+export declare function KafkaSink(client: Kafka, config: ProducerConfig): Promise<KSink>
+
 // // // // // // // // // // // // 
 
-export const KafkaSource: typeof kafkaSource;
-export const KafkaSink: typeof kafkaSink;
+// export const KafkaSource: typeof kafkaSource;
+// export const KafkaSink: typeof kafkaSink;
 export const KafkaRekey: typeof kafkaRekey;
 export const KafkaCommit: typeof kafkaCommit;
 
@@ -168,4 +200,4 @@ import kafkaCommit from "./src/kafka/commit.js";
 // import * as customOperators from "./src/operators/custom.js";
 // import * as sinkOperators from "./src/operators/sink.js";import { objectGroupBy } from "./src/operators/object.js"
 
-type ElemOfArray<T extends any[]> = T extends (infer U)[] ? U : never;
+type ElemOfArr<T extends any[]> = T extends (infer U)[] ? U : never;

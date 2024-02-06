@@ -1,6 +1,6 @@
 import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin } from "kafkajs"
 
-export declare interface TaskBase {
+export declare interface TaskBase<T> {
     //base
     withMetadata: Function/*TBD*/
     setMetadata: Function/*TBD*/
@@ -54,7 +54,7 @@ export declare interface TaskBase {
 
     //source
     fromKafka: Function/*TBD*/
-    fromArray: Function/*TBD*/
+    fromArray: (array: T[]) => TaskOfArray<T[]>
     fromObject: Function/*TBD*/
     fromString: Function/*TBD*/
     fromInterval: Function/*TBD*/
@@ -63,20 +63,20 @@ export declare interface TaskBase {
     [x: string]: any 
 }
 
-export declare interface TaskOfArray {
-    map: Function/*TBD*/
+export declare interface TaskOfArray<T extends any[]> extends TaskBase<T>, TaskOfObject<T> {
+    map: <R>(func: (x: ElemOfArray<T>) => R) => TaskBase<R>
     each: Function/*TBD*/
-    filterArray: Function/*TBD*/
+    filterArray: (func: (x: ElemOfArray<T>) => boolean) => TaskOfArray<T>
     flat: Function/*TBD*/
-    reduce: Function/*TBD*/
+    reduce: <R>(func: (prev: ElemOfArray<T>, curr: ElemOfArray<T>, currIdx?: number) => R, initialValue?: R) => TaskBase<R>
     countInArray: Function/*TBD*/ //*???
-    length: Function/*TBD*/
+    length: () => TaskBase<number>
     groupBy: Function/*TBD*/
 
     [x: string]: any
 }
 
-export declare interface TaskOfObject {
+export declare interface TaskOfObject<T> extends TaskBase<T> {
     sumMap: Function/*TBD*/
     objectGroupBy: Function/*TBD*/
     aggregate: Function/*TBD*/
@@ -84,7 +84,7 @@ export declare interface TaskOfObject {
     [x: string]: any
 }
 
-export declare function Task(id: any): TaskBase
+export declare function Task<T = any>(id: any): TaskBase<T>
 
 export declare interface Exch {
     setKeyParser: (fn: any) => any;/*TBD*/
@@ -168,3 +168,4 @@ import kafkaCommit from "./src/kafka/commit.js";
 // import * as customOperators from "./src/operators/custom.js";
 // import * as sinkOperators from "./src/operators/sink.js";import { objectGroupBy } from "./src/operators/object.js"
 
+type ElemOfArray<T extends any[]> = T extends (infer U)[] ? U : never;

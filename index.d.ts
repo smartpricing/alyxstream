@@ -65,13 +65,13 @@ export declare interface TaskBase<T> {
 
 export declare interface TaskOfArray<T extends any[]> extends TaskBase<T>, TaskOfObject<T> {
     map: <R>(func: (x: ElemOfArray<T>) => R) => TaskBase<R>
-    each: Function/*TBD*/
+    each: Function/*TBD*/ //bug? the callback is never called
     filterArray: (func: (x: ElemOfArray<T>) => boolean) => TaskOfArray<T>
     flat: Function/*TBD*/
     reduce: <R>(func: (prev: ElemOfArray<T>, curr: ElemOfArray<T>, currIdx?: number) => R, initialValue?: R) => TaskBase<R>
     countInArray: Function/*TBD*/ //*???
     length: () => TaskBase<number>
-    groupBy: Function/*TBD*/
+    groupBy: (func: (elem: T, index: number, array: T[]) => any) => TaskOfObject<{[x in string | number]: T[]}> // TO CHECK
 
     [x: string]: any
 }

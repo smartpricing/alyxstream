@@ -1,8 +1,90 @@
 import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin } from "kafkajs"
 
-export declare interface Tsk {} /*TBD*/
+export declare interface TaskBase {
+    //base
+    withMetadata: Function/*TBD*/
+    setMetadata: Function/*TBD*/
+    getMetadata: Function/*TBD*/
 
-export declare function Task(id: any): Tsk
+    withDefaultKey: Function/*TBD*/
+    withEventTime: Function/*TBD*/
+    keyBy: Function/*TBD*/
+
+    filter: Function/*TBD*/
+    sum: Function/*TBD*/ //???
+    tokenize: Function/*TBD*/
+    print: Function/*TBD*/
+
+    branch: Function/*TBD*/
+    readline: Function/*TBD*/
+
+    //custom
+    fn: Function/*TBD*/
+    fnRaw: Function/*TBD*/
+    customFunction: Function/*TBD*/
+    customAsyncFunction: Function/*TBD*/
+    customFunctionRaw: Function/*TBD*/
+    customAsyncFunctionRaw: Function/*TBD*/
+    joinByKeyWithParallelism: Function/*TBD*/
+
+    //queue
+    queueSize: Function/*TBD*/
+    enqueue: Function/*TBD*/
+    dequeue: Function/*TBD*/
+
+    //storage
+    withStorage: Function/*TBD*/
+    toStorage: Function/*TBD*/
+    fromStorage: Function/*TBD*/
+    fromStorageToGlobalState: Function/*TBD*/
+    disconnectStorage: Function/*TBD*/
+    flushStorage: Function/*TBD*/
+    storage: Function/*TBD*/
+
+    //window
+    tumblingWindowCount: Function/*TBD*/
+    tumblingWindowTime: Function/*TBD*/
+    sessionWindowTime: Function/*TBD*/
+    slidingWindowCount: Function/*TBD*/
+    slidingWindowTime: Function/*TBD*/
+
+    //sink 
+    toKafka: Function/*TBD*/
+    kafkaCommit: Function/*TBD*/
+
+    //source
+    fromKafka: Function/*TBD*/
+    fromArray: Function/*TBD*/
+    fromObject: Function/*TBD*/
+    fromString: Function/*TBD*/
+    fromInterval: Function/*TBD*/
+    fromReadableStream: Function/*TBD*/
+
+    [x: string]: any 
+}
+
+export declare interface TaskOfArray {
+    map: Function/*TBD*/
+    each: Function/*TBD*/
+    filterArray: Function/*TBD*/
+    flat: Function/*TBD*/
+    reduce: Function/*TBD*/
+    countInArray: Function/*TBD*/ //*???
+    length: Function/*TBD*/
+    groupBy: Function/*TBD*/
+
+    [x: string]: any
+}
+
+export declare interface TaskOfObject {
+    sumMap: Function/*TBD*/
+    objectGroupBy: Function/*TBD*/
+    aggregate: Function/*TBD*/
+
+    [x: string]: any
+}
+
+export declare function Task(id: any): TaskBase
 
 export declare interface Exch {
     setKeyParser: (fn: any) => any;/*TBD*/
@@ -45,21 +127,6 @@ export declare function KafkaAdmin(client: Kafka): Promise<Admin>
 
 // // // // // // // // // // // // 
 
-// export const Task: typeof task;
-// export const Exchange: typeof exchange;
-// export const ExtendTask: typeof ExtendTaskSet;
-// export const ExtendTaskRaw: typeof ExtendTaskSetRaw;
-// export const MakeStorage: typeof storageMake;
-// export const StorageKind: {
-//     Memory: string;
-//     Redis: string;
-//     Cassandra: string;
-// };
-// export const ExposeStorageState: typeof exposeStorageState;
-// export const KafkaClient: typeof kafkaClient;
-// export const KafkaAdmin: typeof kafkaAdmin;
-
-
 export const KafkaSource: typeof kafkaSource;
 export const KafkaSink: typeof kafkaSink;
 export const KafkaRekey: typeof kafkaRekey;
@@ -99,4 +166,5 @@ import * as baseOperators from "./src/operators/base.js";
 import * as windowOperators from "./src/operators/window.js";
 import * as arrayOperators from "./src/operators/array.js";
 import * as customOperators from "./src/operators/custom.js";
-import * as sinkOperators from "./src/operators/sink.js";
+import * as sinkOperators from "./src/operators/sink.js";import { objectGroupBy } from "./src/operators/object.js"
+

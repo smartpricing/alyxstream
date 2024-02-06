@@ -1,11 +1,14 @@
 import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin, Consumer, Producer, CompressionTypes, Message, TopicPartitionOffsetAndMetadata } from "kafkajs"
 import { ReadStream, PathLike } from "fs"
 
-type TaskTypeHelper<T> = T extends (infer U)[] 
-    ? U extends any[] ? TaskOfMultiArray<U[]> : TaskOfArray<U[]>
-    : TaskOfObject<T>;
+type TaskTypeHelper<I, T> = T extends (infer U)[] 
+    ? U extends any[] ? TaskOfMultiArray<I, U[]> : TaskOfArray<I, U[]>
+    : TaskOfObject<I, T>;
 
-export declare interface TaskBase<T> {
+// T = current value type
+// I = initial value type (needed for the "inject" method)
+
+export declare interface TaskBase<I, T> {
     //base
     withMetadata: Function/*TBD*/
     setMetadata: Function/*TBD*/
@@ -54,41 +57,41 @@ export declare interface TaskBase<T> {
     slidingWindowTime: Function/*TBD*/
 
     //sink 
-    toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Message[], options?: KSinkOptions) => TaskTypeHelper<T>
-    kafkaCommit: (kafkaSource: KSource, commitParams: KCommitParams) => TaskTypeHelper<T>
+    toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Message[], options?: KSinkOptions) => TaskTypeHelper<I, T>
+    kafkaCommit: (kafkaSource: KSource, commitParams: KCommitParams) => TaskTypeHelper<I, T>
  
     //source
-    fromKafka: <R = any>(source: KSource) => TaskTypeHelper<KMessage<R>>
-    fromArray: <R>(array: R[]) => TaskTypeHelper<R[]>
-    fromObject: <R>(object: R) => TaskTypeHelper<R>
-    fromString: (string: string) => TaskTypeHelper<string>
-    fromInterval: <R = number>(intervalMs: number, generatorFunc?: (counter: number) => R, maxSize?: number) => TaskTypeHelper<R>/*TBD*/
-    fromReadableStream: (filePath: PathLike, useZlib?: boolean) => TaskTypeHelper<ReadStream>
+    fromKafka: <R = any>(source: KSource) => TaskTypeHelper<I, KMessage<R>>
+    fromArray: <R>(array: R[]) => TaskTypeHelper<I, R[]>
+    fromObject: <R>(object: R) => TaskTypeHelper<I, R>
+    fromString: (string: string) => TaskTypeHelper<I, string>
+    fromInterval: <R = number>(intervalMs: number, generatorFunc?: (counter: number) => R, maxSize?: number) => TaskTypeHelper<I, R>/*TBD*/
+    fromReadableStream: (filePath: PathLike, useZlib?: boolean) => TaskTypeHelper<I, ReadStream>
 
-    injext: (data: T) => Promise<TaskTypeHelper<T>>
+    inject: (data: I) => Promise<TaskTypeHelper<I, T>>
 
     [x: string]: any 
 }
 
-export declare interface TaskOfArray<T extends any[]> extends TaskOfObject<T> {
-    map: <R>(func: (x: ElemOfArr<T>) => R) => TaskTypeHelper<R>
+export declare interface TaskOfArray<I, T extends any[]> extends TaskOfObject<I, T> {
+    map: <R>(func: (x: ElemOfArr<T>) => R) => TaskTypeHelper<I, R>
     each: Function/*TBD*/ //bug? the callback is never called
-    filterArray: (func: (x: ElemOfArr<T>) => boolean) => TaskTypeHelper<T>
-    reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => TaskTypeHelper<R>
+    filterArray: (func: (x: ElemOfArr<T>) => boolean) => TaskTypeHelper<I, T>
+    reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => TaskTypeHelper<I, R>
     countInArray: Function/*TBD*/ //*???
-    length: () => TaskTypeHelper<number>
-    groupBy: (func: (elem: T, index: number, array: T[]) => any) => TaskTypeHelper<{ [x in string | number]: T[] }> // TO CHECK
+    length: () => TaskTypeHelper<I, number>
+    groupBy: (func: (elem: T, index: number, array: T[]) => any) => TaskTypeHelper<I, { [x in string | number]: T[] }> // TO CHECK
 
     [x: string]: any
 }
 
-export declare interface TaskOfMultiArray<T extends any[][]> extends TaskOfArray<T>, TaskOfObject<T> {
-    flat: () => TaskTypeHelper<ElemOfArr<ElemOfArr<T>>[]>
+export declare interface TaskOfMultiArray<I, T extends any[][]> extends TaskOfArray<I, T>, TaskOfObject<I, T> {
+    flat: () => TaskTypeHelper<I, ElemOfArr<ElemOfArr<T>>[]>
     
     [x: string]: any
 }
 
-export declare interface TaskOfObject<T> extends TaskBase<T> {
+export declare interface TaskOfObject<I, T> extends TaskBase<I, T> {
     sumMap: Function/*TBD*/
     objectGroupBy: Function/*TBD*/
     aggregate: Function/*TBD*/
@@ -96,7 +99,7 @@ export declare interface TaskOfObject<T> extends TaskBase<T> {
     [x: string]: any
 }
 
-export declare function Task<T = any>(id?: any): TaskTypeHelper<T>
+export declare function Task<I = any>(id?: any): TaskTypeHelper<I, I> /*TBD*/
 export declare function ExtendTask(name: string, extension: any /*TBD*/): void
 export declare function ExtendTaskRaw(name: string, extension: any /*TBD*/): void
 

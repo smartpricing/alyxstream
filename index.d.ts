@@ -1,20 +1,70 @@
-export const Task: typeof task;
-export const Exchange: typeof exchange;
-export const ExtendTask: typeof ExtendTaskSet;
-export const ExtendTaskRaw: typeof ExtendTaskSetRaw;
-export const MakeStorage: typeof storageMake;
-export const StorageKind: {
-    Memory: string;
-    Redis: string;
-    Cassandra: string;
-};
-export const ExposeStorageState: typeof exposeStorageState;
-export const KafkaClient: typeof kafkaClient;
-export const KafkaAdmin: typeof kafkaAdmin;
+import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin } from "kafkajs"
+
+export declare interface Tsk {} /*TBD*/
+
+export declare function Task(id: any): Tsk
+
+export declare interface Exch {
+    setKeyParser: (fn: any) => any;/*TBD*/
+    setValidationFunction: (fn: any) => any;/*TBD*/
+    on: (fn: (x: any) => Promise<any>) => Promise<any>;/*TBD*/
+    emit: (mex: any) => Promise<any>;/*TBD*/
+}
+
+export declare function Exchange(client: Kafka, topic: string, sourceOptions: ConsumerConfig, sinkOptions: ProducerConfig): Exch
+
+export declare function ExtendTask(name: string, extension: any /*TBD*/): void
+
+export declare function ExtendTaskRaw(name: string, extension: any /*TBD*/): void
+
+export enum StorageKind {
+    Memory = "memory",
+    Redis = "redis",
+    Cassandra = "cassandra",
+}
+
+export declare interface Storage {
+    db: () => any; /*TBD*/
+    set: (key: string, value: any, ttl?: number | null) => Promise<void>; /*TBD*/
+    get: (key: string) => Promise<any>; /*TBD*/
+    push: (key: string, value: any) => Promise<void>; /*TBD*/
+    getList: (key: string) => Promise<any[]>; /*TBD*/
+    flush: (key: string) => Promise<void>; /*TBD*/
+    slice: (key: string, numberOfItemsToRemove: number) => Promise<void>; /*TBD*/
+    sliceByTime: (key: string, startTime: number) => Promise<void>; /*TBD*/
+    disconnect: () => Promise<void>; /*TBD*/
+    flushStorage: () => Promise<void>; /*TBD*/
+}
+
+export declare function MakeStorage(kind: StorageKind, config?: any/*TBD*/, id?: any /*TBD*/): Storage
+
+export declare function ExposeStorageState(storageMap: any /*TBD*/, config: any /*TBD*/): void
+
+export declare function KafkaClient(config: KafkaConfig): Kafka
+export declare function KafkaAdmin(client: Kafka): Promise<Admin>
+
+// // // // // // // // // // // // 
+
+// export const Task: typeof task;
+// export const Exchange: typeof exchange;
+// export const ExtendTask: typeof ExtendTaskSet;
+// export const ExtendTaskRaw: typeof ExtendTaskSetRaw;
+// export const MakeStorage: typeof storageMake;
+// export const StorageKind: {
+//     Memory: string;
+//     Redis: string;
+//     Cassandra: string;
+// };
+// export const ExposeStorageState: typeof exposeStorageState;
+// export const KafkaClient: typeof kafkaClient;
+// export const KafkaAdmin: typeof kafkaAdmin;
+
+
 export const KafkaSource: typeof kafkaSource;
 export const KafkaSink: typeof kafkaSink;
 export const KafkaRekey: typeof kafkaRekey;
 export const KafkaCommit: typeof kafkaCommit;
+
 export const TumblingWindowTime: typeof tumblingWindowTime;
 export const TumblingWindowCount: typeof tumblingWindowCount;
 export const SlidingWindowTime: typeof slidingWindowTime;
@@ -26,6 +76,7 @@ export const WindowOperators: typeof windowOperators;
 export const ArrayOperators: typeof arrayOperators;
 export const CustomOperators: typeof customOperators;
 export const SinkOperators: typeof sinkOperators;
+
 import task from "./src/task/task.js";
 import exchange from "./src/exchange/exchange.js";
 import { set as ExtendTaskSet } from "./src/task/extend.js";

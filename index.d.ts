@@ -1,19 +1,6 @@
 import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin, Consumer, Producer, CompressionTypes, Message, TopicPartitionOffsetAndMetadata } from "kafkajs"
 import { ReadStream, PathLike } from "fs"
 
-type KCompressionType = 
-    CompressionTypes.GZIP |
-    CompressionTypes.LZ4 |
-    CompressionTypes.None |
-    CompressionTypes.Snappy |
-    CompressionTypes.ZSTD 
-
-type KSinkOptions = { 
-    compressionType: KCompressionType
-}
-
-type KCommitParams = Pick<TopicPartitionOffsetAndMetadata, 'topic' | 'partition' | 'offset'>
-
 type TaskTypeHelper<T> = T extends (infer U)[] 
     ? U extends any[] ? TaskOfMultiArray<U[]> : TaskOfArray<U[]>
     : TaskOfObject<T>;
@@ -158,6 +145,19 @@ export declare interface KMessage<T> {
     key: string,
     value: T
 }
+
+type KCompressionType = 
+    CompressionTypes.GZIP |
+    CompressionTypes.LZ4 |
+    CompressionTypes.None |
+    CompressionTypes.Snappy |
+    CompressionTypes.ZSTD 
+
+type KSinkOptions = { 
+    compressionType: KCompressionType
+}
+
+type KCommitParams = Pick<TopicPartitionOffsetAndMetadata, 'topic' | 'partition' | 'offset'>
 
 export declare interface KSource {
     stream: (cb: any) => Promise<void> /*TBD*/

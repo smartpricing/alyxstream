@@ -1,6 +1,18 @@
-import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin, Consumer, Producer } from "kafkajs"
+import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin, Consumer, Producer, CompressionTypes, Message, TopicPartitionOffsetAndMetadata } from "kafkajs"
 import { ReadStream, PathLike } from "fs"
 
+type KCompressionType = 
+    CompressionTypes.GZIP |
+    CompressionTypes.LZ4 |
+    CompressionTypes.None |
+    CompressionTypes.Snappy |
+    CompressionTypes.ZSTD 
+
+type KSinkOptions = { 
+    compressionType: KCompressionType
+}
+
+type KCommitParams = Pick<TopicPartitionOffsetAndMetadata, 'topic' | 'partition' | 'offset'>
 
 type TaskTypeHelper<T> = T extends (infer U)[] 
     ? U extends any[] ? TaskOfMultiArray<U[]> : TaskOfArray<U[]>
@@ -55,9 +67,9 @@ export declare interface TaskBase<T> {
     slidingWindowTime: Function/*TBD*/
 
     //sink 
-    toKafka: Function/*TBD*/
-    kafkaCommit: Function/*TBD*/
-
+    toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Message[], options?: KSinkOptions) => TaskTypeHelper<T>
+    kafkaCommit: (kafkaSource: KSource, commitParams: KCommitParams) => TaskTypeHelper<T>
+ 
     //source
     fromKafka: <R = any>(source: KSource) => TaskTypeHelper<KMessage<R>>
     fromArray: <R>(array: R[]) => TaskTypeHelper<R[]>
@@ -156,13 +168,14 @@ export declare interface KSink extends Producer {}
 
 export declare function KafkaSource(client: Kafka, config: ConsumerConfig): Promise<KSource>
 export declare function KafkaSink(client: Kafka, config: ProducerConfig): Promise<KSink>
+export declare function KafkaCommit(source: KSource, params: KCommitParams): Promise<KCommitParams>
 
 // // // // // // // // // // // // 
 
 // export const KafkaSource: typeof kafkaSource;
 // export const KafkaSink: typeof kafkaSink;
 export const KafkaRekey: typeof kafkaRekey;
-export const KafkaCommit: typeof kafkaCommit;
+// export const KafkaCommit: typeof kafkaCommit;
 
 // export const TumblingWindowTime: typeof tumblingWindowTime;
 // export const TumblingWindowCount: typeof tumblingWindowCount;
@@ -184,8 +197,8 @@ export const KafkaCommit: typeof kafkaCommit;
 // import { ExposeStorageState as exposeStorageState } from "./src/rest/state.js";
 // import kafkaClient from "./src/kafka/client.js";
 // import kafkaAdmin from "./src/kafka/admin.js";
-import kafkaSource from "./src/kafka/source.js";
-import kafkaSink from "./src/kafka/sink.js";
+// import kafkaSource from "./src/kafka/source.js";
+// import kafkaSink from "./src/kafka/sink.js";
 import kafkaRekey from "./src/kafka/rekey.js";
 import kafkaCommit from "./src/kafka/commit.js";
 // import tumblingWindowTime from "./src/window/tumblingWindowTime.js";

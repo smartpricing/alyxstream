@@ -97,18 +97,7 @@ export declare interface TaskOfObject<T> extends TaskBase<T> {
 }
 
 export declare function Task<T = any>(id?: any): TaskTypeHelper<T>
-
-export declare interface Exch {
-    setKeyParser: (fn: any) => any;/*TBD*/
-    setValidationFunction: (fn: any) => any;/*TBD*/
-    on: (fn: (x: any) => Promise<any>) => Promise<any>;/*TBD*/
-    emit: (mex: any) => Promise<any>;/*TBD*/
-}
-
-export declare function Exchange(client: Kafka, topic: string, sourceOptions: ConsumerConfig, sinkOptions: ProducerConfig): Exch
-
 export declare function ExtendTask(name: string, extension: any /*TBD*/): void
-
 export declare function ExtendTaskRaw(name: string, extension: any /*TBD*/): void
 
 export enum StorageKind {
@@ -131,11 +120,7 @@ export declare interface Storage {
 }
 
 export declare function MakeStorage(kind: StorageKind, config?: any/*TBD*/, id?: any /*TBD*/): Storage
-
 export declare function ExposeStorageState(storageMap: any /*TBD*/, config: any /*TBD*/): void
-
-export declare function KafkaClient(config: KafkaConfig): Kafka
-export declare function KafkaAdmin(client: Kafka): Promise<Admin>
 
 export declare interface KMessage<T> {
     topic: string, 
@@ -166,15 +151,29 @@ export declare interface KSource {
 
 export declare interface KSink extends Producer {}
 
+export type RekeyFunction = (s: any) => any /*TBD*/
+export type SinkDataFunction = (s: any) => Message /*TBD*/
+
+export declare interface Exch {
+    setKeyParser: (fn: any) => any;/*TBD*/
+    setValidationFunction: (fn: any) => any;/*TBD*/
+    on: (fn: (x: any) => Promise<any>) => Promise<any>;/*TBD*/
+    emit: (mex: any) => Promise<any>;/*TBD*/
+}
+
+export declare function KafkaClient(config: KafkaConfig): Kafka
+export declare function KafkaAdmin(client: Kafka): Promise<Admin>
 export declare function KafkaSource(client: Kafka, config: ConsumerConfig): Promise<KSource>
 export declare function KafkaSink(client: Kafka, config: ProducerConfig): Promise<KSink>
 export declare function KafkaCommit(source: KSource, params: KCommitParams): Promise<KCommitParams>
+export declare function KafkaRekey(kafkaSource: KSource, rekeyFunction: RekeyFunction, kafkaSink: KSink, sinkTopic: string, sinkDataFunction: SinkDataFunction): void
+export declare function Exchange(client: Kafka, topic: string, sourceOptions: ConsumerConfig, sinkOptions: ProducerConfig): Exch
 
 // // // // // // // // // // // // 
 
 // export const KafkaSource: typeof kafkaSource;
 // export const KafkaSink: typeof kafkaSink;
-export const KafkaRekey: typeof kafkaRekey;
+// export const KafkaRekey: typeof kafkaRekey;
 // export const KafkaCommit: typeof kafkaCommit;
 
 // export const TumblingWindowTime: typeof tumblingWindowTime;
@@ -199,8 +198,8 @@ export const KafkaRekey: typeof kafkaRekey;
 // import kafkaAdmin from "./src/kafka/admin.js";
 // import kafkaSource from "./src/kafka/source.js";
 // import kafkaSink from "./src/kafka/sink.js";
-import kafkaRekey from "./src/kafka/rekey.js";
-import kafkaCommit from "./src/kafka/commit.js";
+// import kafkaRekey from "./src/kafka/rekey.js";
+// import kafkaCommit from "./src/kafka/commit.js";
 // import tumblingWindowTime from "./src/window/tumblingWindowTime.js";
 // import tumblingWindowCount from "./src/window/tumblingWindowCount.js";
 // import slidingWindowTime from "./src/window/slidingWindowTime.js";

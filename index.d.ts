@@ -117,7 +117,7 @@ export declare interface TaskOfStringArray<I, T extends string[]> extends TaskOf
 }
 
 export declare interface TaskOfString<I, T extends string> extends TaskOfObject<I, T> {
-    tokenize: () => TaskTypeHelper<I, string>
+    tokenize: () => TaskTypeHelper<I, string[]>
 }
 
 export declare function Task<I = any>(id?: any): TaskTypeHelper<I, I> /*TBD*/

@@ -86,7 +86,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     fromStorageToGlobalState: Ss extends false ? never : (keysFunc: (x: Msg<T>) => (string | number)[]) => TaskTypeHelper<I, T, L, Ls, Ss>
     disconnectStorage: Ss extends false ? never : () => TaskTypeHelper<I, T, L, Ls, Ss>
     flushStorage: Ss extends false ? never : () => TaskTypeHelper<I, T, L, Ls, Ss>
-    storage: Ss extends false ? never : Function/*TBD*/
+    storage: Ss extends false ? never : () => Storage
 
     //local storage (only when Ls is true)
     withLocalKVStorage: <newL = any>() => TaskTypeHelper<I, T, newL, true, Ss> // define the type of items stored in storage keys

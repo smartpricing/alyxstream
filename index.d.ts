@@ -88,12 +88,12 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     mergeLocalKV: Ls extends false ? never : <K extends string | number>(key: K) => TaskTypeHelper<I, T & { [x in K]: L }, L, Ls, Ss> 
     flushLocalKV: Ls extends false ? never : (key: string | number) => TaskTypeHelper<I, T, L, Ls, Ss> 
 
-    //window
-    tumblingWindowCount: Function/*TBD*/
-    tumblingWindowTime: Function/*TBD*/
-    sessionWindowTime: Function/*TBD*/
-    slidingWindowCount: Function/*TBD*/
-    slidingWindowTime: Function/*TBD*/
+    //window (returned type to be checked)
+    tumblingWindowCount: (storage: Storage, countLength: number, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss>
+    tumblingWindowTime: (storage: Storage, timeLengthMilliSeconds: number, inactivityMilliseconds?: number) => TaskTypeHelper<I, T[], L, Ls, Ss>
+    sessionWindowTime: (storage: Storage, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss>
+    slidingWindowCount: (storage: Storage, countLength: number, slidingLength: number, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss>
+    slidingWindowTime: (storage: Storage, timeLengthMilliSeconds: number, slidingLengthMilliseconds: number, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss>
 
     //sink 
     toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Message[], options?: KSinkOptions) => TaskTypeHelper<I, T, L, Ls, Ss>

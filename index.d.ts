@@ -4,15 +4,22 @@ import { ReadStream, PathLike } from "fs"
 /**
  * Note per Alice
  * 
- *  - i metodi disponibili del task dipenderanno dal tipo del messaggio a quel punto del task
+ *  - i metodi disponibili del task dipenderanno dal tipo del messaggio a quello specifico punto del task
  *    es: Task().fromArray([1,2,3]) avrà a disposizione anche i metodi degli array
  *        Task().fromArray([1,2,3]).length() non ha i metodi degli array perchè il messaggio è number
+ *    nota: tutti i tipi sono considerati object di base e quindi hanno i metodi degli objects (es: aggregate)
  * 
- *  - se non viene chiamato withLocalKVStorage, tutte i metodi localKV hanno tipo never (ts dà errore)
- *  - se non viene chiamato withStorage, tutti i metodi dello storage hanno tipo never
+ *  - se non viene chiamato withLocalKVStorage, tutti i metodi localKV hanno tipo never (ts dà errore)
+ *  - stessa cosa per withStorage
  * 
  *  - il task ha sempre una proprietà [x: string]: any in modo da permettere di invocare metodi
  *    che non sono fra quelli tipizzati (es: le estensioni)
+ * 
+ *  - il task può essere inizializzato con un tipo se va usato con inject
+ *     es: Task<string>().inject({a: 2}) dà errore perchè non viene iniettata una stringa
+ *  
+ *  - altrimenti il tipo dipende dalla source e dall'oggetto che le viene passato
+ *     es: Task().fromArray([1,2,3,4])  -> il tipo del messaggio sarà number[]
  * 
  * */
 
@@ -218,7 +225,7 @@ export declare interface KExchange<T> {
     setKeyParser: (fn: (x: T) => string | number) => void;
     setValidationFunction: (fn: (x: T) => boolean | any) => void;
     on: <R>(fn: (x: T) => R) => Promise<TaskTypeHelper<void, R, T, true, false>>; /*TBD*/
-    emit: (mex: any) => Promise<any>;/*TBD*/
+    emit: (mex: any) => Promise<TaskTypeHelper<{ key: string | number, value: string }, { key: string | number, value: string }, void, false, false>>
 }
 
 export declare function KafkaClient(config: KafkaConfig): Kafka

@@ -140,7 +140,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
 
     inject: (data: I) => Promise<TaskTypeHelper<I, T, L, Ls, Ss, Ms>>
     close: () => Promise<TaskTypeHelper<I, T, L, Ls, Ss, Ms>>
-    finalize: () => T
+    finalize: <R = T>() => R
     self: (cb: (task: TaskTypeHelper<I, T, L, Ls, Ss, Ms>) => any) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
 
     [x: string]: any 

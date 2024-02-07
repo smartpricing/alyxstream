@@ -99,15 +99,3 @@ test('groupBy', async () => {
 	})
 	.close()
 })
-
-
-test('groupBy', async () => {
-	const t = await Task()
-	.fromObject([1,2,3,1,2,1])
-	.withLocalKVStorage<string>()
-	.setLocalKV()
-	// .customFunction((x) => {
-	// 	expect(x).toStrictEqual({"1": [1, 1, 1], "2": [2, 2], "3": [3]})
-	// })
-	.close()
-})

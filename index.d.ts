@@ -191,6 +191,6 @@ export declare function KafkaSource(client: Kafka, config: ConsumerConfig): Prom
 export declare function KafkaSink(client: Kafka, config: ProducerConfig): Promise<KSink>
 export declare function KafkaCommit(source: KSource, params: KCommitParams): Promise<KCommitParams>
 export declare function KafkaRekey(kafkaSource: KSource, rekeyFunction: RekeyFunction, kafkaSink: KSink, sinkTopic: string, sinkDataFunction: SinkDataFunction): void
-export declare function Exchange(client: Kafka, topic: string, sourceOptions: ConsumerConfig, sinkOptions: ProducerConfig): Exch
+export declare function Exchange(client: Kafka, topic: string, groupId: string, sourceOptions?: ConsumerConfig, sinkOptions?: ProducerConfig): Exch
 
 type ElemOfArr<T extends any[]> = T extends (infer U)[] ? U : never;

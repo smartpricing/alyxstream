@@ -30,6 +30,16 @@ import { RedisOptions } from "ioredis";
  *  - altrimenti il tipo dipende dalla source e dall'oggetto che le viene passato
  *     es: Task().fromArray([1,2,3,4])  -> il tipo del messaggio sarà number[]
  * 
+ *  - mi sembra ci sia un problema nell'operator "branch"
+ *     > da quello che è descritto in doc sembra che l'ultimo risultato del task padre venga automaticamente inietato nei subtask,
+ *      ma da codice questo non avviene (il payload viene passato alla funzione che ritorna il subtask, ma poi è la funzione 
+ *      a doverlo iniettare manualmente nel subtask).
+ *      Per ora è tipizzato per come è scritto il codice. 
+ * 
+ *  - il metodo each degli array non chiama la callback che gli viene passata
+ * 
+ *  - tutte le keys (proprietà degli oggetti, chiavi dello storage, ecc) sono di tipo string | number
+ * 
  * */
 
 // T = current value type
@@ -67,24 +77,24 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
         [x: number]: any
     }
 
-    withDefaultKey: Function/*TBD*/
-    withEventTime: Function/*TBD*/
-    keyBy: Function/*TBD*/
+    withDefaultKey: () => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
+    withEventTime: (cb: (x: T) => number) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
+    keyBy: (cb: (x: T) => string | number) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
 
-    filter: Function/*TBD*/
-    print: Function/*TBD*/
+    filter: (cb: (x: T) => boolean) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
+    print: (str?: string) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
 
-    branch: Function/*TBD*/
-    readline: Function/*TBD*/
+    branch: <R = any>(subtaskFuncs: ((x: T) => Promise<TaskTypeHelper<any, R, any, any, any, any>>)[]) => TaskTypeHelper<I, R[], L, Ls, Ss, Ms>
+    readline: () => TaskTypeHelper<I, string, L, Ls, Ss, Ms>
 
     //custom
-    fn: <R>(callback: (x: T) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms> /*TO CHECK*/
-    fnRaw: Function/*TBD*/
-    customFunction: Function/*TBD*/
-    customAsyncFunction: Function/*TBD*/
-    customFunctionRaw: Function/*TBD*/
-    customAsyncFunctionRaw: Function/*TBD*/
-    joinByKeyWithParallelism: Function/*TBD*/
+    fn: <R>(callback: (x: T) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
+    fnRaw: <R>(callback: (x: Msg<T>) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
+    customFunction: <R>(callback: (x: T) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
+    customAsyncFunction: <R>(callback: (x: T) => Promise<R>) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
+    customFunctionRaw: <R>(callback: (x: Msg<T>) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
+    customAsyncFunctionRaw: <R>(callback: (x: Msg<T>) => Promise<R>) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
+    joinByKeyWithParallelism: (storage: Storage, keyFunction: (x: Msg<T>) => string | number, parallelism: number) => TaskTypeHelper<I, T[], L, Ls, Ss, Ms>
 
     //queue
     queueSize: Function/*TBD*/
@@ -138,12 +148,12 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
 
 export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Ss, Ms> {
     map: <R>(func: (x: ElemOfArr<T>) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
-    each: Function/*TBD*/ //bug? the callback is never called
+    each: (func: (x: ElemOfArr<T>) => any) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
     filterArray: (func: (x: ElemOfArr<T>) => boolean) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
     reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
-    countInArray: Function/*TBD*/ //*???
+    countInArray: (func: (x: ElemOfArr<T>) => string | number) => TaskTypeHelper<I, { [x in string | number]: number }, L, Ls, Ss, Ms>
     length: () => TaskTypeHelper<I, number, L, Ls, Ss, Ms>
-    groupBy: (func: (elem: T, index: number, array: T[]) => any) => TaskTypeHelper<I, { [x in string | number]: T[] }, L, Ls, Ss, Ms> // TO CHECK
+    groupBy: (func: (elem: T, index?: number, array?: T[]) => any) => TaskTypeHelper<I, { [x in string | number]: T[] }, L, Ls, Ss, Ms> 
 
     // it seems that fromStorage is available only if the message payload value is an array
     // since it pushes the stored values into the message payload

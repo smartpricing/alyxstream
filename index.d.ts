@@ -6,7 +6,7 @@ import { ClientOptions } from "cassandra-driver";
 /**
  * Note per Alice
  * 
- *  - i metodi disponibili del task dipenderanno dal tipo del messaggio a quello specifico punto del task
+ *  - i metodi disponibili del task dipenderanno dal tipo del messaggio in quello specifico punto del task
  *    es: Task().fromArray([1,2,3]) avrà a disposizione anche i metodi degli array
  *        Task().fromArray([1,2,3]).length() non ha i metodi degli array perchè il messaggio è number
  *    nota: tutti i tipi sono considerati object di base e quindi hanno i metodi degli objects (es: aggregate)
@@ -27,7 +27,7 @@ import { ClientOptions } from "cassandra-driver";
 
 // T = current value type
 // I = initial value type (needed for the "inject" method)
-// L = type of local storage properties (void by default)
+// L = type of local storage properties (void by default, any if not set)
 // Ls = is local storage set (false by default)
 // Ss = is storage set (false by default)
 
@@ -118,6 +118,8 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
 
     inject: (data: I) => Promise<TaskTypeHelper<I, T, L, Ls, Ss>>
     close: () => Promise<TaskTypeHelper<I, T, L, Ls, Ss>>
+    finalize: () => T
+    self: (cb: (task: TaskTypeHelper<I, T, L, Ls, Ss>) => any) => TaskTypeHelper<I, T, L, Ls, Ss>
 
     [x: string]: any 
 }

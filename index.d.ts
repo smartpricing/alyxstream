@@ -1,22 +1,25 @@
 import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin, Consumer, Producer, CompressionTypes, Message, TopicPartitionOffsetAndMetadata } from "kafkajs"
+import { ClientOptions as CassandraClientOptions } from "cassandra-driver";
 import { ReadStream, PathLike } from "fs"
 import { RedisOptions } from "ioredis";
-import { ClientOptions } from "cassandra-driver";
 
 /**
- * Note per Alice
+ * Note/Domande per Alice
  * 
  *  - i metodi disponibili del task dipenderanno dal tipo del messaggio in quello specifico punto del task
  *    es: Task().fromArray([1,2,3]) avrà a disposizione anche i metodi degli array
  *        Task().fromArray([1,2,3]).length() non ha i metodi degli array perchè il messaggio è number
  *    nota: tutti i tipi sono considerati object di base e quindi hanno i metodi degli objects (es: aggregate)
  * 
- *  - se non viene chiamato withLocalKVStorage, tutti i metodi localKV hanno tipo never (ts dà errore)
+ *  - se non viene chiamato withLocalKVStorage, tutti i metodi localKV hanno tipo never (ts dà errore provando a invocarli)
  *  - stessa cosa per withStorage
  *  - stessa cosa per metadata
  * 
- *  - i metodi dei metadata sono corretti? 
+ *  - i metodi dei metadata sono corretti o andranno modificati? 
  *    non capisco molto a cosa servano perche mi sembra che si possa modificare solo il campo "id"
+ * 
+ *  - come per i metodi dello storage, andrebbe impedito di invocare le window quando non sono state
+ *     chiamate le funzioni withDefaultKey o byKey?
  * 
  *  - il task ha sempre una proprietà [x: string]: any in modo da permettere l'invocazione
  *    che non sono fra quelli tipizzati (es: le estensioni)
@@ -43,15 +46,15 @@ type Msg<T> = {
 
 type TaskTypeHelper<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> = T extends (infer U)[] // is T an array?
 /**/ ? U extends number // is array of numbers?
-/**//**/ ? TaskOfNumberArray<I, U[], L, Ls, Ss, Ms> // array of numbers
-/**//**/ : U extends string // not array of numbers, is array of strings?
-/**//**//**/ ? TaskOfStringArray<I, U[], L, Ls, Ss, Ms> // array of strings
-/**//**//**/ : U extends any[] // not array of strings, is array of anything else?
-/**//**//**//**/ ? TaskOfMultiArray<I, U[], L, Ls, Ss, Ms> // n dimensions array
-/**//**//**//**/ : TaskOfArray<I, U[], L, Ls, Ss, Ms> // 1 dimension array
+/*    */ ? TaskOfNumberArray<I, U[], L, Ls, Ss, Ms> // array of numbers
+/*    */ : U extends string // not array of numbers, is array of strings?
+/*        */ ? TaskOfStringArray<I, U[], L, Ls, Ss, Ms> // array of strings
+/*        */ : U extends any[] // not array of strings, is array of anything else?
+/*            */ ? TaskOfMultiArray<I, U[], L, Ls, Ss, Ms> // n dimensions array
+/*            */ : TaskOfArray<I, U[], L, Ls, Ss, Ms> // 1 dimension array
 /**/ : T extends string // not an array, is string?
-/**//**/ ? TaskOfString<I, T, L, Ls, Ss, Ms> // is string
-/**//**/ : TaskOfObject<I, T, L, Ls, Ss, Ms> // anything else
+/*    */ ? TaskOfString<I, T, L, Ls, Ss, Ms> // is string
+/*    */ : TaskOfObject<I, T, L, Ls, Ss, Ms> // anything else
 // since everything in js is an object, TaskOfObject is the default
 
 export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> {
@@ -190,7 +193,7 @@ export type StorageConfig<K extends StorageKind> = K extends StorageKind.Memory
     : K extends StorageKind.Redis
     ? RedisOptions
     : K extends StorageKind.Cassandra
-    ? ClientOptions
+    ? CassandraClientOptions
     : never;
 
 export declare interface Storage {
@@ -251,7 +254,7 @@ export declare interface KExchange<T> {
     setKeyParser: (fn: (x: T) => string | number) => void;
     setValidationFunction: (fn: (x: T) => boolean | any) => void;
     on: <R>(fn: (x: T) => R) => Promise<TaskTypeHelper<void, R, T, true, false, false>>;
-    emit: (mex: any) => ExchangeEmitTask
+    emit: (mex: any) => Promise<ExchangeEmitTask>
 }
 
 export declare function KafkaClient(config: KafkaConfig): Kafka

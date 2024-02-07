@@ -4,20 +4,20 @@ import { ReadStream, PathLike } from "fs"
 // T = current value type
 // I = initial value type (needed for the "inject" method)
 
-type TaskTypeHelper<I, T> = T extends (infer U)[] // is T an array?
+type TaskTypeHelper<I, T, L> = T extends (infer U)[] // is T an array?
 /**/ ? U extends number // array
-/**//**/ ? TaskOfNumberArray<I, U[]> // array of numbers
+/**//**/ ? TaskOfNumberArray<I, U[], L> // array of numbers
 /**//**/ : U extends string // not array of numbers
-/**//**//**/ ? TaskOfStringArray<I, U[]> // array of strings
+/**//**//**/ ? TaskOfStringArray<I, U[], L> // array of strings
 /**//**//**/ : U extends any[] // array of anything else
-/**//**//**//**/ ? TaskOfMultiArray<I, U[]> // n dimensions array
-/**//**//**//**/ : TaskOfArray<I, U[]> // 1 dimension array
+/**//**//**//**/ ? TaskOfMultiArray<I, U[], L> // n dimensions array
+/**//**//**//**/ : TaskOfArray<I, U[], L> // 1 dimension array
 /**/ : T extends string // not an array
-/**//**/ ? TaskOfString<I, T> // string
-/**//**/ : TaskOfObject<I, T> // anything else
+/**//**/ ? TaskOfString<I, T, L> // string
+/**//**/ : TaskOfObject<I, T, L> // anything else
 // since everything in js is an object, TaskOfObject is the default
 
-export declare interface TaskBase<I, T> {
+export declare interface TaskBase<I, T, L> {
     //base
     withMetadata: Function/*TBD*/
     setMetadata: Function/*TBD*/
@@ -34,7 +34,7 @@ export declare interface TaskBase<I, T> {
     readline: Function/*TBD*/
 
     //custom
-    fn: <R>(callback: (x: T) => R) => TaskTypeHelper<I, R> /*TO CHECK*/
+    fn: <R>(callback: (x: T) => R) => TaskTypeHelper<I, R, L> /*TO CHECK*/
     fnRaw: Function/*TBD*/
     customFunction: Function/*TBD*/
     customAsyncFunction: Function/*TBD*/
@@ -56,6 +56,15 @@ export declare interface TaskBase<I, T> {
     flushStorage: Function/*TBD*/
     storage: Function/*TBD*/
 
+    //local storage
+    withLocalKVStorage: <newL = any>() => TaskTypeHelper<I, T, newL>
+    setLocalKV: (key: string | number) => TaskTypeHelper<I, T, L> //sets local KV storage type {[x in string | number]: newL}
+    getLocalKV: <K>(key?: K) => K extends Exclude<K, string | number> // check if key is provided
+        ? TaskTypeHelper<I, { [x in string | number]: L }, L> // not provided => returns full storage
+        : TaskTypeHelper<I, L, L> // provided => returns single storage value
+    mergeLocalKV: Function/*TBD*/
+    flushLocalKV: Function/*TBD*/
+
     //window
     tumblingWindowCount: Function/*TBD*/
     tumblingWindowTime: Function/*TBD*/
@@ -64,42 +73,42 @@ export declare interface TaskBase<I, T> {
     slidingWindowTime: Function/*TBD*/
 
     //sink 
-    toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Message[], options?: KSinkOptions) => TaskTypeHelper<I, T>
-    kafkaCommit: (kafkaSource: KSource, commitParams: KCommitParams) => TaskTypeHelper<I, T>
+    toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Message[], options?: KSinkOptions) => TaskTypeHelper<I, T, L>
+    kafkaCommit: (kafkaSource: KSource, commitParams: KCommitParams) => TaskTypeHelper<I, T, L>
  
     //source
-    fromKafka: <R = any>(source: KSource) => TaskTypeHelper<I, KMessage<R>>
-    fromArray: <R>(array: R[]) => TaskTypeHelper<I, R[]>
-    fromObject: <R>(object: R) => TaskTypeHelper<I, R>
-    fromString: (string: string) => TaskTypeHelper<I, string>
-    fromInterval: <R = number>(intervalMs: number, generatorFunc?: (counter: number) => R, maxSize?: number) => TaskTypeHelper<I, R>/*TBD*/
-    fromReadableStream: (filePath: PathLike, useZlib?: boolean) => TaskTypeHelper<I, ReadStream>
+    fromKafka: <R = any>(source: KSource) => TaskTypeHelper<I, KMessage<R>, L>
+    fromArray: <R>(array: R[]) => TaskTypeHelper<I, R[], L>
+    fromObject: <R>(object: R) => TaskTypeHelper<I, R, L>
+    fromString: (string: string) => TaskTypeHelper<I, string, L>
+    fromInterval: <R = number>(intervalMs: number, generatorFunc?: (counter: number) => R, maxSize?: number) => TaskTypeHelper<I, R, L>/*TBD*/
+    fromReadableStream: (filePath: PathLike, useZlib?: boolean) => TaskTypeHelper<I, ReadStream, L>
 
-    inject: (data: I) => Promise<TaskTypeHelper<I, T>>
-    close: () => Promise<TaskTypeHelper<I, T>>
+    inject: (data: I) => Promise<TaskTypeHelper<I, T, L>>
+    close: () => Promise<TaskTypeHelper<I, T, L>>
 
     [x: string]: any 
 }
 
-export declare interface TaskOfArray<I, T extends any[]> extends TaskOfObject<I, T> {
-    map: <R>(func: (x: ElemOfArr<T>) => R) => TaskTypeHelper<I, R>
+export declare interface TaskOfArray<I, T extends any[], L> extends TaskOfObject<I, T, L> {
+    map: <R>(func: (x: ElemOfArr<T>) => R) => TaskTypeHelper<I, R, L>
     each: Function/*TBD*/ //bug? the callback is never called
-    filterArray: (func: (x: ElemOfArr<T>) => boolean) => TaskTypeHelper<I, T>
-    reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => TaskTypeHelper<I, R>
+    filterArray: (func: (x: ElemOfArr<T>) => boolean) => TaskTypeHelper<I, T, L>
+    reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => TaskTypeHelper<I, R, L>
     countInArray: Function/*TBD*/ //*???
-    length: () => TaskTypeHelper<I, number>
-    groupBy: (func: (elem: T, index: number, array: T[]) => any) => TaskTypeHelper<I, { [x in string | number]: T[] }> // TO CHECK
+    length: () => TaskTypeHelper<I, number, L>
+    groupBy: (func: (elem: T, index: number, array: T[]) => any) => TaskTypeHelper<I, { [x in string | number]: T[] }, L> // TO CHECK
 
     [x: string]: any
 }
 
-export declare interface TaskOfMultiArray<I, T extends any[][]> extends TaskOfArray<I, T>, TaskOfObject<I, T> {
-    flat: () => TaskTypeHelper<I, ElemOfArr<ElemOfArr<T>>[]>
+export declare interface TaskOfMultiArray<I, T extends any[][], L> extends TaskOfArray<I, T, L>, TaskOfObject<I, T, L> {
+    flat: () => TaskTypeHelper<I, ElemOfArr<ElemOfArr<T>>[], L>
     
     [x: string]: any
 }
 
-export declare interface TaskOfObject<I, T> extends TaskBase<I, T> {
+export declare interface TaskOfObject<I, T, L> extends TaskBase<I, T, L> {
     sumMap: Function/*TBD*/
     objectGroupBy: Function/*TBD*/
     aggregate: Function/*TBD*/
@@ -107,20 +116,20 @@ export declare interface TaskOfObject<I, T> extends TaskBase<I, T> {
     [x: string]: any
 }
 
-export declare interface TaskOfNumberArray<I, T extends number[]> extends TaskOfArray<I, T> {
-    sum: () => TaskTypeHelper<I, number>    
+export declare interface TaskOfNumberArray<I, T extends number[], L> extends TaskOfArray<I, T, L> {
+    sum: () => TaskTypeHelper<I, number, L>    
 }
 
-export declare interface TaskOfStringArray<I, T extends string[]> extends TaskOfArray<I, T> {
+export declare interface TaskOfStringArray<I, T extends string[], L> extends TaskOfArray<I, T, L> {
     // just in case it's needed
     // eg concat () =>
 }
 
-export declare interface TaskOfString<I, T extends string> extends TaskOfObject<I, T> {
-    tokenize: () => TaskTypeHelper<I, string[]>
+export declare interface TaskOfString<I, T extends string, L> extends TaskOfObject<I, T, L> {
+    tokenize: () => TaskTypeHelper<I, string[], L>
 }
 
-export declare function Task<I = any>(id?: any): TaskTypeHelper<I, I> /*TBD*/
+export declare function Task<I = any>(id?: any): TaskTypeHelper<I, I, void> /*TBD*/
 export declare function ExtendTask(name: string, extension: any /*TBD*/): void
 export declare function ExtendTaskRaw(name: string, extension: any /*TBD*/): void
 
@@ -178,10 +187,10 @@ export declare interface KSink extends Producer {}
 export type RekeyFunction = (s: any) => any /*TBD*/
 export type SinkDataFunction = (s: any) => Message /*TBD*/
 
-export declare interface Exch {
-    setKeyParser: (fn: any) => any;/*TBD*/
-    setValidationFunction: (fn: any) => any;/*TBD*/
-    on: (fn: (x: any) => Promise<any>) => Promise<any>;/*TBD*/
+export declare interface KExchange<T> {
+    setKeyParser: (fn: (x: T) => string | number) => void;
+    setValidationFunction: (fn: (x: T) => boolean | any) => void;
+    on: <R>(fn: (x: T) => R) => Promise<TaskTypeHelper<void, R, any>>; /*TBD*/
     emit: (mex: any) => Promise<any>;/*TBD*/
 }
 
@@ -191,6 +200,12 @@ export declare function KafkaSource(client: Kafka, config: ConsumerConfig): Prom
 export declare function KafkaSink(client: Kafka, config: ProducerConfig): Promise<KSink>
 export declare function KafkaCommit(source: KSource, params: KCommitParams): Promise<KCommitParams>
 export declare function KafkaRekey(kafkaSource: KSource, rekeyFunction: RekeyFunction, kafkaSink: KSink, sinkTopic: string, sinkDataFunction: SinkDataFunction): void
-export declare function Exchange(client: Kafka, topic: string, groupId: string, sourceOptions?: ConsumerConfig, sinkOptions?: ProducerConfig): Exch
+export declare function Exchange<T = any>(client: Kafka, topic: string, groupId: string, sourceOptions?: ConsumerConfig, sinkOptions?: ProducerConfig): KExchange<T>
 
 type ElemOfArr<T extends any[]> = T extends (infer U)[] ? U : never;
+
+// type OptionalParameterFunction<P, A, B> = {
+//     <K extends P>(key?: K): ExactlyMatches<typeof key, undefined> extends true ? A : B;
+// };
+
+// type ExactlyMatches<A, B> = A extends B ? (B extends A ? true : false) : false;

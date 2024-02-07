@@ -1,12 +1,21 @@
 import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin, Consumer, Producer, CompressionTypes, Message, TopicPartitionOffsetAndMetadata } from "kafkajs"
 import { ReadStream, PathLike } from "fs"
 
-type TaskTypeHelper<I, T> = T extends (infer U)[] 
-    ? U extends any[] ? TaskOfMultiArray<I, U[]> : TaskOfArray<I, U[]>
-    : TaskOfObject<I, T>;
-
 // T = current value type
 // I = initial value type (needed for the "inject" method)
+
+type TaskTypeHelper<I, T> = T extends (infer U)[] // is T an array?
+/**/ ? U extends number // array
+/**//**/ ? TaskOfNumberArray<I, U[]> // array of numbers
+/**//**/ : U extends string // not array of numbers
+/**//**//**/ ? TaskOfStringArray<I, U[]> // array of strings
+/**//**//**/ : U extends any[] // array of anything else
+/**//**//**//**/ ? TaskOfMultiArray<I, U[]> // n dimensions array
+/**//**//**//**/ : TaskOfArray<I, U[]> // 1 dimension array
+/**/ : T extends string // not an array
+/**//**/ ? TaskOfString<I, T> // string
+/**//**/ : TaskOfObject<I, T> // anything else
+// since everything in js is an object, TaskOfObject is the default
 
 export declare interface TaskBase<I, T> {
     //base
@@ -19,8 +28,6 @@ export declare interface TaskBase<I, T> {
     keyBy: Function/*TBD*/
 
     filter: Function/*TBD*/
-    sum: Function/*TBD*/ //???
-    tokenize: Function/*TBD*/
     print: Function/*TBD*/
 
     branch: Function/*TBD*/
@@ -69,6 +76,7 @@ export declare interface TaskBase<I, T> {
     fromReadableStream: (filePath: PathLike, useZlib?: boolean) => TaskTypeHelper<I, ReadStream>
 
     inject: (data: I) => Promise<TaskTypeHelper<I, T>>
+    close: () => Promise<TaskTypeHelper<I, T>>
 
     [x: string]: any 
 }
@@ -97,6 +105,19 @@ export declare interface TaskOfObject<I, T> extends TaskBase<I, T> {
     aggregate: Function/*TBD*/
 
     [x: string]: any
+}
+
+export declare interface TaskOfNumberArray<I, T extends number[]> extends TaskOfArray<I, T> {
+    sum: () => TaskTypeHelper<I, number>    
+}
+
+export declare interface TaskOfStringArray<I, T extends string[]> extends TaskOfArray<I, T> {
+    // just in case it's needed
+    // eg concat () =>
+}
+
+export declare interface TaskOfString<I, T extends string> extends TaskOfObject<I, T> {
+    tokenize: () => TaskTypeHelper<I, string>
 }
 
 export declare function Task<I = any>(id?: any): TaskTypeHelper<I, I> /*TBD*/
@@ -171,48 +192,5 @@ export declare function KafkaSink(client: Kafka, config: ProducerConfig): Promis
 export declare function KafkaCommit(source: KSource, params: KCommitParams): Promise<KCommitParams>
 export declare function KafkaRekey(kafkaSource: KSource, rekeyFunction: RekeyFunction, kafkaSink: KSink, sinkTopic: string, sinkDataFunction: SinkDataFunction): void
 export declare function Exchange(client: Kafka, topic: string, sourceOptions: ConsumerConfig, sinkOptions: ProducerConfig): Exch
-
-// // // // // // // // // // // // 
-
-// export const KafkaSource: typeof kafkaSource;
-// export const KafkaSink: typeof kafkaSink;
-// export const KafkaRekey: typeof kafkaRekey;
-// export const KafkaCommit: typeof kafkaCommit;
-
-// export const TumblingWindowTime: typeof tumblingWindowTime;
-// export const TumblingWindowCount: typeof tumblingWindowCount;
-// export const SlidingWindowTime: typeof slidingWindowTime;
-// export const SlidingWindowCount: typeof slidingWindowCount;
-// export const SessionWindow: typeof sessionWindow;
-// export const SourceOperators: typeof sourceOperators;
-// export const BaseOperators: typeof baseOperators;
-// export const WindowOperators: typeof windowOperators;
-// export const ArrayOperators: typeof arrayOperators;
-// export const CustomOperators: typeof customOperators;
-// export const SinkOperators: typeof sinkOperators;
-
-// import task from "./src/task/task.js";
-// import exchange from "./src/exchange/exchange.js";
-// import { set as ExtendTaskSet } from "./src/task/extend.js";
-// import { setRaw as ExtendTaskSetRaw } from "./src/task/extend.js";
-// import { Make as storageMake } from "./src/storage/interface.js";
-// import { ExposeStorageState as exposeStorageState } from "./src/rest/state.js";
-// import kafkaClient from "./src/kafka/client.js";
-// import kafkaAdmin from "./src/kafka/admin.js";
-// import kafkaSource from "./src/kafka/source.js";
-// import kafkaSink from "./src/kafka/sink.js";
-// import kafkaRekey from "./src/kafka/rekey.js";
-// import kafkaCommit from "./src/kafka/commit.js";
-// import tumblingWindowTime from "./src/window/tumblingWindowTime.js";
-// import tumblingWindowCount from "./src/window/tumblingWindowCount.js";
-// import slidingWindowTime from "./src/window/slidingWindowTime.js";
-// import slidingWindowCount from "./src/window/slidingWindowCount.js";
-// import sessionWindow from "./src/window/windowSession.js";
-// import * as sourceOperators from "./src/operators/source.js";
-// import * as baseOperators from "./src/operators/base.js";
-// import * as windowOperators from "./src/operators/window.js";
-// import * as arrayOperators from "./src/operators/array.js";
-// import * as customOperators from "./src/operators/custom.js";
-// import * as sinkOperators from "./src/operators/sink.js";import { objectGroupBy } from "./src/operators/object.js"
 
 type ElemOfArr<T extends any[]> = T extends (infer U)[] ? U : never;

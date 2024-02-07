@@ -58,11 +58,11 @@ export declare interface TaskBase<I, T, L> {
 
     //local storage
     withLocalKVStorage: <newL = any>() => TaskTypeHelper<I, T, newL>
-    setLocalKV: (key: string | number) => TaskTypeHelper<I, T, L> //sets local KV storage type {[x in string | number]: newL}
+    setLocalKV: (key: string | number, func: (x: T) => L) => TaskTypeHelper<I, T, L> //sets local KV storage type {[x in string | number]: newL}
     getLocalKV: <K>(key?: K) => K extends Exclude<K, string | number> // check if key is provided
         ? TaskTypeHelper<I, { [x in string | number]: L }, L> // not provided => returns full storage
         : TaskTypeHelper<I, L, L> // provided => returns single storage value
-    mergeLocalKV: Function/*TBD*/
+    mergeLocalKV: <K extends string | number>(key: K) => TaskTypeHelper<I, T & {[x in K]: L}, L> 
     flushLocalKV: Function/*TBD*/
 
     //window

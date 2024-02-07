@@ -55,16 +55,16 @@ type Msg<T> = {
 }
 
 type TaskTypeHelper<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> = T extends (infer U)[] // is T an array?
-/**/ ? U extends number // is array of numbers?
-/*    */ ? TaskOfNumberArray<I, U[], L, Ls, Ss, Ms> // array of numbers
-/*    */ : U extends string // not array of numbers, is array of strings?
-/*        */ ? TaskOfStringArray<I, U[], L, Ls, Ss, Ms> // array of strings
-/*        */ : U extends any[] // not array of strings, is array of anything else?
-/*            */ ? TaskOfMultiArray<I, U[], L, Ls, Ss, Ms> // n dimensions array
-/*            */ : TaskOfArray<I, U[], L, Ls, Ss, Ms> // 1 dimension array
-/**/ : T extends string // not an array, is string?
-/*    */ ? TaskOfString<I, T, L, Ls, Ss, Ms> // is string
-/*    */ : TaskOfObject<I, T, L, Ls, Ss, Ms> // anything else
+/*  */ ? U extends number // is array of numbers?
+/*      */ ? TaskOfNumberArray<I, U[], L, Ls, Ss, Ms> // array of numbers
+/*      */ : U extends string // not array of numbers, is array of strings?
+/*            */ ? TaskOfStringArray<I, U[], L, Ls, Ss, Ms> // array of strings
+/*          */ : U extends any[] // not array of strings, is array of anything else?
+/*                */ ? TaskOfMultiArray<I, U[], L, Ls, Ss, Ms> // n dimensions array
+/*              */ : TaskOfArray<I, U[], L, Ls, Ss, Ms> // 1 dimension array
+/*      */ : T extends string // not an array, is string?
+/*      */ ? TaskOfString<I, T, L, Ls, Ss, Ms> // is string
+/*      */ : TaskOfObject<I, T, L, Ls, Ss, Ms> // anything else
 // since everything in js is an object, TaskOfObject is the default
 
 export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> {

@@ -13,6 +13,10 @@ import { ClientOptions } from "cassandra-driver";
  * 
  *  - se non viene chiamato withLocalKVStorage, tutti i metodi localKV hanno tipo never (ts dà errore)
  *  - stessa cosa per withStorage
+ *  - stessa cosa per metadata
+ * 
+ *  - i metodi dei metadata sono corretti? 
+ *    non capisco molto a cosa servano perche mi sembra che si possa modificare solo il campo "id"
  * 
  *  - il task ha sempre una proprietà [x: string]: any in modo da permettere l'invocazione
  *    che non sono fra quelli tipizzati (es: le estensioni)
@@ -30,30 +34,35 @@ import { ClientOptions } from "cassandra-driver";
 // L = type of local storage properties (void by default, any if not set)
 // Ls = is local storage set (false by default)
 // Ss = is storage set (false by default)
+// Ms = is metadata set (false by default)
 
 type Msg<T> = {
     value: T
     key: string | number
 }
 
-type TaskTypeHelper<I, T, L, Ls extends boolean, Ss extends boolean> = T extends (infer U)[] // is T an array?
+type TaskTypeHelper<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> = T extends (infer U)[] // is T an array?
 /**/ ? U extends number // is array of numbers?
-/**//**/ ? TaskOfNumberArray<I, U[], L, Ls, Ss> // array of numbers
+/**//**/ ? TaskOfNumberArray<I, U[], L, Ls, Ss, Ms> // array of numbers
 /**//**/ : U extends string // not array of numbers, is array of strings?
-/**//**//**/ ? TaskOfStringArray<I, U[], L, Ls, Ss> // array of strings
+/**//**//**/ ? TaskOfStringArray<I, U[], L, Ls, Ss, Ms> // array of strings
 /**//**//**/ : U extends any[] // not array of strings, is array of anything else?
-/**//**//**//**/ ? TaskOfMultiArray<I, U[], L, Ls, Ss> // n dimensions array
-/**//**//**//**/ : TaskOfArray<I, U[], L, Ls, Ss> // 1 dimension array
+/**//**//**//**/ ? TaskOfMultiArray<I, U[], L, Ls, Ss, Ms> // n dimensions array
+/**//**//**//**/ : TaskOfArray<I, U[], L, Ls, Ss, Ms> // 1 dimension array
 /**/ : T extends string // not an array, is string?
-/**//**/ ? TaskOfString<I, T, L, Ls, Ss> // is string
-/**//**/ : TaskOfObject<I, T, L, Ls, Ss> // anything else
+/**//**/ ? TaskOfString<I, T, L, Ls, Ss, Ms> // is string
+/**//**/ : TaskOfObject<I, T, L, Ls, Ss, Ms> // anything else
 // since everything in js is an object, TaskOfObject is the default
 
-export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolean> {
+export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> {
     //base
-    withMetadata: Function/*TBD*/
-    setMetadata: Function/*TBD*/
-    getMetadata: Function/*TBD*/
+    withMetadata: () => TaskTypeHelper<I, T, L, Ls, Ss, true>
+    setMetadata: Ms extends false ? never : (id: any) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
+    getMetadata: Ms extends false ? never : () => { 
+        id: any, 
+        [x: string]: any
+        [x: number]: any
+    }
 
     withDefaultKey: Function/*TBD*/
     withEventTime: Function/*TBD*/
@@ -66,7 +75,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     readline: Function/*TBD*/
 
     //custom
-    fn: <R>(callback: (x: T) => R) => TaskTypeHelper<I, R, L, Ls, Ss> /*TO CHECK*/
+    fn: <R>(callback: (x: T) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms> /*TO CHECK*/
     fnRaw: Function/*TBD*/
     customFunction: Function/*TBD*/
     customAsyncFunction: Function/*TBD*/
@@ -80,73 +89,73 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     dequeue: Function/*TBD*/
 
     //storage (only when Ss is true)
-    withStorage: (storage: Storage) => TaskTypeHelper<I, T, L, Ls, true>
-    toStorage: Ss extends false ? never : (keyFunc: (x: Msg<T>) => string | number, valueFunc?: (x: T) => any, ttl?: number) => TaskTypeHelper<I, T, L, Ls, Ss> /*To check*/
+    withStorage: (storage: Storage) => TaskTypeHelper<I, T, L, Ls, true, Ms>
+    toStorage: Ss extends false ? never : (keyFunc: (x: Msg<T>) => string | number, valueFunc?: (x: T) => any, ttl?: number) => TaskTypeHelper<I, T, L, Ls, Ss, Ms> /*To check*/
     // fromStorage is in TaskOfArray
-    fromStorageToGlobalState: Ss extends false ? never : (keysFunc: (x: Msg<T>) => (string | number)[]) => TaskTypeHelper<I, T, L, Ls, Ss>
-    disconnectStorage: Ss extends false ? never : () => TaskTypeHelper<I, T, L, Ls, Ss>
-    flushStorage: Ss extends false ? never : () => TaskTypeHelper<I, T, L, Ls, Ss>
+    fromStorageToGlobalState: Ss extends false ? never : (keysFunc: (x: Msg<T>) => (string | number)[]) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
+    disconnectStorage: Ss extends false ? never : () => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
+    flushStorage: Ss extends false ? never : () => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
     storage: Ss extends false ? never : () => Storage
 
     //local storage (only when Ls is true)
-    withLocalKVStorage: <newL = any>() => TaskTypeHelper<I, T, newL, true, Ss> // define the type of items stored in storage keys
-    setLocalKV: Ls extends false ? never : (key: string | number, func: (x: T) => L) => TaskTypeHelper<I, T, L, Ls, Ss> //sets local KV storage type {[x in string | number]: newL}
+    withLocalKVStorage: <newL = any>() => TaskTypeHelper<I, T, newL, true, Ss, Ms> // define the type of items stored in storage keys
+    setLocalKV: Ls extends false ? never : (key: string | number, func: (x: T) => L) => TaskTypeHelper<I, T, L, Ls, Ss, Ms> //sets local KV storage type {[x in string | number]: newL}
     getLocalKV: Ls extends false ? never : <K>(key?: K) => K extends Exclude<K, string | number> // check if key is provided
-        ? TaskTypeHelper<I, { [x in string | number]: L }, L, Ls, Ss> // not provided => returns full storage
-        : TaskTypeHelper<I, L, L, Ls, Ss> // provided => returns single storage value
-    mergeLocalKV: Ls extends false ? never : <K extends string | number>(key: K) => TaskTypeHelper<I, T & { [x in K]: L }, L, Ls, Ss> 
-    flushLocalKV: Ls extends false ? never : (key: string | number) => TaskTypeHelper<I, T, L, Ls, Ss> 
+        ? TaskTypeHelper<I, { [x in string | number]: L }, L, Ls, Ss, Ms> // not provided => returns full storage
+        : TaskTypeHelper<I, L, L, Ls, Ss, Ms> // provided => returns single storage value
+    mergeLocalKV: Ls extends false ? never : <K extends string | number>(key: K) => TaskTypeHelper<I, T & { [x in K]: L }, L, Ls, Ss, Ms> 
+    flushLocalKV: Ls extends false ? never : (key: string | number) => TaskTypeHelper<I, T, L, Ls, Ss, Ms> 
 
     //window (returned type to be checked)
-    tumblingWindowCount: (storage: Storage, countLength: number, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss>
-    tumblingWindowTime: (storage: Storage, timeLengthMilliSeconds: number, inactivityMilliseconds?: number) => TaskTypeHelper<I, T[], L, Ls, Ss>
-    sessionWindowTime: (storage: Storage, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss>
-    slidingWindowCount: (storage: Storage, countLength: number, slidingLength: number, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss>
-    slidingWindowTime: (storage: Storage, timeLengthMilliSeconds: number, slidingLengthMilliseconds: number, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss>
+    tumblingWindowCount: (storage: Storage, countLength: number, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss, Ms>
+    tumblingWindowTime: (storage: Storage, timeLengthMilliSeconds: number, inactivityMilliseconds?: number) => TaskTypeHelper<I, T[], L, Ls, Ss, Ms>
+    sessionWindowTime: (storage: Storage, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss, Ms>
+    slidingWindowCount: (storage: Storage, countLength: number, slidingLength: number, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss, Ms>
+    slidingWindowTime: (storage: Storage, timeLengthMilliSeconds: number, slidingLengthMilliseconds: number, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss, Ms>
 
     //sink 
-    toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Message[], options?: KSinkOptions) => TaskTypeHelper<I, T, L, Ls, Ss>
-    kafkaCommit: (kafkaSource: KSource, commitParams: KCommitParams) => TaskTypeHelper<I, T, L, Ls, Ss>
+    toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Message[], options?: KSinkOptions) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
+    kafkaCommit: (kafkaSource: KSource, commitParams: KCommitParams) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
  
     //source
-    fromKafka: <R = any>(source: KSource) => TaskTypeHelper<I, KMessage<R>, L, Ls, Ss>
-    fromArray: <R>(array: R[]) => TaskTypeHelper<I, R[], L, Ls, Ss>
-    fromObject: <R>(object: R) => TaskTypeHelper<I, R, L, Ls, Ss>
-    fromString: (string: string) => TaskTypeHelper<I, string, L, Ls, Ss>
-    fromInterval: <R = number>(intervalMs: number, generatorFunc?: (counter: number) => R, maxSize?: number) => TaskTypeHelper<I, R, L, Ls, Ss>/*TBD*/
-    fromReadableStream: (filePath: PathLike, useZlib?: boolean) => TaskTypeHelper<I, ReadStream, L, Ls, Ss>
+    fromKafka: <R = any>(source: KSource) => TaskTypeHelper<I, KMessage<R>, L, Ls, Ss, Ms>
+    fromArray: <R>(array: R[]) => TaskTypeHelper<I, R[], L, Ls, Ss, Ms>
+    fromObject: <R>(object: R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
+    fromString: (string: string) => TaskTypeHelper<I, string, L, Ls, Ss, Ms>
+    fromInterval: <R = number>(intervalMs: number, generatorFunc?: (counter: number) => R, maxSize?: number) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>/*TBD*/
+    fromReadableStream: (filePath: PathLike, useZlib?: boolean) => TaskTypeHelper<I, ReadStream, L, Ls, Ss, Ms>
 
-    inject: (data: I) => Promise<TaskTypeHelper<I, T, L, Ls, Ss>>
-    close: () => Promise<TaskTypeHelper<I, T, L, Ls, Ss>>
+    inject: (data: I) => Promise<TaskTypeHelper<I, T, L, Ls, Ss, Ms>>
+    close: () => Promise<TaskTypeHelper<I, T, L, Ls, Ss, Ms>>
     finalize: () => T
-    self: (cb: (task: TaskTypeHelper<I, T, L, Ls, Ss>) => any) => TaskTypeHelper<I, T, L, Ls, Ss>
+    self: (cb: (task: TaskTypeHelper<I, T, L, Ls, Ss, Ms>) => any) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
 
     [x: string]: any 
 }
 
-export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, Ss extends boolean> extends TaskOfObject<I, T, L, Ls, Ss> {
-    map: <R>(func: (x: ElemOfArr<T>) => R) => TaskTypeHelper<I, R, L, Ls, Ss>
+export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Ss, Ms> {
+    map: <R>(func: (x: ElemOfArr<T>) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
     each: Function/*TBD*/ //bug? the callback is never called
-    filterArray: (func: (x: ElemOfArr<T>) => boolean) => TaskTypeHelper<I, T, L, Ls, Ss>
-    reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => TaskTypeHelper<I, R, L, Ls, Ss>
+    filterArray: (func: (x: ElemOfArr<T>) => boolean) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
+    reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
     countInArray: Function/*TBD*/ //*???
-    length: () => TaskTypeHelper<I, number, L, Ls, Ss>
-    groupBy: (func: (elem: T, index: number, array: T[]) => any) => TaskTypeHelper<I, { [x in string | number]: T[] }, L, Ls, Ss> // TO CHECK
+    length: () => TaskTypeHelper<I, number, L, Ls, Ss, Ms>
+    groupBy: (func: (elem: T, index: number, array: T[]) => any) => TaskTypeHelper<I, { [x in string | number]: T[] }, L, Ls, Ss, Ms> // TO CHECK
 
     // it seems that fromStorage is available only if the message payload value is an array
     // since it pushes the stored values into the message payload
-    fromStorage: Ss extends false ? never : (keysFunc: (x: Msg<T>) => (string | number)[]) => TaskTypeHelper<I, any, L, Ls, Ss> /*To check*/
+    fromStorage: Ss extends false ? never : (keysFunc: (x: Msg<T>) => (string | number)[]) => TaskTypeHelper<I, any, L, Ls, Ss, Ms> /*To check*/
 
     [x: string]: any
 }
 
-export declare interface TaskOfMultiArray<I, T extends any[][], L, Ls extends boolean, Ss extends boolean> extends TaskOfArray<I, T, L, Ls, Ss> {
-    flat: () => TaskTypeHelper<I, ElemOfArr<ElemOfArr<T>>[], L, Ls, Ss>
+export declare interface TaskOfMultiArray<I, T extends any[][], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfArray<I, T, L, Ls, Ss, Ms> {
+    flat: () => TaskTypeHelper<I, ElemOfArr<ElemOfArr<T>>[], L, Ls, Ss, Ms>
     
     [x: string]: any
 }
 
-export declare interface TaskOfObject<I, T, L, Ls extends boolean, Ss extends boolean> extends TaskBase<I, T, L, Ls, Ss> {
+export declare interface TaskOfObject<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskBase<I, T, L, Ls, Ss, Ms> {
     sumMap: Function/*TBD*/
     objectGroupBy: Function/*TBD*/
     aggregate: Function/*TBD*/
@@ -154,20 +163,20 @@ export declare interface TaskOfObject<I, T, L, Ls extends boolean, Ss extends bo
     [x: string]: any
 }
 
-export declare interface TaskOfNumberArray<I, T extends number[], L, Ls extends boolean, Ss extends boolean> extends TaskOfArray<I, T, L, Ls, Ss> {
-    sum: () => TaskTypeHelper<I, number, L, Ls, Ss>    
+export declare interface TaskOfNumberArray<I, T extends number[], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfArray<I, T, L, Ls, Ss, Ms> {
+    sum: () => TaskTypeHelper<I, number, L, Ls, Ss, Ms>    
 }
 
-export declare interface TaskOfStringArray<I, T extends string[], L, Ls extends boolean, Ss extends boolean> extends TaskOfArray<I, T, L, Ls, Ss> {
+export declare interface TaskOfStringArray<I, T extends string[], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfArray<I, T, L, Ls, Ss, Ms> {
     // just in case it's needed
     // eg concat () => string
 }
 
-export declare interface TaskOfString<I, T extends string, L, Ls extends boolean, Ss extends boolean> extends TaskOfObject<I, T, L, Ls, Ss> {
-    tokenize: () => TaskTypeHelper<I, string[], L, Ls, Ss>
+export declare interface TaskOfString<I, T extends string, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Ss, Ms> {
+    tokenize: () => TaskTypeHelper<I, string[], L, Ls, Ss, Ms>
 }
 
-export declare function Task<I = any>(id?: any): TaskTypeHelper<I, I, void, false, false> /*TBD*/
+export declare function Task<I = any>(id?: any): TaskTypeHelper<I, I, void, false, false, false> /*TBD*/
 export declare function ExtendTask(name: string, extension: any /*TBD*/): void
 export declare function ExtendTaskRaw(name: string, extension: any /*TBD*/): void
 
@@ -235,13 +244,13 @@ export type SinkDataFunction = (s: any) => Message /*TBD*/
 type ExchangeEmitTask = TaskTypeHelper<
     { key: string | number, value: string }, 
     { key: string | number, value: string }, 
-    void, false, false
+    void, false, false, false
 >
 
 export declare interface KExchange<T> {
     setKeyParser: (fn: (x: T) => string | number) => void;
     setValidationFunction: (fn: (x: T) => boolean | any) => void;
-    on: <R>(fn: (x: T) => R) => Promise<TaskTypeHelper<void, R, T, true, false>>;
+    on: <R>(fn: (x: T) => R) => Promise<TaskTypeHelper<void, R, T, true, false, false>>;
     emit: (mex: any) => ExchangeEmitTask
 }
 

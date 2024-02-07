@@ -50,7 +50,7 @@ import { RedisOptions } from "ioredis";
 // Ms = is metadata set (false by default)
 
 type Msg<T> = {
-    value: T
+    payload: T
     key: string | number
 }
 
@@ -143,7 +143,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     finalize: <R = T>() => R
     self: (cb: (task: TaskTypeHelper<I, T, L, Ls, Ss, Ms>) => any) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
 
-    [x: string]: any 
+    [x: string]: any
 }
 
 export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Ss, Ms> {
@@ -189,9 +189,11 @@ export declare interface TaskOfString<I, T extends string, L, Ls extends boolean
     tokenize: () => TaskTypeHelper<I, string[], L, Ls, Ss, Ms>
 }
 
+export type TaskExtension<T, U extends any[]> = (first: T, ...rest: U) => void;
+
 export declare function Task<I = any>(id?: any): TaskTypeHelper<I, I, void, false, false, false> /*TBD*/
-export declare function ExtendTask(name: string, extension: any /*TBD*/): void
-export declare function ExtendTaskRaw(name: string, extension: any /*TBD*/): void
+export declare function ExtendTask(name: string, extension: TaskExtension<any, any>): void // can't be more specific :(
+export declare function ExtendTaskRaw(name: string, extension:  TaskExtension<Msg<any>, any>): void
 
 export enum StorageKind {
     Memory = "memory",

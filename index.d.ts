@@ -97,9 +97,9 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     joinByKeyWithParallelism: (storage: Storage, keyFunction: (x: Msg<T>) => string | number, parallelism: number) => TaskTypeHelper<I, T[], L, Ls, Ss, Ms>
 
     //queue
-    queueSize: Function/*TBD*/
-    enqueue: Function/*TBD*/
-    dequeue: Function/*TBD*/
+    queueSize: (storage: Storage) => TaskTypeHelper<I, number, L, Ls, Ss, Ms> // to check if it's really a number
+    enqueue: (storage: Storage) => TaskTypeHelper<I, number, T, Ls, Ss, Ms> 
+    dequeue: <R = any>(storage: Storage) => TaskTypeHelper<I, R, T, Ls, Ss, Ms>  // R is expected result
 
     //storage (only when Ss is true)
     withStorage: (storage: Storage) => TaskTypeHelper<I, T, L, Ls, true, Ms>

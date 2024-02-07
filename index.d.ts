@@ -63,7 +63,7 @@ export declare interface TaskBase<I, T, L> {
         ? TaskTypeHelper<I, { [x in string | number]: L }, L> // not provided => returns full storage
         : TaskTypeHelper<I, L, L> // provided => returns single storage value
     mergeLocalKV: <K extends string | number>(key: K) => TaskTypeHelper<I, T & {[x in K]: L}, L> 
-    flushLocalKV: Function/*TBD*/
+    flushLocalKV: (key: string | number) => TaskTypeHelper<I, T, L> 
 
     //window
     tumblingWindowCount: Function/*TBD*/

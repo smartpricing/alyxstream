@@ -1,22 +1,42 @@
 import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin, Consumer, Producer, CompressionTypes, Message, TopicPartitionOffsetAndMetadata } from "kafkajs"
 import { ReadStream, PathLike } from "fs"
 
+/**
+ * Note per Alice
+ * 
+ *  - i metodi disponibili del task dipenderanno dal tipo del messaggio a quel punto del task
+ *    es: Task().fromArray([1,2,3]) avrà a disposizione anche i metodi degli array
+ *        Task().fromArray([1,2,3]).length() non ha i metodi degli array perchè il messaggio è number
+ * 
+ *  - se non viene chiamato withLocalKVStorage, tutte i metodi localKV hanno tipo never (ts dà errore)
+ *  - se non viene chiamato withStorage, tutti i metodi dello storage hanno tipo never
+ * 
+ *  - il task ha sempre una proprietà [x: string]: any in modo da permettere di invocare metodi
+ *    che non sono fra quelli tipizzati (es: le estensioni)
+ * 
+ * */
+
 // T = current value type
 // I = initial value type (needed for the "inject" method)
 // L = type of local storage properties (void by default)
 // Ls = is local storage set (false by default)
 // Ss = is storage set (false by default)
 
+type Msg<T> = {
+    value: T
+    key: string | number
+}
+
 type TaskTypeHelper<I, T, L, Ls extends boolean, Ss extends boolean> = T extends (infer U)[] // is T an array?
-/**/ ? U extends number // array
+/**/ ? U extends number // is array of numbers?
 /**//**/ ? TaskOfNumberArray<I, U[], L, Ls, Ss> // array of numbers
-/**//**/ : U extends string // not array of numbers
+/**//**/ : U extends string // not array of numbers, is array of strings?
 /**//**//**/ ? TaskOfStringArray<I, U[], L, Ls, Ss> // array of strings
-/**//**//**/ : U extends any[] // array of anything else
+/**//**//**/ : U extends any[] // not array of strings, is array of anything else?
 /**//**//**//**/ ? TaskOfMultiArray<I, U[], L, Ls, Ss> // n dimensions array
 /**//**//**//**/ : TaskOfArray<I, U[], L, Ls, Ss> // 1 dimension array
-/**/ : T extends string // not an array
-/**//**/ ? TaskOfString<I, T, L, Ls, Ss> // string
+/**/ : T extends string // not an array, is string?
+/**//**/ ? TaskOfString<I, T, L, Ls, Ss> // is string
 /**//**/ : TaskOfObject<I, T, L, Ls, Ss> // anything else
 // since everything in js is an object, TaskOfObject is the default
 
@@ -50,16 +70,16 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     enqueue: Function/*TBD*/
     dequeue: Function/*TBD*/
 
-    //storage
-    withStorage: Function/*TBD*/
-    toStorage: Function/*TBD*/
-    fromStorage: Function/*TBD*/
-    fromStorageToGlobalState: Function/*TBD*/
-    disconnectStorage: Function/*TBD*/
-    flushStorage: Function/*TBD*/
-    storage: Function/*TBD*/
+    //storage (only when Ss is true)
+    withStorage: (storage: Storage) => TaskTypeHelper<I, T, L, Ls, true>
+    toStorage: Ss extends false ? never : (keyFunc: (x: Msg<T>) => string | number, valueFunc?: (x: T) => any, ttl?: number) => TaskTypeHelper<I, T, L, Ls, Ss> /*To check*/
+    // fromStorage is in TaskOfArray
+    fromStorageToGlobalState: Ss extends false ? never : (keysFunc: (x: Msg<T>) => (string | number)[]) => TaskTypeHelper<I, T, L, Ls, Ss>
+    disconnectStorage: Ss extends false ? never : () => TaskTypeHelper<I, T, L, Ls, Ss>
+    flushStorage: Ss extends false ? never : () => TaskTypeHelper<I, T, L, Ls, Ss>
+    storage: Ss extends false ? never : Function/*TBD*/
 
-    //local storage (only when Ls = true)
+    //local storage (only when Ls is true)
     withLocalKVStorage: <newL = any>() => TaskTypeHelper<I, T, newL, true, Ss> // define the type of items stored in storage keys
     setLocalKV: Ls extends false ? never : (key: string | number, func: (x: T) => L) => TaskTypeHelper<I, T, L, Ls, Ss> //sets local KV storage type {[x in string | number]: newL}
     getLocalKV: Ls extends false ? never : <K>(key?: K) => K extends Exclude<K, string | number> // check if key is provided
@@ -101,6 +121,10 @@ export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, 
     countInArray: Function/*TBD*/ //*???
     length: () => TaskTypeHelper<I, number, L, Ls, Ss>
     groupBy: (func: (elem: T, index: number, array: T[]) => any) => TaskTypeHelper<I, { [x in string | number]: T[] }, L, Ls, Ss> // TO CHECK
+
+    // it seems that fromStorage is available only if the message payload value is an array
+    // since it pushes the stored values into the message payload
+    fromStorage: Ss extends false ? never : (keysFunc: (x: Msg<T>) => (string | number)[]) => TaskTypeHelper<I, any, L, Ls, Ss> /*To check*/
 
     [x: string]: any
 }
@@ -206,9 +230,3 @@ export declare function KafkaRekey(kafkaSource: KSource, rekeyFunction: RekeyFun
 export declare function Exchange<T = any>(client: Kafka, topic: string, groupId: string, sourceOptions?: ConsumerConfig, sinkOptions?: ProducerConfig): KExchange<T>
 
 type ElemOfArr<T extends any[]> = T extends (infer U)[] ? U : never;
-
-// type OptionalParameterFunction<P, A, B> = {
-//     <K extends P>(key?: K): ExactlyMatches<typeof key, undefined> extends true ? A : B;
-// };
-
-// type ExactlyMatches<A, B> = A extends B ? (B extends A ? true : false) : false;

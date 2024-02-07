@@ -169,9 +169,10 @@ export declare interface TaskOfMultiArray<I, T extends any[][], L, Ls extends bo
 }
 
 export declare interface TaskOfObject<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskBase<I, T, L, Ls, Ss, Ms> {
-    sumMap: Function/*TBD*/
-    objectGroupBy: Function/*TBD*/
-    aggregate: Function/*TBD*/
+    //sumMap should belong to an hypothetical TaskOfObjectOfArrays or TaskOfObjectOfStrings type (because it sums fields lenghts)
+    sumMap: () => TaskTypeHelper<I, { [x in keyof T]: number }, L, Ls, Ss, Ms>
+    objectGroupBy: (keyFunction: (x: T) => string | number) => TaskTypeHelper<I, { [x in string | number]: T[] }, L, Ls, Ss, Ms>
+    aggregate: <R = T>(storage: Storage, name: string, keyFunction: (x: T) => string | number) => TaskTypeHelper<I, { [x in string | number]: R[] }, L, Ls, Ss, Ms>
 
     [x: string]: any
 }
@@ -193,7 +194,7 @@ export type TaskExtension<T, U extends any[]> = (first: T, ...rest: U) => void;
 
 export declare function Task<I = any>(id?: any): TaskTypeHelper<I, I, void, false, false, false> /*TBD*/
 export declare function ExtendTask(name: string, extension: TaskExtension<any, any>): void // can't be more specific :(
-export declare function ExtendTaskRaw(name: string, extension:  TaskExtension<Msg<any>, any>): void
+export declare function ExtendTaskRaw(name: string, extension: TaskExtension<Msg<any>, any>): void
 
 export enum StorageKind {
     Memory = "memory",

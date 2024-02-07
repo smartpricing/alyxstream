@@ -1,5 +1,7 @@
 import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin, Consumer, Producer, CompressionTypes, Message, TopicPartitionOffsetAndMetadata } from "kafkajs"
 import { ReadStream, PathLike } from "fs"
+import { RedisOptions } from "ioredis";
+import { ClientOptions } from "cassandra-driver";
 
 /**
  * Note per Alice
@@ -12,7 +14,7 @@ import { ReadStream, PathLike } from "fs"
  *  - se non viene chiamato withLocalKVStorage, tutti i metodi localKV hanno tipo never (ts dà errore)
  *  - stessa cosa per withStorage
  * 
- *  - il task ha sempre una proprietà [x: string]: any in modo da permettere di invocare metodi
+ *  - il task ha sempre una proprietà [x: string]: any in modo da permettere l'invocazione
  *    che non sono fra quelli tipizzati (es: le estensioni)
  * 
  *  - il task può essere inizializzato con un tipo se va usato con inject
@@ -172,6 +174,13 @@ export enum StorageKind {
     Redis = "redis",
     Cassandra = "cassandra",
 }
+export type StorageConfig<K extends StorageKind> = K extends StorageKind.Memory
+    ? null // memory storage has no config obj
+    : K extends StorageKind.Redis
+    ? RedisOptions
+    : K extends StorageKind.Cassandra
+    ? ClientOptions
+    : never;
 
 export declare interface Storage {
     db: () => any; /*TBD*/
@@ -186,8 +195,8 @@ export declare interface Storage {
     flushStorage: () => Promise<void>; /*TBD*/
 }
 
-export declare function MakeStorage(kind: StorageKind, config?: any/*TBD*/, id?: any /*TBD*/): Storage
-export declare function ExposeStorageState(storageMap: any /*TBD*/, config: any /*TBD*/): void
+export declare function MakeStorage<K extends StorageKind>(kind: K, config?: StorageConfig<K>, id?: string | number): Storage
+export declare function ExposeStorageState(storageMap: { [x in string | number]: Storage }, config?: { port?: number }): void
 
 export declare interface KMessage<T> {
     topic: string, 
@@ -221,11 +230,17 @@ export declare interface KSink extends Producer {}
 export type RekeyFunction = (s: any) => any /*TBD*/
 export type SinkDataFunction = (s: any) => Message /*TBD*/
 
+type ExchangeEmitTask = TaskTypeHelper<
+    { key: string | number, value: string }, 
+    { key: string | number, value: string }, 
+    void, false, false
+>
+
 export declare interface KExchange<T> {
     setKeyParser: (fn: (x: T) => string | number) => void;
     setValidationFunction: (fn: (x: T) => boolean | any) => void;
-    on: <R>(fn: (x: T) => R) => Promise<TaskTypeHelper<void, R, T, true, false>>; /*TBD*/
-    emit: (mex: any) => Promise<TaskTypeHelper<{ key: string | number, value: string }, { key: string | number, value: string }, void, false, false>>
+    on: <R>(fn: (x: T) => R) => Promise<TaskTypeHelper<void, R, T, true, false>>;
+    emit: (mex: any) => ExchangeEmitTask
 }
 
 export declare function KafkaClient(config: KafkaConfig): Kafka

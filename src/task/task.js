@@ -98,6 +98,7 @@ export default function (id) {
 		QueueOperators.queueSize,
 		QueueOperators.enqueue,
 		QueueOperators.dequeue,
+		QueueOperators.multiDequeue,
 
 		StorageOperators.withStorage,	
 		LocalStorageOperators.localStorage,

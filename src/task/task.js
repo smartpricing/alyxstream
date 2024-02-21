@@ -109,9 +109,12 @@ export default function (id) {
 		SourceOperators.fromString,
 		SourceOperators.fromInterval,
 		SourceOperators.fromReadableStream,
+		SourceOperators.fromPulsar,
 
 		SinkOperators.toKafka,
 		SinkOperators.kafkaCommit,
+		SinkOperators.toPulsar,
+		SinkOperators.flushPulsar,
 
 		WindowOperators.tumblingWindowTime,
 		WindowOperators.tumblingWindowCount,

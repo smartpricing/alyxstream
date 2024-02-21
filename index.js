@@ -39,6 +39,13 @@ export const KafkaSink = kafkaSink
 export const KafkaRekey = kafkaRekey
 export const KafkaCommit = kafkaCommit
 
+/** Pulsar things */
+import pulsarClient from './src/pulsar/client.js'
+import pulsarSource from './src/pulsar/source.js'
+import pulsarSink from './src/pulsar/sink.js'
+export const PulsarClient = pulsarClient
+export const PulsarSource = pulsarSource
+export const PulsarSink = pulsarSink
 
 /** ----------------------------------
  *  Building blocks 

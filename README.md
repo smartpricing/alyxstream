@@ -2,6 +2,13 @@
 
 Alyxstream is a library that simplify stream processing in Node.js. We use it in production to make real time logs analysis, errors detection, parallel job processing, using mainly Kafka as source and Cassandra and Redis as sinks. Although it's not perfect and still under active development, this library could help you to solve a lot of processing problems, with a nice dataflow syntax.
 
+Out-of-the-box sources/sinks:
+
+- Kafka
+- Redis
+- Pulsar
+- Cassandra
+
 Working usage examples are in the *usage-examples* folder.
 
 ## Table of contents
@@ -17,6 +24,7 @@ Working usage examples are in the *usage-examples* folder.
 9. [Extend the library](#extend)
 10. [Kafka Exchange Mode](#exchange)
 11. [Multiprocess/Parallel Mode](#parallel)
+12. [Pulsar](#pulsar)
 
 ## Introduction <a name="introduction"></a>
 
@@ -593,3 +601,56 @@ await Task()
 .dequeue(STORAGE)
 .close()
 ```
+
+## Pulsar [ALPHA] <a name="pulsar"></a>
+
+Pulsar producer: 
+
+```js
+import { Task, PulsarClient, PulsarSink } from '@dev.smartpricing/alyxstream';
+
+(async () => {
+  	const client = PulsarClient({
+  	  serviceUrl: 'pulsar://localhost:6650'
+  	})
+	
+  	const pulsarSink = await PulsarSink(client, {
+      topic: 'non-persistent://public/default/my-topic-1',
+      batchingEnabled: true,
+      batchingMaxPublishDelayMs: 10
+    })  
+	
+  	const t = await Task()
+    .toPulsar(pulsarSink, x => x.val, x => x)
+    .flushPulsar(pulsarSink)
+
+    for (var i = 0; i < 1000; i += 1) {
+      await t.inject({val: i})
+    }
+})()
+```
+
+Pulsar consumer:
+
+```js
+import { Task, PulsarClient, PulsarSource } from '@dev.smartpricing/alyxstream';
+
+(async () => {
+  	const client = PulsarClient({
+  	  serviceUrl: 'pulsar://localhost:6650'
+  	})
+	
+  	const pulsarSource = await PulsarSource(client, {
+  	  topic: 'non-persistent://public/default/my-topic-1',
+  	  subscription: 'sub1',
+  	  subscriptionType: "Shared", //'Failover'
+  	  parseWith: (x) => x
+  	})  
+	
+  	await Task()
+  	.fromPulsar(pulsarSource)
+  	.print('>>>')
+  	.close()
+})()
+```
+

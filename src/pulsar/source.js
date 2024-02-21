@@ -11,16 +11,14 @@ import Message from '../message/message.js'
 */ 
 export default async function (pulsarClient, consumerConfig) {
   	const consumer = await pulsarClient.subscribe(consumerConfig)
-  	const payloadParser = typeof consumerConfig.parseWith == 'function' ? consumerConfig.parseWith : (v) => { return JSON.parse(v) }
   	let onMessaggeAction = []
   	const loop = async function () {
  		while (true) {
  			const msg = await consumer.receive()
- 			const msgString = msg.getData().toString()
 			for (const action of onMessaggeAction) {
 				try {
-					await action(Message(payloadParser(msgString)))	
-					consumer.acknowledge(msg)
+					await action(Message(msg))
+					// consumer.acknowledge(msg)
 				} catch (error) {
 					console.log(new Date(), '#> Error at pulsar source', error)
 					throw error

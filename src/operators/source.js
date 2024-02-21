@@ -87,16 +87,3 @@ export const fromReadableStream = {
         return task
     }
 }
-
-export const fromPulsar = {
-    fromPulsar (source) {
-        const task = this
-        const index = task._nextIndex()
-        task._setNext(async () => {
-            await source.stream(async (message) => {
-                await task._nextAtIndex(index)(message)
-            })
-        })
-        return task
-    }
-}

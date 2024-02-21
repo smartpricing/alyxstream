@@ -648,8 +648,13 @@ import { Task, PulsarClient, PulsarSource } from '@dev.smartpricing/alyxstream';
   	})  
 	
   	await Task()
+  	.withLocalKVStorage()
   	.fromPulsar(pulsarSource)
+  	.setLocalKV('local-mex', x => x)
+  	.parsePulsar()
   	.print('>>>')
+  	.getLocalKV('local-mex')
+  	.ackPulsar(pulsarSource)
   	.close()
 })()
 ```

@@ -36,35 +36,3 @@ export const kafkaCommit = {
         return task
     }
 }
-
-export const toPulsar = {
-    toPulsar (sink, keycb, datacb) {
-        const task = this
-        const index = task._nextIndex()
-        task._setNext(async (s) => {
-            const key = keycb == null ? null : keycb(s.payload)
-            const data = datacb == null ? s.payload : datacb(s.payload)
-            let mex = {
-              data: Buffer.from(JSON.stringify(data))
-            }
-            if (key == null) {
-                mex.partitionKey = key.toString()
-            }
-            sink.send(mex)              
-            await task._nextAtIndex(index)(s)
-        })
-        return task
-    }
-}
-
-export const flushPulsar = {
-    flushPulsar (sink) {
-        const task = this
-        const index = task._nextIndex()
-        task._setNext(async (s) => {
-            await sink.flush()          
-            await task._nextAtIndex(index)(s)
-        })
-        return task
-    }
-}

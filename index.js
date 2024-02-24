@@ -42,10 +42,14 @@ export const KafkaCommit = kafkaCommit
 /** Pulsar things */
 import pulsarClient from './src/pulsar/client.js'
 import pulsarSource from './src/pulsar/source.js'
+import pulsarSourceWs from './src/pulsar/source-ws.js'
 import pulsarSink from './src/pulsar/sink.js'
+import pulsarSinkWs from './src/pulsar/sink-ws.js'
 export const PulsarClient = pulsarClient
 export const PulsarSource = pulsarSource
+export const PulsarSourceWs = pulsarSourceWs
 export const PulsarSink = pulsarSink
+export const PulsarSinkWs = pulsarSinkWs
 
 /** ----------------------------------
  *  Building blocks 

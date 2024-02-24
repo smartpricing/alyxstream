@@ -116,8 +116,10 @@ export default function (id) {
 		PulsarOperators.fromPulsar,
 		PulsarOperators.flushPulsar,
 		PulsarOperators.toPulsar,
+		PulsarOperators.toPulsarWs,
 		PulsarOperators.parsePulsar,
 		PulsarOperators.ackPulsar,
+		PulsarOperators.fromPulsarWs,	
 
 		WindowOperators.tumblingWindowTime,
 		WindowOperators.tumblingWindowCount,

@@ -53,6 +53,7 @@ type Msg<T> = {
     key: string | number
 }
 
+// ternary type to determine the correct operator, depending on the message type
 type TaskTypeHelper<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> = T extends (infer U)[] // is T an array?
 /*  */ ? U extends number // is array of numbers?
 /*      */ ? TaskOfNumberArray<I, U[], L, Ls, Ss, Ms> // array of numbers
@@ -157,12 +158,6 @@ export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, 
     fromStorage: Ss extends false ? never : (keysFunc: (x: Msg<T>) => (string | number)[]) => TaskTypeHelper<I, any, L, Ls, Ss, Ms> /*To check*/
     [x: string]: any
 }
-
-// export declare interface TaskOfMultiArray<I, T extends any[][], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfArray<I, T, L, Ls, Ss, Ms> {
-    
-    
-//     [x: string]: any
-// }
 
 export declare interface TaskOfObject<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskBase<I, T, L, Ls, Ss, Ms> {
     //sumMap should belong to an hypothetical TaskOfObjectOfArrays or TaskOfObjectOfStrings type (because it sums fields lenghts)

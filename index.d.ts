@@ -25,12 +25,11 @@ import { RedisOptions } from "ioredis";
  *    che non sono fra quelli tipizzati (es: le estensioni)
  * 
  *  - il task può essere inizializzato con un tipo se va usato con inject
- *     es: Task<string>().inject({a: 2}) dà errore perchè non viene iniettata una stringa
- *  
- *  - altrimenti il tipo dipende dalla source e dall'oggetto che le viene passato
+ *     (es: Task<string>().inject({a: 2}) dà errore perchè non viene iniettata una stringa)
+ *     altrimenti il tipo dipende dalla source e dall'oggetto che le viene passato
  *     es: Task().fromArray([1,2,3,4])  -> il tipo del messaggio sarà number[]
  * 
- *  - mi sembra ci sia un problema nell'operator "branch"
+ *  - mi sembra ci sia un'ambiguità nell'operator "branch"
  *     > da quello che è descritto in doc sembra che l'ultimo risultato del task padre venga automaticamente inietato nei subtask,
  *      ma da codice questo non avviene (il payload viene passato alla funzione che ritorna il subtask, ma poi è la funzione 
  *      a doverlo iniettare manualmente nel subtask).
@@ -59,13 +58,10 @@ type TaskTypeHelper<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends 
 /*      */ ? TaskOfNumberArray<I, U[], L, Ls, Ss, Ms> // array of numbers
 /*      */ : U extends string // not array of numbers, is array of strings?
 /*            */ ? TaskOfStringArray<I, U[], L, Ls, Ss, Ms> // array of strings
-/*          */ : U extends any[] // not array of strings, is array of anything else?
-/*                */ ? TaskOfMultiArray<I, U[], L, Ls, Ss, Ms> // n dimensions array
-/*              */ : TaskOfArray<I, U[], L, Ls, Ss, Ms> // 1 dimension array
+/*            */ : TaskOfArray<I, U[], L, Ls, Ss, Ms> // 1 dimension array
 /*      */ : T extends string // not an array, is string?
 /*      */ ? TaskOfString<I, T, L, Ls, Ss, Ms> // is string
 /*      */ : TaskOfObject<I, T, L, Ls, Ss, Ms> // anything else
-// since everything in js is an object, TaskOfObject is the default
 
 export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> {
     //base
@@ -154,19 +150,19 @@ export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, 
     countInArray: (func: (x: ElemOfArr<T>) => string | number) => TaskTypeHelper<I, { [x in string | number]: number }, L, Ls, Ss, Ms>
     length: () => TaskTypeHelper<I, number, L, Ls, Ss, Ms>
     groupBy: (func: (elem: T, index?: number, array?: T[]) => any) => TaskTypeHelper<I, { [x in string | number]: T[] }, L, Ls, Ss, Ms> 
+    flat: () => TaskTypeHelper<I, ElemOfArr<ElemOfArr<T>>[], L, Ls, Ss, Ms>
 
     // it seems that fromStorage is available only if the message payload value is an array
     // since it pushes the stored values into the message payload
     fromStorage: Ss extends false ? never : (keysFunc: (x: Msg<T>) => (string | number)[]) => TaskTypeHelper<I, any, L, Ls, Ss, Ms> /*To check*/
-
     [x: string]: any
 }
 
-export declare interface TaskOfMultiArray<I, T extends any[][], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfArray<I, T, L, Ls, Ss, Ms> {
-    flat: () => TaskTypeHelper<I, ElemOfArr<ElemOfArr<T>>[], L, Ls, Ss, Ms>
+// export declare interface TaskOfMultiArray<I, T extends any[][], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfArray<I, T, L, Ls, Ss, Ms> {
     
-    [x: string]: any
-}
+    
+//     [x: string]: any
+// }
 
 export declare interface TaskOfObject<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskBase<I, T, L, Ls, Ss, Ms> {
     //sumMap should belong to an hypothetical TaskOfObjectOfArrays or TaskOfObjectOfStrings type (because it sums fields lenghts)

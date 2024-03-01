@@ -2,6 +2,6 @@
 
 import WebSocket from 'ws'
 
-export default async function (source) {
-  return new WebSocket(source)
+export default async function (source, options) {
+  return new WebSocket(source, options)
 }

@@ -1,6 +1,6 @@
 {
   "name": "@dev.smartpricing/alyxstream",
-  "version": "0.4.9",
+  "version": "0.4.11",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -19,6 +19,7 @@
     "ioredis": "^5.2.4",
     "kafkajs": "^2.2.2",
     "level": "^8.0.0",
+    "nats": "^2.19.0",
     "pulsar-client": "^1.10.0",
     "uuid": "^9.0.0",
     "ws": "^8.16.0"

@@ -25,6 +25,7 @@ Working usage examples are in the *usage-examples* folder.
 10. [Kafka Exchange Mode](#exchange)
 11. [Multiprocess/Parallel Mode](#parallel)
 12. [Pulsar](#pulsar)
+12. [Nats JetStream](#jetstream)
 
 ## Introduction <a name="introduction"></a>
 
@@ -659,3 +660,38 @@ import { Task, PulsarClient, PulsarSource } from '@dev.smartpricing/alyxstream';
 })()
 ```
 
+## NATS JetStream [ALPHA] <a name="jetstream"></a>
+
+Producer:
+
+```js
+import { Task, NatsClient } from '@dev.smartpricing/alyxstream';
+
+const nc = await NatsClient()
+
+const t = await Task()
+.toNats(nc, 'sp-test.a.a')
+
+for (var i = 0; i < 100; i += 1) {
+  await t.inject({key: i})
+}
+
+```
+
+Consumer:
+```js
+import { Task, NatsClient, NatsJetstreamSource } from '@dev.smartpricing/alyxstream';
+
+const nc = await NatsClient()
+const source = await NatsJetstreamSource(nc, [{
+  stream: 'sp-test',
+  durable_name: 'worker-4',
+  ack_policy: 'Explicit',
+  filter_subjects: ['sp-test.a.a', 'sp-test.a.b']
+}])
+
+await Task()
+.fromNats(source)
+.print('>')
+.close()
+```

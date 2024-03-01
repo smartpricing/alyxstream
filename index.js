@@ -51,6 +51,12 @@ export const PulsarSourceWs = pulsarSourceWs
 export const PulsarSink = pulsarSink
 export const PulsarSinkWs = pulsarSinkWs
 
+/** Nats things */
+import natsClient from './src/nats/client.js'
+import natsSourceJetstream from './src/nats/source-jetstream.js'
+export const NatsClient = natsClient
+export const NatsJetstreamSource = natsSourceJetstream
+
 /** ----------------------------------
  *  Building blocks 
  * 

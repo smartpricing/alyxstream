@@ -49,7 +49,7 @@ export default async function (natsClients, sources) {
 										m: m
 									}
 									const mex = Message(p)
-									action(mex)
+									await action(mex)
 								} catch (error) {
 									console.log(new Date(), '#> Error at nats jetstream source', error)				
 								}				

@@ -2,6 +2,13 @@
 
 Alyxstream is a library that simplify stream processing in Node.js. We use it in production to make real time logs analysis, errors detection, parallel job processing, using mainly Kafka as source and Cassandra and Redis as sinks. Although it's not perfect and still under active development, this library could help you to solve a lot of processing problems, with a nice dataflow syntax.
 
+Out-of-the-box sources/sinks:
+
+- Kafka
+- Redis
+- Pulsar
+- Cassandra
+
 Working usage examples are in the *usage-examples* folder.
 
 ## Table of contents
@@ -17,6 +24,8 @@ Working usage examples are in the *usage-examples* folder.
 9. [Extend the library](#extend)
 10. [Kafka Exchange Mode](#exchange)
 11. [Multiprocess/Parallel Mode](#parallel)
+12. [Pulsar](#pulsar)
+12. [Nats JetStream](#jetstream)
 
 ## Introduction <a name="introduction"></a>
 
@@ -591,5 +600,98 @@ import { Task } from '@dev.smartpricing/alyxstream'
 await Task()
 .parallel(3)
 .dequeue(STORAGE)
+.close()
+```
+
+## Pulsar [ALPHA] <a name="pulsar"></a>
+
+Pulsar producer: 
+
+```js
+import { Task, PulsarClient, PulsarSink } from '@dev.smartpricing/alyxstream';
+
+(async () => {
+  	const client = PulsarClient({
+  	  serviceUrl: 'pulsar://localhost:6650'
+  	})
+	
+  	const pulsarSink = await PulsarSink(client, {
+      topic: 'non-persistent://public/default/my-topic-1',
+      batchingEnabled: true,
+      batchingMaxPublishDelayMs: 10
+    })  
+	
+  	const t = await Task()
+    .toPulsar(pulsarSink, x => x.val, x => x)
+    .flushPulsar(pulsarSink)
+
+    for (var i = 0; i < 1000; i += 1) {
+      await t.inject({val: i})
+    }
+})()
+```
+
+Pulsar consumer:
+
+```js
+import { Task, PulsarClient, PulsarSource } from '@dev.smartpricing/alyxstream';
+
+(async () => {
+  	const client = PulsarClient({
+  	  serviceUrl: 'pulsar://localhost:6650'
+  	})
+	
+  	const pulsarSource = await PulsarSource(client, {
+  	  topic: 'non-persistent://public/default/my-topic-1',
+  	  subscription: 'sub1',
+  	  subscriptionType: "Shared", //'Failover'
+  	  parseWith: (x) => x
+  	})  
+	
+  	await Task()
+  	.withLocalKVStorage()
+  	.fromPulsar(pulsarSource)
+  	.setLocalKV('local-mex', x => x)
+  	.parsePulsar()
+  	.print('>>>')
+  	.getLocalKV('local-mex')
+  	.ackPulsar(pulsarSource)
+  	.close()
+})()
+```
+
+## NATS JetStream [ALPHA] <a name="jetstream"></a>
+
+Producer:
+
+```js
+import { Task, NatsClient } from '@dev.smartpricing/alyxstream';
+
+const nc = await NatsClient()
+
+const t = await Task()
+.toNats(nc, 'sp-test.a.a')
+
+for (var i = 0; i < 100; i += 1) {
+  await t.inject({key: i})
+}
+
+```
+
+Consumer:
+```js
+import { Task, NatsClient, NatsJetstreamSource } from '@dev.smartpricing/alyxstream';
+
+const nc = await NatsClient()
+const source = await NatsJetstreamSource(nc, [{
+  stream: 'sp-test',
+  durable_name: 'worker-4',
+  ack_policy: 'Explicit',
+  filter_subjects: ['sp-test.a.a', 'sp-test.a.b']
+}])
+
+await Task()
+.fromNats(source)
+.print('>')
 .close()
 ```

@@ -24,7 +24,6 @@ export const toKafka = {
     }
 }
 
-
 export const kafkaCommit = {
     kafkaCommit (kafkaSource, commitParams = null) {
         const task = this

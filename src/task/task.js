@@ -3,6 +3,8 @@
 import { extensions } from './extend.js'
 import Messagge from '../message/message.js'
 import * as SourceOperators from '../operators/source.js'
+import * as PulsarOperators from '../operators/pulsar.js'
+import * as NatsOperators from '../operators/nats.js'
 import * as SinkOperators from '../operators/sink.js'
 import * as BaseOperators from '../operators/base.js'
 import * as WindowOperators from '../operators/window.js'
@@ -86,7 +88,6 @@ export default function (id) {
 		ObjectOperators.aggregate,	
 		ObjectOperators.objectGroupBy,
 
-
 		CustomOperators.fn,
 		CustomOperators.fnRaw,
 		CustomOperators.customFunction,
@@ -98,6 +99,7 @@ export default function (id) {
 		QueueOperators.queueSize,
 		QueueOperators.enqueue,
 		QueueOperators.dequeue,
+		QueueOperators.multiDequeue,
 
 		StorageOperators.withStorage,	
 		LocalStorageOperators.localStorage,
@@ -111,6 +113,17 @@ export default function (id) {
 
 		SinkOperators.toKafka,
 		SinkOperators.kafkaCommit,
+
+		PulsarOperators.fromPulsar,
+		PulsarOperators.flushPulsar,
+		PulsarOperators.toPulsar,
+		PulsarOperators.toPulsarWs,
+		PulsarOperators.parsePulsar,
+		PulsarOperators.ackPulsar,
+		PulsarOperators.fromPulsarWs,	
+
+		NatsOperators.fromNats,
+		NatsOperators.toNats,
 
 		WindowOperators.tumblingWindowTime,
 		WindowOperators.tumblingWindowCount,

@@ -40,3 +40,17 @@ export const dequeue = {
         return task
     }
 }
+
+export const multiDequeue = {
+    multiDequeue (dbInstance, aryOfKeys) {
+        const task = this
+        const index = task._nextIndex()
+        task._setNext(async (s) => {
+            while (true) {
+                const mex = JSON.parse((await dbInstance.brpop(aryOfKeys, 0))[1])
+                await task._nextAtIndex(index)(Message(mex))
+            }
+        })
+        return task
+    }
+}

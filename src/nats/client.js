@@ -1,8 +1,8 @@
 'use strict'
 
-import { connect, StringCodec } from 'nats'
+import { connect } from 'nats'
 
 /** Nats client */
 export default async function (server) {
-	return await connect(server)
+  return await connect(server)
 }

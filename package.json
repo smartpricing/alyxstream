@@ -1,6 +1,6 @@
 {
   "name": "@dev.smartpricing/alyxstream",
-  "version": "0.4.12",
+  "version": "0.4.13",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -12,6 +12,14 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/smartpricing/alyxstream"
+  },
+  "standard": {
+    "ignore": [
+      "tests/*",
+      "dev/*",
+      "docs/*",
+      "usage-examples/*"
+    ]
   },
   "dependencies": {
     "cassandra-driver": "^4.6.4",
@@ -28,6 +36,7 @@
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
     "jest": "^29.3.1",
+    "standard": "^17.1.0",
     "ts": "^0.2.2"
   },
   "keywords": [

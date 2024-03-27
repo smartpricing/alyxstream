@@ -1,0 +1,4 @@
+- repo: https://github.com/smartpricing/alyxstream
+  rev: master
+  hooks:
+    - id: standard

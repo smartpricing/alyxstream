@@ -1,7 +1,10 @@
-import { Kafka, ConsumerConfig, ProducerConfig, KafkaConfig, Admin, Consumer, Producer, CompressionTypes, Message, TopicPartitionOffsetAndMetadata } from "kafkajs"
-import { ClientOptions as CassandraClientOptions } from "cassandra-driver";
-import { ReadStream, PathLike } from "fs"
-import { RedisOptions } from "ioredis";
+import * as Cassandra from "cassandra-driver";
+import * as Pulsar from 'pulsar-client'
+import * as Kafka from "kafkajs"
+import * as Redis from "ioredis";
+import * as Nats from "nats"
+import * as Ws from "ws"
+import * as fs from "fs"
 
 /**
  * Note/Domande per Alice
@@ -48,7 +51,7 @@ import { RedisOptions } from "ioredis";
 // Ss = is storage set (false by default)
 // Ms = is metadata set (false by default)
 
-type Msg<T> = {
+type TaskMessage<T> = {
     payload: T
     key: string | number
 }
@@ -86,12 +89,12 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
 
     //custom
     fn: <R>(callback: (x: T) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
-    fnRaw: <R>(callback: (x: Msg<T>) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
+    fnRaw: <R>(callback: (x: TaskMessage<T>) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
     customFunction: <R>(callback: (x: T) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
     customAsyncFunction: <R>(callback: (x: T) => Promise<R>) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
-    customFunctionRaw: <R>(callback: (x: Msg<T>) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
-    customAsyncFunctionRaw: <R>(callback: (x: Msg<T>) => Promise<R>) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
-    joinByKeyWithParallelism: (storage: Storage, keyFunction: (x: Msg<T>) => string | number, parallelism: number) => TaskTypeHelper<I, T[], L, Ls, Ss, Ms>
+    customFunctionRaw: <R>(callback: (x: TaskMessage<T>) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
+    customAsyncFunctionRaw: <R>(callback: (x: TaskMessage<T>) => Promise<R>) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
+    joinByKeyWithParallelism: (storage: Storage, keyFunction: (x: TaskMessage<T>) => string | number, parallelism: number) => TaskTypeHelper<I, T[], L, Ls, Ss, Ms>
 
     //queue
     queueSize: (storage: Storage) => TaskTypeHelper<I, number, L, Ls, Ss, Ms> // to check if it's really a number
@@ -100,9 +103,9 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
 
     //storage (only when Ss is true)
     withStorage: (storage: Storage) => TaskTypeHelper<I, T, L, Ls, true, Ms>
-    toStorage: Ss extends false ? never : (keyFunc: (x: Msg<T>) => string | number, valueFunc?: (x: T) => any, ttl?: number) => TaskTypeHelper<I, T, L, Ls, Ss, Ms> /*To check*/
+    toStorage: Ss extends false ? never : (keyFunc: (x: TaskMessage<T>) => string | number, valueFunc?: (x: T) => any, ttl?: number) => TaskTypeHelper<I, T, L, Ls, Ss, Ms> /*To check*/
     // fromStorage is in TaskOfArray
-    fromStorageToGlobalState: Ss extends false ? never : (keysFunc: (x: Msg<T>) => (string | number)[]) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
+    fromStorageToGlobalState: Ss extends false ? never : (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
     disconnectStorage: Ss extends false ? never : () => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
     flushStorage: Ss extends false ? never : () => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
     storage: Ss extends false ? never : () => Storage
@@ -123,17 +126,30 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     slidingWindowCount: (storage: Storage, countLength: number, slidingLength: number, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss, Ms>
     slidingWindowTime: (storage: Storage, timeLengthMilliSeconds: number, slidingLengthMilliseconds: number, inactivityMilliseconds: number) => TaskTypeHelper<I, T[], L, Ls, Ss, Ms>
 
-    //sink 
-    toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Message[], options?: KSinkOptions) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
-    kafkaCommit: (kafkaSource: KSource, commitParams: KCommitParams) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
- 
-    //source
-    fromKafka: <R = any>(source: KSource) => TaskTypeHelper<I, KMessage<R>, L, Ls, Ss, Ms>
+    //sources
     fromArray: <R>(array: R[]) => TaskTypeHelper<I, R[], L, Ls, Ss, Ms>
     fromObject: <R>(object: R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>
     fromString: (string: string) => TaskTypeHelper<I, string, L, Ls, Ss, Ms>
     fromInterval: <R = number>(intervalMs: number, generatorFunc?: (counter: number) => R, maxSize?: number) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>/*TBD*/
-    fromReadableStream: (filePath: PathLike, useZlib?: boolean) => TaskTypeHelper<I, ReadStream, L, Ls, Ss, Ms>
+    fromReadableStream: (filePath: fs.PathLike, useZlib?: boolean) => TaskTypeHelper<I, fs.ReadStream, L, Ls, Ss, Ms>
+
+    //kafka 
+    toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Kafka.Message[], options?: KSinkOptions) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
+    fromKafka: <R = any>(source: KSource) => TaskTypeHelper<I, KMessage<R>, L, Ls, Ss, Ms>
+    kafkaCommit: (kafkaSource: KSource, commitParams: KCommitParams) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
+ 
+    //pulsar
+    fromPulsar: (source: PlsSource) => TaskTypeHelper<I, Pulsar.Message, L, Ls, Ss, Ms>
+    toPulsar: (sink: PlsSink, keyCb: (x: T) => any /*TBD*/, dataCb: (x: T) => any) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>
+    flushPulsar: (sink: PlsSink) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>,
+    toPulsarWs: (sink: PlsWsSink, keyCb: (x: T) => any /*TBD*/, dataCb: (x: T) => any) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>,
+    parsePulsar: <R = any>(parseWith?: (x: string) => R) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>,
+    ackPulsar: (sink: PlsSource) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>,
+    fromPulsarWs: never, // not implemented
+
+    //nats
+    fromNats: <R = any>(source: NatsJsSource) => TaskTypeHelper<I, R, L, Ls, Ss, Ms>,
+    toNats: (sink: Nats.NatsConnection, topic: string, dataCb: (x: T) => any) => TaskTypeHelper<I, T, L, Ls, Ss, Ms>,
 
     inject: (data: I) => Promise<TaskTypeHelper<I, T, L, Ls, Ss, Ms>>
     close: () => Promise<TaskTypeHelper<I, T, L, Ls, Ss, Ms>>
@@ -155,7 +171,7 @@ export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, 
 
     // it seems that fromStorage is available only if the message payload value is an array
     // since it pushes the stored values into the message payload
-    fromStorage: Ss extends false ? never : (keysFunc: (x: Msg<T>) => (string | number)[]) => TaskTypeHelper<I, any, L, Ls, Ss, Ms> /*To check*/
+    fromStorage: Ss extends false ? never : (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => TaskTypeHelper<I, any, L, Ls, Ss, Ms> /*To check*/
     [x: string]: any
 }
 
@@ -185,7 +201,9 @@ export type TaskExtension<T, U extends any[]> = (first: T, ...rest: U) => void;
 
 export declare function Task<I = any>(id?: any): TaskTypeHelper<I, I, void, false, false, false> /*TBD*/
 export declare function ExtendTask(name: string, extension: TaskExtension<any, any>): void // can't be more specific :(
-export declare function ExtendTaskRaw(name: string, extension: TaskExtension<Msg<any>, any>): void
+export declare function ExtendTaskRaw(name: string, extension: TaskExtension<TaskMessage<any>, any>): void
+
+/* STORAGE */
 
 export enum StorageKind {
     Memory = "memory",
@@ -195,9 +213,9 @@ export enum StorageKind {
 export type StorageConfig<K extends StorageKind> = K extends StorageKind.Memory
     ? null // memory storage has no config obj
     : K extends StorageKind.Redis
-    ? RedisOptions
+    ? Redis.RedisOptions
     : K extends StorageKind.Cassandra
-    ? CassandraClientOptions
+    ? Cassandra.ClientOptions
     : never;
 
 export declare interface Storage {
@@ -216,6 +234,8 @@ export declare interface Storage {
 export declare function MakeStorage<K extends StorageKind>(kind: K, config?: StorageConfig<K>, id?: string | number): Storage
 export declare function ExposeStorageState(storageMap: { [x in string | number]: Storage }, config?: { port?: number }): void
 
+/* KAFKA */
+
 export declare interface KMessage<T> {
     topic: string, 
     offset: number,
@@ -226,27 +246,27 @@ export declare interface KMessage<T> {
 }
 
 type KCompressionType = 
-    CompressionTypes.GZIP |
-    CompressionTypes.LZ4 |
-    CompressionTypes.None |
-    CompressionTypes.Snappy |
-    CompressionTypes.ZSTD 
+    Kafka.CompressionTypes.GZIP |
+    Kafka.CompressionTypes.LZ4 |
+    Kafka.CompressionTypes.None |
+    Kafka.CompressionTypes.Snappy |
+    Kafka.CompressionTypes.ZSTD 
 
 type KSinkOptions = { 
     compressionType: KCompressionType
 }
 
-type KCommitParams = Pick<TopicPartitionOffsetAndMetadata, 'topic' | 'partition' | 'offset'>
+type KCommitParams = Pick<Kafka.TopicPartitionOffsetAndMetadata, 'topic' | 'partition' | 'offset'>
 
 export declare interface KSource {
     stream: (cb: any) => Promise<void> /*TBD*/
-    consumer: () => Consumer
+    consumer: () => Kafka.Consumer
 }
 
-export declare interface KSink extends Producer {}
+export declare interface KSink extends Kafka.Producer {}
 
 export type RekeyFunction = (s: any) => any /*TBD*/
-export type SinkDataFunction = (s: any) => Message /*TBD*/
+export type SinkDataFunction = (s: any) => Kafka.Message /*TBD*/
 
 type ExchangeEmitTask = TaskTypeHelper<
     { key: string | number, value: string }, 
@@ -261,12 +281,44 @@ export declare interface KExchange<T> {
     emit: (mex: any) => Promise<ExchangeEmitTask>
 }
 
-export declare function KafkaClient(config: KafkaConfig): Kafka
-export declare function KafkaAdmin(client: Kafka): Promise<Admin>
-export declare function KafkaSource(client: Kafka, config: ConsumerConfig): Promise<KSource>
-export declare function KafkaSink(client: Kafka, config: ProducerConfig): Promise<KSink>
+export declare function KafkaClient(config: Kafka.KafkaConfig): Kafka.Kafka
+export declare function KafkaAdmin(client: Kafka.Kafka): Promise<Kafka.Admin>
+export declare function KafkaSource(client: Kafka.Kafka, config: Kafka.ConsumerConfig): Promise<KSource>
+export declare function KafkaSink(client: Kafka.Kafka, config: Kafka.ProducerConfig): Promise<KSink>
 export declare function KafkaCommit(source: KSource, params: KCommitParams): Promise<KCommitParams>
 export declare function KafkaRekey(kafkaSource: KSource, rekeyFunction: RekeyFunction, kafkaSink: KSink, sinkTopic: string, sinkDataFunction: SinkDataFunction): void
-export declare function Exchange<T = any>(client: Kafka, topic: string, groupId: string, sourceOptions?: ConsumerConfig, sinkOptions?: ProducerConfig): KExchange<T>
+export declare function Exchange<T = any>(client: Kafka.Kafka, topic: string, groupId: string, sourceOptions?: Kafka.ConsumerConfig, sinkOptions?: Kafka.ProducerConfig): KExchange<T>
+
+/* PULSAR */
+
+export declare interface PlsSource {
+    stream: (cb: any) => Promise<void> /*TBD*/
+    consumer: () => Pulsar.Consumer
+}
+
+export declare interface PlsWsSource {
+    stream: (cb: any) => Promise<void> /*TBD*/
+    consumer: () => void
+}
+
+export declare interface PlsSink extends Pulsar.Producer {}
+
+export declare interface PlsWsSink extends Ws.WebSocket {}
+
+export declare function PulsarClient(config: Pulsar.ClientConfig): Pulsar.Client
+export declare function PulsarSource(client: Pulsar.Client, consumerConfig: Pulsar.ConsumerConfig): Promise<PlsSource>
+export declare function PulsarSourceWs(source: string /*????*/, options: Ws.ClientOptions): Promise<PlsWsSource>
+export declare function PulsarSink(client: Pulsar.Client, producerConfig: Pulsar.ProducerConfig): Promise<PlsSink>
+export declare function PulsarSinkWs(sources: string | string[], options: Ws.ClientOptions): Promise<PlsWsSink>
+
+/* NATS */
+ 
+export declare interface NatsJsSource {
+    stream: (cb: any) => Promise<void> /*TBD*/
+    consumer: () => void
+}
+
+export declare function NatsClient(server: Nats.ConnectionOptions): Promise<Nats.NatsConnection>
+export declare function NatsJetstreamSource(natsCliens: Nats.NatsConnection, sources: Nats.ConsumerConfig[]): Promise<NatsJsSource>
 
 type ElemOfArr<T extends any[]> = T extends (infer U)[] ? U : never;

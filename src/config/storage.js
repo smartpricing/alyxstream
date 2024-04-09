@@ -11,5 +11,5 @@ export const RedisDefaultConfig = {
 export const CassandraDefaultConfig = {
   contactPoints: ['localhost:9042'],
   localDataCenter: 'datacenter1',
-  keyspace: 'nks'
+  keyspace: 'alyxstream'
 }

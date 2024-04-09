@@ -28,6 +28,10 @@ export function Make (config, id) {
   const db = new cassandra.Client(_config)
   return {
 
+    id: function () {
+      return id
+    },
+
     db: function () {
       return db
     },

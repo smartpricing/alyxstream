@@ -5,6 +5,7 @@ import WindowCount from '../window/tumblingWindowCount.js'
 import WindowSlidingCount from '../window/slidingWindowCount.js'
 import WindowSlidingTime from '../window/slidingWindowTime.js'
 import WindowSession from '../window/windowSession.js'
+import WindowFixed from '../window/windowFixed.js'
 
 export const tumblingWindowCount = {
   tumblingWindowCount (storage, countLength, inactivityTimeMilliseconds) {
@@ -71,6 +72,20 @@ export const slidingWindowTime = {
       storage,
       timeLengthMilliSeconds,
       slidingLengthMilliSeconds,
+      inactivityTimeMilliseconds)
+
+    return win
+  }
+}
+
+export const fixedWindow = {
+  fixedWindow (storage, countLength, inactivityTimeMilliseconds) {
+    const task = this
+
+    const win = WindowFixed(
+      task,
+      storage,
+      countLength,
       inactivityTimeMilliseconds)
 
     return win

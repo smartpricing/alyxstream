@@ -9,6 +9,7 @@ import * as SinkOperators from '../operators/sink.js'
 import * as BaseOperators from '../operators/base.js'
 import * as WindowOperators from '../operators/window.js'
 import * as ArrayOperators from '../operators/array.js'
+import * as CollectOperators from '../operators/collect.js'
 import * as ObjectOperators from '../operators/object.js'
 import * as QueueOperators from '../operators/queue.js'
 import * as CustomOperators from '../operators/custom.js'
@@ -94,6 +95,8 @@ export default function (id) {
     CustomOperators.customFunctionRaw,
     CustomOperators.customAsyncFunctionRaw,
     CustomOperators.joinByKeyWithParallelism,
+
+    CollectOperators.collect,
 
     QueueOperators.queueSize,
     QueueOperators.enqueue,

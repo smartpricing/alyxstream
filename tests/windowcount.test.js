@@ -22,7 +22,7 @@ test('tumblingWindowCountRedis', async () => {
   const rs = MakeStorage(StorageKind.Redis, null, 'test')
   const t = await Task()
     .withStorage(rs)
-    .flushStorage()
+    .flushStorage(x => ['test'])
     .fromArray(testData)
     .tumblingWindowCount(rs, 3)
     .customFunction((x) => {

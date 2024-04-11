@@ -30,7 +30,7 @@ test('slidingWindowTimeRedis', async () => {
   const storage = MakeStorage(StorageKind.Redis, null, 'testslide')
   const t = await Task()
     .withStorage(storage)
-    .flushStorage('testslide')
+    .flushStorage(x => ['testslide'])
     .fromArray(testData)
     .withDefaultKey()
     .withEventTime(x => new Date(x.date))

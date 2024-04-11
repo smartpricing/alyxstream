@@ -17,6 +17,15 @@ export const localStorage = {
     })
     return task
   },
+  setLocalKVRaw (k, func) {
+    const task = this
+    const index = task._nextIndex()
+    task._setNext(async (element) => {
+      task._localStorage[k] = func(element)
+      await task._nextAtIndex(index)(element)
+    })
+    return task
+  },
   getLocalKV (k) {
     const task = this
     const index = task._nextIndex()

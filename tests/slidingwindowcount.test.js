@@ -29,7 +29,7 @@ test('slidingWindowCountRedis', async () => {
   const storage = MakeStorage(StorageKind.Redis, null, 'testslidecount')
   const t = await Task()
     .withStorage(storage)
-    .flushStorage('testslidecount')
+    .flushStorage(x => ['testslidecount'])
     .fromArray(testData)
     .withDefaultKey()
     .slidingWindowCount(storage, 3, 2)

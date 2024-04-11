@@ -1,7 +1,7 @@
 /**
-CREATE KEYSPACE nks WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};
+CREATE KEYSPACE alyxstream WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};
 
-create table nks.storage (
+create table alyxstream.storage (
   id text,
   key text,
     value text,
@@ -9,7 +9,7 @@ create table nks.storage (
     PRIMARY KEY (id, key)
 );
 
-create table nks.liststorage (
+create table alyxstream.liststorage (
   id text,
   key text,
   s_uuid timeuuid,
@@ -40,11 +40,11 @@ export function Make (config, id) {
       if (ttl == null) {
         await db.execute('UPDATE storage SET value=?, s_uuid=uuid() WHERE id=? AND key=?',
           [JSON.stringify(value), id, key],
-          { prepare: true })
+          { prepare: true, consistency: 'all' })
       } else {
         await db.execute('UPDATE storage USING TTL ? SET value=?, s_uuid=uuid() WHERE id=? AND key=?',
           [parseInt(ttl), JSON.stringify(value), id, key],
-          { prepare: true })
+          { prepare: true, consistency: 'all' })
       }
     },
 
@@ -65,7 +65,7 @@ export function Make (config, id) {
       try {
         await db.execute('INSERT INTO liststorage (id, key, s_uuid, value) VALUES (?,?,now(),?)',
           [id, key, JSON.stringify(value)],
-          { prepare: true })
+          { prepare: true, consistency: 'all' })
       } catch (error) {
         console.log(new Date(), '#> Error at cassandra push', error)
       }

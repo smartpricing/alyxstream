@@ -1,5 +1,7 @@
 'use strict'
 
+import Message from '../message/message.js'
+
 export const withStorage = {
 
   withStorage (storageInstance) {
@@ -25,6 +27,20 @@ export const withStorage = {
     return task
   },
 
+  toStorageList (keyFunction, valueFunction = null, ttl = null) {
+    const task = this
+    const index = task._nextIndex()
+    const storage = task._storage
+    task._setNext(async (s) => {
+      const res = s
+      const valueToSave = valueFunction == null ? res : valueFunction(res)
+      const key = keyFunction(res)
+      await storage.push(key, valueToSave, ttl)
+      await task._nextAtIndex(index)(s)
+    })
+    return task
+  },
+
   fromStorage (keyFunction) {
     const task = this
     const index = task._nextIndex()
@@ -36,6 +52,24 @@ export const withStorage = {
         returnArray.push(storedValue)
       }
       await task._nextAtIndex(index)(s)
+    })
+    return task
+  },
+
+  fromStorageList (keyFunction, valueFunction) {
+    const task = this
+    const index = task._nextIndex()
+    const storage = task._storage
+    task._setNext(async (s) => {
+      const returnArray = valueFunction(s)
+      for (const key of keyFunction(s)) {
+        const storedValue = await storage.getList(key)
+        for (const r of storedValue) {
+          returnArray.push(r)
+        }
+      }
+      const flat = returnArray.flat()
+      await task._nextAtIndex(index)(Message(flat))
     })
     return task
   },
@@ -67,12 +101,14 @@ export const withStorage = {
     return task
   },
 
-  flushStorage () {
+  flushStorage (keyFunction) {
     const task = this
     const index = task._nextIndex()
     const storage = task._storage
     task._setNext(async (s) => {
-      await storage.flush()
+      for (const key of keyFunction(s)) {
+        await storage.flush(key)
+      }
       await task._nextAtIndex(index)(s)
     })
     return task

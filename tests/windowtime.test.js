@@ -30,7 +30,7 @@ test('tumblingWindowTimeRedis', async () => {
   const storage = MakeStorage(StorageKind.Redis, null, 'testtime')
   const t = await Task()
     .withStorage(storage)
-    .flushStorage('testtime')
+    .flushStorage(x => ['testtime'])
     .fromArray(testData)
     .withDefaultKey()
     .withEventTime(x => new Date(x.date))

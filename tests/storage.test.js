@@ -9,7 +9,7 @@ import {
 test('withMemoryStorage', async () => {
   const t = await Task()
     .withStorage(MakeStorage(StorageKind.Memory, null, 'test'))
-    .flushStorage('test')
+    .flushStorage(x => ['test'])
     .fromString('alice')
     .toStorage(x => 'myname', x => x)
     .fromStorageToGlobalState(x => ['myname'])
@@ -22,7 +22,7 @@ test('withMemoryStorage', async () => {
 test('withRedisStorage', async () => {
   const t = await Task()
     .withStorage(MakeStorage(StorageKind.Redis, null, 'test'))
-    .flushStorage('test')
+    .flushStorage(x => ['test'])
     .fromString('alice')
     .toStorage(x => 'myname', x => x)
     .fromStorageToGlobalState(x => ['myname'])
@@ -36,7 +36,7 @@ test('withRedisStorage', async () => {
 test('withCassandraStorage', async () => {
   const t = await Task()
     .withStorage(MakeStorage(StorageKind.Cassandra, null, 'test'))
-    .flushStorage('test')
+    .flushStorage(x => ['test'])
     .fromString('alice')
     .toStorage(x => 'myname', x => x)
     .fromStorageToGlobalState(x => ['myname'])

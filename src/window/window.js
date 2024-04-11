@@ -1,7 +1,5 @@
 'use strict'
 
-import { v4 as uuid } from 'uuid'
-
 function makeBaseWindow (storage) {
   return {
     _storage: storage,
@@ -379,42 +377,6 @@ export function MakeSessionWindow (storage) {
         windowElements: winres == null ? [] : winres.length
       }
     }
-  }
-
-  return baseWindow
-}
-
-export function MakeWindowFixed (storage) {
-  const baseWindow = {}
-  const db = storage.db()
-  const storageId = storage.id()
-  const pushQuery = `
-    INSERT INTO 
-      alyxstream.fixed_window (id, key, s_uuid, wid, value) 
-    VALUES 
-      (?,?,now(),?,?)`
-  const countQuery = 'SELECT COUNT(id) FROM alyxstream.fixed_window WHERE id=? AND key=?'
-  const selectLastQuery = 'SELECT wid FROM alyxstream.fixed_window WHERE id=? AND key=? LIMIT 1'
-  const selectQuery = 'SELECT value FROM alyxstream.fixed_window WHERE id=? AND key=?'
-  const deleteQuery = 'DELETE FROM alyxstream.fixed_window WHERE id=? AND key=?'
-
-  baseWindow.push = async function (key, value, maxSize) {
-    const writeId = uuid()
-    await db.execute(pushQuery, [storageId, key, writeId, JSON.stringify(value)])
-    const size = await db.execute(countQuery, [storageId, key])
-    const sizeCountLow = size.rows[0]['system.count(id)'].low
-    if (sizeCountLow >= maxSize) {
-      const lastCheck = await db.execute(selectLastQuery, [storageId, key])
-      const lastWriteWid = lastCheck.rows[0].wid.toString()
-      if (lastWriteWid === writeId) {
-        const data = (await db.execute(selectQuery, [storageId, key])).rows
-        await db.execute(deleteQuery, [storageId, key])
-        return {
-          payload: data
-        }
-      }
-    }
-    return null
   }
 
   return baseWindow

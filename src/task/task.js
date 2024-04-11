@@ -129,7 +129,6 @@ export default function (id) {
     WindowOperators.slidingWindowCount,
     WindowOperators.slidingWindowTime,
     WindowOperators.sessionWindowTime,
-    WindowOperators.fixedWindow,
 
     ParallelProcess.parallel
   )

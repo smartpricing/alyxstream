@@ -16,7 +16,7 @@ import { v4 as uuid } from 'uuid'
   const length = 500
   const processes = 10
   const numberOfJobs = 10
-  const saveLatencyMs = 2000
+  const saveLatencyMs = 200
   const id = os.hostname() + '.' + process.pid
   let start = new Date()
 
@@ -44,8 +44,8 @@ import { v4 as uuid } from 'uuid'
       x => x.payload[0].k, 
       x => x.payload[0].collectKey, 
       x => x, 
-      x => x.length == length,
-      x => x.length == length && x[x.length - 1].processIdentifier == id
+      (y,x) => x.length == length,
+      (y,x) => x.length == length && x[x.length - 1].processIdentifier == id
     )
     .fn(async x => {
       console.log('Write', process.pid, x[0].k, x.length)

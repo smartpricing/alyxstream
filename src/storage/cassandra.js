@@ -71,17 +71,38 @@ export function Make (config, id) {
       }
     },
 
+    pushId: async function (id, key, value) {
+      try {
+        await db.execute('INSERT INTO liststorage (id, key, s_uuid, value) VALUES (?,?,now(),?)',
+          [id, key, JSON.stringify(value)],
+          { prepare: true, consistency: 'all' })
+      } catch (error) {
+        console.log(new Date(), '#> Error at cassandra push', error)
+      }
+    },    
+
     getList: async function (key) {
-      const result = await db.execute('SELECT id, key, value from liststorage WHERE id=? AND key=?',
-        [id, key],
-        { prepare: true })
-      return result.rows.map((r) => { return JSON.parse(r.value) })
+      let result = []
+      let stream = db.stream('SELECT id, key, value, s_uuid from liststorage WHERE id=? AND key=?', [id, key], { prepare: true, fetchSize: 100 })
+      for await (const row of stream) {
+          result.push(row)
+      }
+      return result.map((r) => { return JSON.parse(r.value) })
     },
+
+    getListId: async function (id, key) {
+      let result = []
+      let stream = db.stream('SELECT id, key, value, s_uuid from liststorage WHERE id=? AND key=?', [id, key], { prepare: true, fetchSize: 100 })
+      for await (const row of stream) {
+          result.push(row)
+      }
+      return result.map((r) => { return JSON.parse(r.value) })
+    },    
 
     flush: async function (key) {
       await db.execute('DELETE from liststorage WHERE id=? AND key=?',
         [id, key],
-        { prepare: true })
+        { prepare: true,  consistency: 'all' })
     },
 
     slice: async function (key, numberOfItemsToRemove) {
@@ -118,7 +139,12 @@ export function Make (config, id) {
     flushStorage: async function () {
       await db.execute('DELETE FROM liststorage WHERE id=?', [id], { prepare: true })
       await db.execute('DELETE FROM storage WHERE id=?', [id], { prepare: true })
-    }
+    },
+
+    flushStorageId: async function (id) {
+      await db.execute('DELETE FROM liststorage WHERE id=?', [id], { prepare: true })
+      await db.execute('DELETE FROM storage WHERE id=?', [id], { prepare: true })
+    }    
 
   }
 }

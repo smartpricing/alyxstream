@@ -3,28 +3,36 @@
 import Message from '../message/message.js'
 
 export const collect = {
-  collect (keyFunction, valueFunction, emitFunction, ttl = null) {
+  collect (idFunction, keyFunction, valueFunction, waitUntil, emitFunction, ttl = null) {
     const task = this
     const index = task._nextIndex()
     const storage = task._storage
     task._setNext(async (s) => {
       const res = s
-      const returnArray = []
+      const id = idFunction(res)
       const key = keyFunction(res)
       const valueToSave = valueFunction == null ? res : valueFunction(res)
-      await storage.push(key, valueToSave, ttl)
-
-      const storedValue = await storage.getList(key)
-      for (const r of storedValue) {
-        returnArray.push(r)
+      await storage.pushId(id, key, valueToSave, ttl)
+      const check = async function () {
+        while (true) {
+          const returnArray = await storage.getListId(id, key)
+          
+          const flat = returnArray.flat().map(y => y.payload).flat()
+          const toEmit = await emitFunction(flat)
+          const toBreak = await waitUntil(flat)
+          if (toEmit === true) {
+            await task._nextAtIndex(index)(Message(flat))
+            setTimeout(async () => {
+              await storage.flushStorageId(id)
+            }, 10000)
+          }
+          if (toBreak === true) {
+            break
+          }
+          await new Promise(resolve => setTimeout(resolve, 200))
+        }
       }
-
-      const flat = returnArray.flat().map(y => y.payload).flat()
-      const toEmit = await emitFunction(flat)
-      if (toEmit === true) {
-        await task._nextAtIndex(index)(Message(flat))
-        await storage.flushStorage(keyFunction)
-      }
+      await check()
     })
     return task
   }

@@ -79,30 +79,30 @@ export function Make (config, id) {
       } catch (error) {
         console.log(new Date(), '#> Error at cassandra push', error)
       }
-    },    
+    },
 
     getList: async function (key) {
-      let result = []
-      let stream = db.stream('SELECT id, key, value, s_uuid from liststorage WHERE id=? AND key=?', [id, key], { prepare: true, fetchSize: 100 })
+      const result = []
+      const stream = db.stream('SELECT id, key, value, s_uuid from liststorage WHERE id=? AND key=?', [id, key], { prepare: true, fetchSize: 100 })
       for await (const row of stream) {
-          result.push(row)
+        result.push(row)
       }
       return result.map((r) => { return JSON.parse(r.value) })
     },
 
     getListId: async function (id, key) {
-      let result = []
-      let stream = db.stream('SELECT id, key, value, s_uuid from liststorage WHERE id=? AND key=?', [id, key], { prepare: true, fetchSize: 100 })
+      const result = []
+      const stream = db.stream('SELECT id, key, value, s_uuid from liststorage WHERE id=? AND key=?', [id, key], { prepare: true, fetchSize: 100 })
       for await (const row of stream) {
-          result.push(row)
+        result.push(row)
       }
       return result.map((r) => { return JSON.parse(r.value) })
-    },    
+    },
 
     flush: async function (key) {
       await db.execute('DELETE from liststorage WHERE id=? AND key=?',
         [id, key],
-        { prepare: true,  consistency: 'all' })
+        { prepare: true, consistency: 'all' })
     },
 
     slice: async function (key, numberOfItemsToRemove) {
@@ -144,7 +144,7 @@ export function Make (config, id) {
     flushStorageId: async function (id) {
       await db.execute('DELETE FROM liststorage WHERE id=?', [id], { prepare: true })
       await db.execute('DELETE FROM storage WHERE id=?', [id], { prepare: true })
-    }    
+    }
 
   }
 }

@@ -16,6 +16,7 @@ import * as CustomOperators from '../operators/custom.js'
 import * as StorageOperators from '../operators/storage.js'
 import * as LocalStorageOperators from '../task-storage/task-storage.js'
 import * as ParallelProcess from '../parallel/process.js'
+import * as LockOperators from '../operators/lock.js'
 
 export default function (id) {
   const task = {
@@ -97,6 +98,10 @@ export default function (id) {
     CustomOperators.joinByKeyWithParallelism,
 
     CollectOperators.collect,
+
+    LockOperators.lock,
+    LockOperators.release,
+    LockOperators.counter,
 
     QueueOperators.queueSize,
     QueueOperators.enqueue,

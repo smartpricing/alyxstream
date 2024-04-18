@@ -8,6 +8,9 @@ export function set (name, extension) {
     const task = this
     const index = task._nextIndex()
     task._setNext(async (element) => {
+      if (element === undefined || element == null) {
+        element = Message()
+      }
       const res = await extension(element.payload, ...args)
       await task._nextAtIndex(index)(Message(res, element.metadata, element.globalState))
     })
@@ -21,6 +24,9 @@ export function setRaw (name, extension) {
     const task = this
     const index = task._nextIndex()
     task._setNext(async (element) => {
+      if (element === undefined || element == null) {
+        element = Message()
+      }
       const res = await extension(element, ...args)
       const mex = Message(res.payload, res.metadata, res.globalState)
       await task._nextAtIndex(index)(mex)

@@ -3,6 +3,7 @@
 import * as Memory from './memory.js'
 import * as Redis from './redis.js'
 import * as Cassandra from './cassandra.js'
+import * as Etcd from './etcd.js'
 
 export function Make (kind, config = null, id = null) {
   switch (kind) {
@@ -21,6 +22,12 @@ export function Make (kind, config = null, id = null) {
       }
       return Cassandra.Make(config, id)
 
+    case 'Etcd':
+      if (id === null || typeof id !== 'string') {
+        throw new Error('Id cannot be null and have to be a String')
+      }
+      return Etcd.Make(config, id)
+
     default:
       throw new Error('Unknown storage kind')
   }
@@ -29,5 +36,6 @@ export function Make (kind, config = null, id = null) {
 export const Kind = {
   Memory: 'Memory',
   Redis: 'Redis',
-  Cassandra: 'Cassandra'
+  Cassandra: 'Cassandra',
+  Etcd: 'Etcd'
 }

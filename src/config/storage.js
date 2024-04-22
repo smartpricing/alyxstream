@@ -13,3 +13,15 @@ export const CassandraDefaultConfig = {
   localDataCenter: 'datacenter1',
   keyspace: 'alyxstream'
 }
+
+/** Postgres default config */
+export const PgDefaultConfig = {
+  user: 'alyxstream',
+  host: 'localhost',
+  database: 'alyxstream',
+  password: '',
+  port: 5432,
+  ssl: {
+    rejectUnauthorized: false
+  }
+}

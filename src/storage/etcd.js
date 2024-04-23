@@ -6,6 +6,7 @@ import Log from '../logger/default.js'
 export function Make (config, id) {
   const db = config == null ? new Etcd3() : new Etcd3(config)
   const lockMap = {}
+  const watchMap = {}
   return {
     _db: db,
     state: {},
@@ -54,6 +55,39 @@ export function Make (config, id) {
       try {
         const valueRes = await db.put(lockKey).value(`${value}`)
         return valueRes
+      } catch (error) {
+        return null
+      }
+    },
+
+    watch: async function (key, cb) {
+      try {
+        if (watchMap[key] === undefined) {
+          watchMap[key] = await db.watch().key(key).create()
+        }
+        watchMap[key].on('put', async res => {
+          await cb(res)
+        })
+      } catch (error) {
+        console.log(error)
+        return null
+      }
+    },
+
+    put: async function (key, value) {
+      try {
+        const valueRes = await db.put(key).value(`${value}`)
+        return valueRes
+      } catch (error) {
+        console.log(error)
+        return null
+      }
+    },
+
+    get: async function (key) {
+      try {
+        const value = await db.get(key).string()
+        return value
       } catch (error) {
         return null
       }

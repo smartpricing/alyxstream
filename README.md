@@ -27,7 +27,7 @@ Working usage examples are in the *usage-examples* folder.
 10. [Kafka Exchange Mode](#exchange)
 11. [Multiprocess/Parallel Mode](#parallel)
 12. [Nats JetStream](#jetstream)
-13. [Distributed locks with Etcd](#etcd)
+13. [Distributed locks](#locks)
 14. [Pulsar](#pulsar)
 
 ## Introduction <a name="introduction"></a>
@@ -642,14 +642,15 @@ await Task()
 .close()
 ```
 
-## Distributed locks with Etcd [ALPHA] <a name="etcd"></a>
+## Distributed locks [ALPHA] <a name="locks"></a>
 
-Using Etcd as storage, we can acquire global locks and have atomic counters:
+Using Smartlocks libs, we can acquire global locks and have atomic counters.
 
 Lock/Release:
 
 ```js
-const lockStorage = MakeStorage(StorageKind.Etcd, null, 'myeetcd')
+import { Mutex, StorageKind as MSKind } from 'smartlocks'
+const lockStorage = MakeStorage(MSKind.Cassandra, null)
 
 await Task()
 .parallel(5)
@@ -663,25 +664,6 @@ await Task()
   console.log(x)
 })
 .release(lockStorage, x => 'my-lock')
-.close()
-```
-
-Counter:
-
-```js
-const lockStorage = MakeStorage(StorageKind.Etcd, null, 'myeetcd')
-
-await Task()
-.parallel(5)
-.fromArray([{i: 1}, {i: 2}, {i: 3}])
-.fn(x => {
-  x.i = x.i * 2
-  return x
-})
-.counter(lockStorage, x => 'my-counter-12', (x, y) => y = y + 1 + x.i, 50)
-.fn(x => {
-  console.log(x)
-})
 .close()
 ```
 

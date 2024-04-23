@@ -117,6 +117,7 @@ export default function (id) {
     SourceOperators.fromString,
     SourceOperators.fromInterval,
     SourceOperators.fromReadableStream,
+    SourceOperators.fromEtcd,
 
     SinkOperators.toKafka,
     SinkOperators.kafkaCommit,

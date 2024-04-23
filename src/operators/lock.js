@@ -7,7 +7,7 @@ function randomInteger (min, max) {
 }
 
 export const lock = {
-  lock (storage, lockKeyFn, retryTimeMs = null) {
+  lock (mutex, lockKeyFn, retryTimeMs = null, ttl = 60) {
     const task = this
     const index = task._nextIndex()
     task._setNext(async (element) => {
@@ -15,16 +15,9 @@ export const lock = {
         element = Message()
       }
       const lockKey = await lockKeyFn(element.payload)
-      while (true) {
-        const res = await storage.lock(lockKey)
-        if (res !== null) {
-          await task._nextAtIndex(index)(element)
-          break
-        } else if (retryTimeMs === null) {
-          break
-        } else {
-          await new Promise(resolve => setTimeout(resolve, retryTimeMs + randomInteger(0, 50)))
-        }
+      const result = await mutex.lock(lockKey, retryTimeMs, ttl)
+      if (result === true) {
+        await task._nextAtIndex(index)(element)
       }
     })
     return task
@@ -32,7 +25,7 @@ export const lock = {
 }
 
 export const release = {
-  release (storage, lockKeyFn) {
+  release (mutex, lockKeyFn) {
     const task = this
     const index = task._nextIndex()
     task._setNext(async (element) => {
@@ -40,14 +33,55 @@ export const release = {
         element = Message()
       }
       const lockKey = await lockKeyFn(element.payload)
-      const res = await storage.release(lockKey)
-      if (res !== null) {
-        await task._nextAtIndex(index)(element)
-      }
+      await mutex.release(lockKey)
+      await task._nextAtIndex(index)(element)
     })
     return task
   }
 }
+
+// export const lock = {
+//   lock (storage, lockKeyFn, retryTimeMs = null) {
+//     const task = this
+//     const index = task._nextIndex()
+//     task._setNext(async (element) => {
+//       if (element === undefined || element == null) {
+//         element = Message()
+//       }
+//       const lockKey = await lockKeyFn(element.payload)
+//       while (true) {
+//         const res = await storage.lock(lockKey)
+//         if (res !== null) {
+//           await task._nextAtIndex(index)(element)
+//           break
+//         } else if (retryTimeMs === null) {
+//           break
+//         } else {
+//           await new Promise(resolve => setTimeout(resolve, retryTimeMs + randomInteger(0, 50)))
+//         }
+//       }
+//     })
+//     return task
+//   }
+// }
+//
+// export const release = {
+//   release (storage, lockKeyFn) {
+//     const task = this
+//     const index = task._nextIndex()
+//     task._setNext(async (element) => {
+//       if (element === undefined || element == null) {
+//         element = Message()
+//       }
+//       const lockKey = await lockKeyFn(element.payload)
+//       const res = await storage.release(lockKey)
+//       if (res !== null) {
+//         await task._nextAtIndex(index)(element)
+//       }
+//     })
+//     return task
+//   }
+// }
 
 export const counter = {
   counter (storage, lockKeyFn, incrFn, retryTimeMs = null) {

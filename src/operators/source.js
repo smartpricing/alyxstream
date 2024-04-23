@@ -87,3 +87,16 @@ export const fromReadableStream = {
     return task
   }
 }
+
+export const fromEtcd = {
+  fromEtcd (storage, key, watch = true) {
+    const task = this
+    const index = task._nextIndex()
+    task._setNext(async () => {
+      await storage.watch(key, async (data) => {
+        await task._nextAtIndex(index)(Message(data))
+      })
+    })
+    return task
+  }
+}

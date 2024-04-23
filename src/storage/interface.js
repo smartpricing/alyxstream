@@ -5,6 +5,7 @@ import * as Redis from './redis.js'
 import * as Cassandra from './cassandra.js'
 import * as Etcd from './etcd.js'
 import * as Postgres from './postgres.js'
+import * as Opensearch from './opensearch.js'
 
 export function Make (kind, config = null, id = null) {
   switch (kind) {
@@ -22,6 +23,12 @@ export function Make (kind, config = null, id = null) {
         throw new Error('Id cannot be null and have to be a String')
       }
       return Postgres.Make(config, id)
+
+    case 'Opensearch':
+      if (id === null || typeof id !== 'string') {
+        throw new Error('Id cannot be null and have to be a String')
+      }
+      return Opensearch.Make(config, id)
 
     case 'Cassandra':
       if (id === null || typeof id !== 'string') {
@@ -45,5 +52,6 @@ export const Kind = {
   Redis: 'Redis',
   Cassandra: 'Cassandra',
   Etcd: 'Etcd',
-  Postgres: 'Postgres'
+  Postgres: 'Postgres',
+  Opensearch: 'Opensearch'
 }

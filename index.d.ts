@@ -7,6 +7,9 @@ export const StorageKind: {
     Memory: string;
     Redis: string;
     Cassandra: string;
+    Opensearch: string;
+    Postgres: string;
+    Etcd: string;
 };
 export const ExposeStorageState: typeof exposeStorageState;
 export const KafkaClient: typeof kafkaClient;

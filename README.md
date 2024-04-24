@@ -650,7 +650,7 @@ Lock/Release:
 
 ```js
 import { Mutex, StorageKind as MSKind } from 'smartlocks'
-const lockStorage = MakeStorage(MSKind.Cassandra, null)
+const lockStorage = Mutex(MSKind.Cassandra, null)
 
 await Task()
 .parallel(5)

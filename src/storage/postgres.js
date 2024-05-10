@@ -1,15 +1,20 @@
 import pg from 'pg'
 import { PgDefaultConfig } from '../config/storage.js'
 
-const { Client } = pg
+const { Client, Pool } = pg
 export function Make (config, id) {
-  const db = new Client(config == null ? PgDefaultConfig : config)
+  const standardClient = new Client(config == null ? PgDefaultConfig : config)
+  const poolClient = new Pool(config == null ? PgDefaultConfig : config)
   return {
-    _db: db,
+    _client: standardClient,
+    _poolClient: poolClient,
     _id: id,
 
-    db: function () {
-      return this._db
+    client: function () {
+      return this._client
+    },
+    poolClient: function () {
+      return this._poolClient
     }
   }
 }

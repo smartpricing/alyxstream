@@ -1,6 +1,6 @@
 {
   "name": "@dev.smartpricing/alyxstream",
-  "version": "0.4.22",
+  "version": "0.4.23",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -32,7 +32,7 @@
     "nats": "^2.19.0",
     "pg": "^8.11.5",
     "pulsar-client": "^1.10.0",
-    "smartlocks": "^0.0.3",
+    "smartlocks": "^0.0.4",
     "uuid": "^9.0.0",
     "ws": "^8.16.0"
   },

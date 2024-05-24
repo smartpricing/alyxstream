@@ -82,7 +82,7 @@ export function Make (config, id) {
 
     sliceTime: async function (key, sliceSize) {
       try {
-        const elements = (await db.lrange(this._composeKey(key), 0, -1)).map((v) => { return JSON.parse(v) }).reverse()
+        const elements = (await db.lrange(this._composeKey(key), 0, -1)).map((v) => { return JSON.parse(v) })
         for (let i = 0; i < elements.length; i += 1) {
           if ((new Date(elements[i].eventTime).getTime()) >= sliceSize) {
             await db.lpop(this._composeKey(key), i + 1)

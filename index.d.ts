@@ -110,9 +110,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     ) => Tsk<I, T[], L, Ls, Ss, Ms>
 
     // TO BE CHECKED 
-    parallel: <Pf extends () => any>(numberOfProcess: number, produceFunction?: Pf) => Pf extends null 
-        ? Tsk<I, null, L, Ls, Ss, Ms> 
-        : Tsk<I, T, L, Ls, Ss, Ms> 
+    parallel: <Pf extends () => any>(numberOfProcess: number, produceFunction?: Pf) => Tsk<I, null, L, Ls, Ss, Ms>
 
     queueSize: (storage: Storage) => Tsk<I, number, L, Ls, Ss, Ms> // to check if it's really a number
 

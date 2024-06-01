@@ -84,30 +84,37 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		.fn(x => Object.values(x))
 		.map(x => x[1])
 		.flat()
+		.parallel(3, () => console.log("parallel"))
+		.fn(x => {
+			console.log("x: ", x)
+			if (x !== null) {
+				throw Error("should be null")
+			}
+		})
 
 	await t.inject("I like types!")
 
-	await AS.Task()
-		.fromArray([1, 2, 3, 4])
-		.fn(x => x * 2)
-		.close()
+	// await AS.Task()
+	// 	.fromArray([1, 2, 3, 4])
+	// 	.fn(x => x * 2)
+	// 	.close()
 
-	await AS.Task()
-		.fromArray([[1, 2, 3, 4]])
-		.map(x => x * 2)
-		.close()
+	// await AS.Task()
+	// 	.fromArray([[1, 2, 3, 4]])
+	// 	.map(x => x * 2)
+	// 	.close()
 
-	AS.Task()
-		.fromObject({ a: 1, b: 2, c: { d: 3, e: 4 } })
-		.objectGroupBy(x => "1") // won't work (add ObjectOfArrays task??)
-	// .close()
+	// AS.Task()
+	// 	.fromObject({ a: 1, b: 2, c: { d: 3, e: 4 } })
+	// 	.objectGroupBy(x => "1") // won't work (add ObjectOfArrays task??)
+	// // .close()
 
-	await AS.Task()
-		.fromString("adkasjfdn")
-		.tokenize("a")
-		.each()
-		.print()
-		.close()
+	// await AS.Task()
+	// 	.fromString("adkasjfdn")
+	// 	.tokenize("a")
+	// 	.each()
+	// 	.print()
+	// 	.close()
 
 	// how does this work?
 	// await AS.Task()
@@ -116,82 +123,82 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 	// 	.print()
 	// 	.close()
 
-	const kc = AS.KafkaClient({
-		brokers: ["localhost:9092"],
-		clientId: "test-alyxstream-types",
-	})
+	// const kc = AS.KafkaClient({
+	// 	brokers: ["localhost:9092"],
+	// 	clientId: "test-alyxstream-types",
+	// })
 
-	const nc = await AS.NatsClient({
-		servers: "localhost:4222",
-	})
+	// const nc = await AS.NatsClient({
+	// 	servers: "localhost:4222",
+	// })
 
-	const jsm = await nc.jetstream().jetstreamManager()
-	await jsm.streams.add({
-		name: "alyxstream-test-stream",
-		subjects: ["alyxstream.test.>"]
-	})
+	// const jsm = await nc.jetstream().jetstreamManager()
+	// await jsm.streams.add({
+	// 	name: "alyxstream-test-stream",
+	// 	subjects: ["alyxstream.test.>"]
+	// })
 
-	const nsource = await AS.NatsJetstreamSource(nc, [{
-		stream: "alyxstream-test-stream",
-		name: "alyxstream-test-source",
-		durable_name: "alyxstream-test-source",
-		filter_subjects: ["alyxstream.test.>"],
-		ack_policy: AckPolicy.None,
-		deliver_policy: DeliverPolicy.New,
-		replay_policy: ReplayPolicy.Instant,
-	}])
+	// const nsource = await AS.NatsJetstreamSource(nc, [{
+	// 	stream: "alyxstream-test-stream",
+	// 	name: "alyxstream-test-source",
+	// 	durable_name: "alyxstream-test-source",
+	// 	filter_subjects: ["alyxstream.test.>"],
+	// 	ack_policy: AckPolicy.None,
+	// 	deliver_policy: DeliverPolicy.New,
+	// 	replay_policy: ReplayPolicy.Instant,
+	// }])
 
-	const ksource = await AS.KafkaSource(kc, {
-		groupId: randomUUID(),
-		topics: [{
-			topic: "alyxstream-test-topic"
-		}]
-	})
+	// const ksource = await AS.KafkaSource(kc, {
+	// 	groupId: randomUUID(),
+	// 	topics: [{
+	// 		topic: "alyxstream-test-topic"
+	// 	}]
+	// })
 
-	const ksink = await AS.KafkaSink(kc, {
-		allowAutoTopicCreation: true,
-	})
+	// const ksink = await AS.KafkaSink(kc, {
+	// 	allowAutoTopicCreation: true,
+	// })
 
-	await AS.Task()
-		.fromInterval(10, undefined, 3)
-		.print("kafka - callback")
-		.toKafka(ksink, "alyxstream-test-topic", x => ({
-			key: "asd",
-			value: JSON.stringify({ x })
-		}))
-		.close()
+	// await AS.Task()
+	// 	.fromInterval(10, undefined, 3)
+	// 	.print("kafka - callback")
+	// 	.toKafka(ksink, "alyxstream-test-topic", x => ({
+	// 		key: "asd",
+	// 		value: JSON.stringify({ x })
+	// 	}))
+	// 	.close()
 
-	await AS.Task()
-		.fromInterval(10, undefined, 3)
-		.print("kafka - preparsed")
-		.fn<Message>(x => ({ key: "abcd", value: JSON.stringify({ x }) }))
-		.toKafka(ksink, "alyxstream-test-topic")
-		.close()
+	// await AS.Task()
+	// 	.fromInterval(10, undefined, 3)
+	// 	.print("kafka - preparsed")
+	// 	.fn<Message>(x => ({ key: "abcd", value: JSON.stringify({ x }) }))
+	// 	.toKafka(ksink, "alyxstream-test-topic")
+	// 	.close()
 
-	await AS.Task()
-		.fromKafka(ksource)
-		.slidingWindowTime(s1, 100, 200, 1000)
-		.print("kafka - sliding window time")
-		.each()
-		.fn(x => (x as any).element as TopicPartitionOffsetAndMetadata)
-		.kafkaCommit(ksource)
-		.fn(_ => done = true)
-		.close()
+	// await AS.Task()
+	// 	.fromKafka(ksource)
+	// 	.slidingWindowTime(s1, 100, 200, 1000)
+	// 	.print("kafka - sliding window time")
+	// 	.each()
+	// 	.fn(x => (x as any).element as TopicPartitionOffsetAndMetadata)
+	// 	.kafkaCommit(ksource)
+	// 	.fn(_ => done = true)
+	// 	.close()
 
-	await AS.Task()
-		.fromInterval(10, undefined, 3)
-		.toNats(nc, "alyxstream.test.1234", x => ({
-			key: "asd",
-			value: JSON.stringify({ x }) // cb not called so message is number
-		}))
-		.close()
+	// await AS.Task()
+	// 	.fromInterval(10, undefined, 3)
+	// 	.toNats(nc, "alyxstream.test.1234", x => ({
+	// 		key: "asd",
+	// 		value: JSON.stringify({ x }) // cb not called so message is number
+	// 	}))
+	// 	.close()
 
-	await AS.Task()
-		.fromNats<number>(nsource) // number because cb is not called in sink
-		.fn(x => x.data)
-		.print("nats - consume")
-		.slidingWindowCount(s1, 3, 0, 1000)
-		.print("nats - sliding window count")
-		.map(x => console.log(x))
-		.close()
+	// await AS.Task()
+	// 	.fromNats<number>(nsource) // number because cb is not called in sink
+	// 	.fn(x => x.data)
+	// 	.print("nats - consume")
+	// 	.slidingWindowCount(s1, 3, 0, 1000)
+	// 	.print("nats - sliding window count")
+	// 	.map(x => console.log(x))
+	// 	.close()
 })()

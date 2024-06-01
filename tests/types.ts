@@ -145,7 +145,6 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		allowAutoTopicCreation: true,
 	})
 
-
 	await AS.Task()
 		.fromInterval(10, undefined, 3)
 		.print("kafka - callback")
@@ -164,7 +163,9 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 
 	await AS.Task()
 		.fromKafka(ksource)
-		.print()
+		.slidingWindowTime(s1, 100, 200, 1000)
+		.print("kafka - sliding window time")
+		.each()
 		.kafkaCommit(ksource)
 		.close()
 
@@ -180,6 +181,9 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		.fromNats<number>(nsource) // number because cb is not called in sink
 		.fn(x => x.data)
 		.print("nats - consume")
+		.slidingWindowCount(s1, 3, 0, 1000)
+		.print("nats - sliding window count")
+		.map(x => console.log(x))
 		.fn(_ => setTimeout(() => { process.exit(0) }, 1000))
 		.close()
 })()

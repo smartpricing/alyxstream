@@ -19,7 +19,8 @@ import * as fs from "fs"
 
 type TaskMessage<T> = {
     payload: T
-    key: string | number
+    key: string | number,
+    [x: string]: any
 }
 
 // ternary type to determine the correct operator, depending on the message type

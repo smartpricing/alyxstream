@@ -219,6 +219,11 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     /** Releases a lock on a storage key using a smartlocks library mutex. */
     release: (mutex: Smartlocks.Mutex, lockKeyFn: (x: T) => string | number) => Tsk<I, T, L, Ls, Ss, Ms>,
 
+    /** Progressively sums messages, returning the current counter value. Only works for when message type is *number* */
+    sum: T extends number 
+    ? () => Tsk<I, number, L, Ls, Ss, Ms>  
+    : never
+
     /** Push a new message to the task. */
     inject: (data: I) => Promise<Tsk<I, T, L, Ls, Ss, Ms>>
 
@@ -247,6 +252,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
 export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Ss, Ms> {
     map: <R>(func: (x: ElemOfArr<T>) => R) => Tsk<I, R[], L, Ls, Ss, Ms>
     
+    /** Splits the task execution for each element of the array. */
     each: (func?: (x: ElemOfArr<T>) => any) => Tsk<I, ElemOfArr<T>, L, Ls, Ss, Ms>
     
     filterArray: (func: (x: ElemOfArr<T>) => boolean) => Tsk<I, T, L, Ls, Ss, Ms>
@@ -255,38 +261,37 @@ export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, 
     // reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => Tsk<I, R, L, Ls, Ss, Ms>
     reduce: (func?: (x: ElemOfArr<T>) => number) => Tsk<I, number, L, Ls, Ss, Ms>
 
-    
+    /** Count array element by key. */
     countInArray: (func: (x: ElemOfArr<T>) => string | number) => Tsk<I, { [x in string | number]: number }, L, Ls, Ss, Ms>
     
+    /** Returns the array length. */
     length: () => Tsk<I, number, L, Ls, Ss, Ms>
     
     groupBy: (func: (elem: ElemOfArr<T>, index?: number, array?: T[]) => any) => Tsk<I, { [x in string | number]: T[] }, L, Ls, Ss, Ms> 
-    
-    flat: () => Tsk<I, NestedElem<T>[], L, Ls, Ss, Ms>
 
     /** Requires *task.withStorage()*. */
     fromStorage: Ss extends false ? never : (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => Tsk<I, unknown[], L, Ls, Ss, Ms> /*To check*/
     // it seems that fromStorage is available only if the message payload value is an array
     // since it pushes the stored values into the message payload
+    
+    flat: () => Tsk<I, NestedElem<T>[], L, Ls, Ss, Ms>
 
     [x: string]: any
 }
 
 export declare interface TaskOfObject<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskBase<I, T, L, Ls, Ss, Ms> {
     //sumMap should belong to an hypothetical TaskOfObjectOfArrays or TaskOfObjectOfStrings type (because it sums fields lenghts)
+    /** Only works for objects whose values are arrays or strings (or anyting with a *length: number* property), otherwise will throw an error. */
     sumMap: () => Tsk<I, { [x in keyof T]: number }, L, Ls, Ss, Ms>
   
     /** Executes a groupBy for every key of the object message. */
     objectGroupBy: (keyFunction: (x: T) => string | number) => Tsk<I, { [x in string | number]: T[] }, L, Ls, Ss, Ms>
   
-    aggregate: <R = T>(storage: Storage, name: string, keyFunction: (x: T) => string | number) => Tsk<I, { [x in string | number]: R[] }, L, Ls, Ss, Ms>
-
-    sum: () => Tsk<I, number, L, Ls, Ss, Ms>    
+    /** Aggregates array element by key in a storage system. */
+    aggregate: <R = T>(storage: Storage, name: string, keyFunction: (x: T) => string | number) => Tsk<I, { [x in string | number]: R[] }, L, Ls, Ss, Ms>  
 
     /** Requires *task.withLocalKVStorage().* */
     mergeLocalKV: Ls extends false ? never : <K extends string | number>(key: K) => Tsk<I, T & { [x in K]: L }, L, Ls, Ss, Ms> 
- 
-    [x: string]: any
 }
 
 export declare interface TaskOfString<I, T extends string, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Ss, Ms> {

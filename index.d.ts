@@ -99,7 +99,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     /** @deprecated use fnRaw() instead */
     customFunctionRaw: <R>(callback: (x: TaskMessage<T>) => R) => Tsk<I, R, L, Ls, Ss, Ms>
     
-    /** @deprecated use fn() instead */
+    /** @deprecated use fnRaw() instead */
     customAsyncFunctionRaw: <R>(callback: (x: TaskMessage<T>) => Promise<R>) => Tsk<I, R, L, Ls, Ss, Ms>
 
     /**  */

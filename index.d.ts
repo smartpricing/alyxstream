@@ -28,7 +28,9 @@ type Tsk<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> =
 /*    */ ? TaskOfArray<I, U[], L, Ls, Ss, Ms> 
 /*    */ : T extends string // not an array, is string?
 /*        */ ? TaskOfString<I, T, L, Ls, Ss, Ms> // is string
-/*        */ : TaskOfObject<I, T, L, Ls, Ss, Ms> // anything else
+/*        */ : T extends number 
+/*            */ ? TaskBase<I, T, L, Ls, Ss, Ms>
+/*            */ : TaskOfObject<I, T, L, Ls, Ss, Ms> // anything else
 
 
 export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> {
@@ -55,18 +57,22 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
 
     filter: (cb: (x: T) => boolean) => Tsk<I, T, L, Ls, Ss, Ms>
 
-    print: (str?: string) => Tsk<I, T, L, Ls, Ss, Ms>
+    print: (str?: any) => Tsk<I, T, L, Ls, Ss, Ms>
 
     /** Splits the task execution into multiple subtasks. Waits for subtasks execution and continues to the next operator passing the array of subtasks results as message. */
     branch: <R = any>(subtaskFuncs: ((x: T) => Promise<Tsk<any, R, any, any, any, any>>)[]) => Tsk<I, R[], L, Ls, Ss, Ms>
 
     readline: () => Tsk<I, string, L, Ls, Ss, Ms>
 
-    /** Execute a function on the message payload. */
-    fn: <R>(callback: (x: T) => R) => Tsk<I, R, L, Ls, Ss, Ms>
+    /** Execute a function on the message payload. Can be an async function. */
+    fn: <R>(callback: (x: T) => R) => R extends Promise<infer U> 
+        ? Tsk<I, U, L, Ls, Ss, Ms> 
+        : Tsk<I, R, L, Ls, Ss, Ms>
     
-    /** Execute a function on the raw task message. */
-    fnRaw: <R>(callback: (x: TaskMessage<T>) => R) => Tsk<I, R, L, Ls, Ss, Ms>
+    /** Execute a function on the raw task message. Can be an async fucntion. */
+    fnRaw: <R>(callback: (x: TaskMessage<T>) => R) => R extends Promise<infer U> 
+        ? Tsk<I, U, L, Ls, Ss, Ms> 
+        : Tsk<I, R, L, Ls, Ss, Ms>
     
     /** @deprecated use fn() instead */
     customFunction: <R>(callback: (x: T) => R) => Tsk<I, R, L, Ls, Ss, Ms>
@@ -109,7 +115,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
 
     // not sure of types here
     /** Requires *task.withStorage()*.*/
-    fromStorageList: Ss extends false ? never : <R = any>(keyFunc: (x: TaskMessage<T>) => string | number, valueFunc?: (x: T) => R[]) => Tsk<I, R[], L, Ls, Ss, Ms> 
+    fromStorageList: Ss extends false ? never : <R = any>(keyFunc: (x: TaskMessage<T>) => (string | number)[], valueFunc: (x: T) => R[]) => Tsk<I, R[], L, Ls, Ss, Ms> 
 
     /** Requires *task.withStorage()*. */
     fromStorageToGlobalState: Ss extends false ? never : (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => Tsk<I, T, L, Ls, Ss, Ms>
@@ -118,7 +124,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     disconnectStorage: Ss extends false ? never : () => Tsk<I, T, L, Ls, Ss, Ms>
     
     /** Requires *task.withStorage()*. */
-    flushStorage: Ss extends false ? never : () => Tsk<I, T, L, Ls, Ss, Ms>
+    flushStorage: Ss extends false ? never : (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => Tsk<I, T, L, Ls, Ss, Ms>
     
     /** Requires *task.withStorage()*. */
     storage: Ss extends false ? never : () => Storage
@@ -136,9 +142,6 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     getLocalKV: Ls extends false ? never : <K>(key?: K) => K extends Exclude<K, string | number> // check if key is provided
         ? Tsk<I, { [x in string | number]: L }, L, Ls, Ss, Ms> // not provided => returns full storage
         : Tsk<I, L, L, Ls, Ss, Ms> // provided => returns single storage value
-   
-    /** Requires *task.withLocalKVStorage().* */
-    mergeLocalKV: Ls extends false ? never : <K extends string | number>(key: K) => Tsk<I, T & { [x in K]: L }, L, Ls, Ss, Ms> 
     
     /** Requires *task.withLocalKVStorage()*. */
     flushLocalKV: Ls extends false ? never : (key: string | number) => Tsk<I, T, L, Ls, Ss, Ms> 
@@ -234,12 +237,12 @@ export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, 
     
     length: () => Tsk<I, number, L, Ls, Ss, Ms>
     
-    groupBy: (func: (elem: T, index?: number, array?: T[]) => any) => Tsk<I, { [x in string | number]: T[] }, L, Ls, Ss, Ms> 
+    groupBy: (func: (elem: ElemOfArr<T>, index?: number, array?: T[]) => any) => Tsk<I, { [x in string | number]: T[] }, L, Ls, Ss, Ms> 
     
     flat: () => Tsk<I, NestedElem<T>[], L, Ls, Ss, Ms>
 
     /** Requires *task.withStorage()*. */
-    fromStorage: Ss extends false ? never : (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => Tsk<I, any, L, Ls, Ss, Ms> /*To check*/
+    fromStorage: Ss extends false ? never : (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => Tsk<I, unknown[], L, Ls, Ss, Ms> /*To check*/
     // it seems that fromStorage is available only if the message payload value is an array
     // since it pushes the stored values into the message payload
 
@@ -255,6 +258,9 @@ export declare interface TaskOfObject<I, T, L, Ls extends boolean, Ss extends bo
     aggregate: <R = T>(storage: Storage, name: string, keyFunction: (x: T) => string | number) => Tsk<I, { [x in string | number]: R[] }, L, Ls, Ss, Ms>
 
     sum: () => Tsk<I, number, L, Ls, Ss, Ms>    
+
+    /** Requires *task.withLocalKVStorage().* */
+    mergeLocalKV: Ls extends false ? never : <K extends string | number>(key: K) => Tsk<I, T & { [x in K]: L }, L, Ls, Ss, Ms> 
  
     [x: string]: any
 }
@@ -439,7 +445,7 @@ type ElemOfArr<T extends any[]> = T extends (infer U)[] ? U : never;
 
 /** returns the nested element of both 1d and 2d arrays */
 type NestedElem<T> = T extends readonly (infer U)[]
-  ? U extends readonly (infer V)[] 
+    ? U extends readonly (infer V)[] 
     ? V 
     : U 
-  : never;
+    : never;

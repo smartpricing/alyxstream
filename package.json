@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "ALYXSTREAM_LOG_LEVEL='-' node --experimental-vm-modules ./node_modules/.bin/jest --rootDir=tests"
+    "test": "ALYXSTREAM_LOG_LEVEL='-' node --experimental-vm-modules ./node_modules/.bin/jest --rootDir=tests",
+    "test-types": "tsx tests/types.ts"
   },
   "author": "Alice Viola Setti @ Smartpricing",
   "license": "Apache-2.0",

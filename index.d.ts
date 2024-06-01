@@ -30,7 +30,11 @@ type Tsk<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> =
 /*        */ ? TaskOfString<I, T, L, Ls, Ss, Ms> // is string
 /*        */ : T extends number 
 /*            */ ? TaskBase<I, T, L, Ls, Ss, Ms>
-/*            */ : TaskOfObject<I, T, L, Ls, Ss, Ms> // anything else
+/*            */ : T extends (Kafka.Message | Kafka.Message[])
+/*                */ ? TaskOfKafkaMessage<I, T, L, Ls, Ss, Ms> 
+/*                */ : T extends KCommitParams
+/*                    */ ? TaskOfKafkaCommitParams<I, T, L, Ls, Ss, Ms> 
+/*                    */ : TaskOfObject<I, T, L, Ls, Ss, Ms>  
 
 
 export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> {
@@ -156,7 +160,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
 
     slidingWindowTime: (storage: Storage, timeLengthMilliSeconds: number, slidingLengthMilliseconds: number, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Ss, Ms>
 
-    fromArray: <R>(array: R[]) => Tsk<I, R[], L, Ls, Ss, Ms>
+    fromArray: <R>(array: R[]) => Tsk<I, R, L, Ls, Ss, Ms>
 
     fromObject: <R>(object: R) => Tsk<I, R, L, Ls, Ss, Ms>
 
@@ -166,7 +170,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
 
     fromReadableStream: (filePath: fs.PathLike, useZlib?: boolean) => Tsk<I, fs.ReadStream, L, Ls, Ss, Ms>
 
-    toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Kafka.Message[], options?: KSinkOptions) => Tsk<I, T, L, Ls, Ss, Ms>
+    toKafka: (kafkaSink: KSink, topic: string, callback: (x: T) => Kafka.Message | Kafka.Message[], options?: KSinkOptions) => Tsk<I, T, L, Ls, Ss, Ms>
 
     fromKafka: <R = any>(source: KSource) => Tsk<I, KMessage<R>, L, Ls, Ss, Ms>
 
@@ -186,10 +190,12 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
  
     fromPulsarWs: never, // not implemented
 
-    fromNats: <R = any>(source: NatsJsSource) => Tsk<I, R, L, Ls, Ss, Ms>,
+    /** Consumes messages from a NATS Jetstream stream */
+    fromNats: <R = any>(source: NatsJsSource) => Tsk<I, NatsStreamMsg<R>, L, Ls, Ss, Ms>,
 
     // dataCb is not called in this sink
-    toNats: (sink: Nats.NatsConnection, topic: string, dataCb: (x: T) => any) => Tsk<I, T, L, Ls, Ss, Ms>,
+    /** Produces a message to a NATS Jetstream stream. */
+    toNats: (sink: Nats.NatsConnection, topic: string, dataCb?: (x: T) => any) => Tsk<I, T, L, Ls, Ss, Ms>,
 
     /** Acquires a lock on a storage key using a smartlocks library mutex. */
     lock: (mutex: Smartlocks.Mutex, lockKeyFn: (x: T) => string | number, retryTimeMs?: number, ttl?: number) => Tsk<I, T, L, Ls, Ss, Ms>,
@@ -253,6 +259,7 @@ export declare interface TaskOfObject<I, T, L, Ls extends boolean, Ss extends bo
     //sumMap should belong to an hypothetical TaskOfObjectOfArrays or TaskOfObjectOfStrings type (because it sums fields lenghts)
     sumMap: () => Tsk<I, { [x in keyof T]: number }, L, Ls, Ss, Ms>
   
+    /** Executes a groupBy for every key of the object message. */
     objectGroupBy: (keyFunction: (x: T) => string | number) => Tsk<I, { [x in string | number]: T[] }, L, Ls, Ss, Ms>
   
     aggregate: <R = T>(storage: Storage, name: string, keyFunction: (x: T) => string | number) => Tsk<I, { [x in string | number]: R[] }, L, Ls, Ss, Ms>
@@ -265,18 +272,20 @@ export declare interface TaskOfObject<I, T, L, Ls extends boolean, Ss extends bo
     [x: string]: any
 }
 
-// export declare interface TaskOfNumberArray<I, T extends number[], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfArray<I, T, L, Ls, Ss, Ms> {
-// }
-
-// export declare interface TaskOfStringArray<I, T extends string[], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfArray<I, T, L, Ls, Ss, Ms> {
-//     // just in case it's needed
-//     // eg concat () => string
-// }
-
 export declare interface TaskOfString<I, T extends string, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Ss, Ms> {
     /** Splits the string message using a separator (space character the default separator). */
     tokenize: (separator?: string) => Tsk<I, string[], L, Ls, Ss, Ms>
 }
+
+export declare interface TaskOfKafkaMessage<I, T extends (Kafka.Message | Kafka.Message[]), L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Ss, Ms> {
+    toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Kafka.Message | Kafka.Message[], options?: KSinkOptions) => Tsk<I, T, L, Ls, Ss, Ms>
+    kafkaCommit: (kafkaSource: KSource, commitParams?: KCommitParams) => Tsk<I, T, L, Ls, Ss, Ms>
+}
+
+export declare interface TaskOfKafkaCommitParams<I, T extends KCommitParams, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Ss, Ms> {
+    kafkaCommit: (kafkaSource: KSource, commitParams?: KCommitParams) => Tsk<I, T, L, Ls, Ss, Ms>
+}
+
 
 export type TaskExtension<T, U extends any[]> = (first: T, ...rest: U) => void;
 
@@ -301,6 +310,7 @@ export enum StorageKind {
 // from IOptions.node
 export type OpensearchNode = string | string[] | Opensearch.NodeOptions | Opensearch.NodeOptions[]
 
+/** Conditional generic type for different storage configuration objects. */
 export type StorageConfig<K extends StorageKind> = K extends StorageKind.Memory
     ? null // memory storage has no config obj
     : K extends StorageKind.Redis
@@ -329,14 +339,14 @@ export declare interface Storage {
 }
 
 /** Initialize an Alyxstream storage system to be used in a task. */
-export declare function MakeStorage<K extends StorageKind>(kind: K, config?: StorageConfig<K>, id?: string | number): Storage
+export declare function MakeStorage<K extends StorageKind>(kind: K, config?: StorageConfig<K> | null, id?: string | number): Storage
 
 /** Initialize an HTTP that exposes the state of a set of Alyxstream storage systems. Endpoint: /api/v1/state/:prefix/:keys. */
 export declare function ExposeStorageState(storageMap: { [x in string | number]: Storage }, config?: { port?: number }): void
 
 export declare interface KMessage<T> {
     topic: string, 
-    offset: number,
+    offset: string,
     partition: number, 
     headers: any, /*TBD*/
     key: string,
@@ -389,7 +399,7 @@ export type DefaultExchangeMessageKind = {
 
 export declare function KafkaClient(config: Kafka.KafkaConfig): Kafka.Kafka
 export declare function KafkaAdmin(client: Kafka.Kafka): Promise<Kafka.Admin>
-export declare function KafkaSource(client: Kafka.Kafka, config: Kafka.ConsumerConfig): Promise<KSource>
+export declare function KafkaSource(client: Kafka.Kafka, config: Kafka.ConsumerConfig & { topics: [{ topic: string, [x: string]: any }] }): Promise<KSource>
 export declare function KafkaSink(client: Kafka.Kafka, config: Kafka.ProducerConfig): Promise<KSink>
 export declare function KafkaCommit(source: KSource, params: KCommitParams): Promise<KCommitParams>
 export declare function KafkaRekey(kafkaSource: KSource, rekeyFunction: RekeyFunction, kafkaSink: KSink, sinkTopic: string, sinkDataFunction: SinkDataFunction): void
@@ -438,8 +448,16 @@ export declare interface NatsJsSource {
     consumer: () => void
 }
 
+export declare interface NatsStreamMsg<T> {
+    data: T, 
+    m: {
+        msg: Nats.JsMsg,
+        didAck: boolean,
+    }
+}
+
 export declare function NatsClient(server: Nats.ConnectionOptions): Promise<Nats.NatsConnection>
-export declare function NatsJetstreamSource(natsCliens: Nats.NatsConnection, sources: Nats.ConsumerConfig[]): Promise<NatsJsSource>
+export declare function NatsJetstreamSource(natsCliens: Nats.NatsConnection, sources: (Nats.ConsumerConfig & { stream: string })[]): Promise<NatsJsSource>
 
 type ElemOfArr<T extends any[]> = T extends (infer U)[] ? U : never;
 

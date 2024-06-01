@@ -1,8 +1,16 @@
 import * as AS from "../index";
+import { Message } from "kafkajs";
+import { AckPolicy, DeliverPolicy, ReplayPolicy } from "nats"
 
 const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
+// const s1 = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");
+// const s1 = AS.MakeStorage(AS.StorageKind.Postgres, null, "s1");
+// const s1 = AS.MakeStorage(AS.StorageKind.Redis, null, "s1");
+// const s1 = AS.MakeStorage(AS.StorageKind.Etcd, null, "s1");
+// const s1 = AS.MakeStorage(AS.StorageKind.Opensearch, null, "s1");
 
-(async function () { 
+
+(async function () {
 	const t = AS.Task<string>()
 		.tokenize()
 		.print(1)
@@ -65,7 +73,112 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 			: "odd"
 		)
 		.print(23)
+		.objectGroupBy(x => "1")
+		.fn(x => { console.log(24, x); return x })
+		.fn(x => Object.values(x))
+		.map(x => x[1])
+		.flat()
+
+	await t.inject("I like types!")
+
+	await AS.Task()
+		.fromArray([1, 2, 3, 4])
+		.fn(x => x * 2)
+		.close()
+
+	await AS.Task()
+		.fromArray([[1, 2, 3, 4]])
+		.map(x => x * 2)
+		.close()
+
+	AS.Task()
+		.fromObject({ a: 1, b: 2, c: { d: 3, e: 4 } })
+		.objectGroupBy(x => "1") // won't work (add ObjectOfArrays task??)
+	// .close()
+
+	await AS.Task()
+		.fromString("adkasjfdn")
+		.tokenize("a")
+		.each()
+		.print()
+		.close()
+
+	// how does this work?
+	// await AS.Task()
+	// 	.fromReadableStream("./tests/types.txt")
+	// 	.fn(x => x.read())
+	// 	.print()
+	// 	.close()
+
+	const kc = AS.KafkaClient({
+		brokers: ["localhost:9092"],
+		clientId: "test-alyxstream-types",
+	})
+
+	const nc = await AS.NatsClient({
+		servers: "localhost:4222",
+	})
+
+		; (await nc.jetstream().jetstreamManager()).streams.add({
+			name: "alyxstream-test-stream",
+			subjects: ["alyxstream.test.>"]
+		})
+
+	const nsource = await AS.NatsJetstreamSource(nc, [{
+		stream: "alyxstream-test-stream",
+		name: "alyxstream-test-source",
+		durable_name: "alyxstream-test-source",
+		filter_subjects: ["alyxstream.test.>"],
+		ack_policy: AckPolicy.None,
+		deliver_policy: DeliverPolicy.New,
+		replay_policy: ReplayPolicy.Instant,
+	}])
+
+	const ksource = await AS.KafkaSource(kc, {
+		groupId: "test-alyxstream-types-source",
+		topics: [{
+			topic: "alyxstream-test-topic"
+		}]
+	})
+
+	const ksink = await AS.KafkaSink(kc, {
+		allowAutoTopicCreation: true,
+	})
 
 
-	await t.inject("i tipi sono belli e mi fanno sentire più sicuro, anche con javascript")
+	await AS.Task()
+		.fromInterval(10, undefined, 3)
+		.print("kafka - callback")
+		.toKafka(ksink, "alyxstream-test-topic", x => ({
+			key: "asd",
+			value: JSON.stringify({ x })
+		}))
+		.close()
+
+	await AS.Task()
+		.fromInterval(10, undefined, 3)
+		.print("kafka - preparsed")
+		.fn<Message>(x => ({ key: "abcd", value: JSON.stringify({ x }) }))
+		.toKafka(ksink, "alyxstream-test-topic")
+		.close()
+
+	await AS.Task()
+		.fromKafka(ksource)
+		.print()
+		.kafkaCommit(ksource)
+		.close()
+
+	await AS.Task()
+		.fromInterval(10, undefined, 3)
+		.toNats(nc, "alyxstream.test.1234", x => ({
+			key: "asd",
+			value: JSON.stringify({ x }) // cb not called so message is number
+		}))
+		.close()
+
+	await AS.Task()
+		.fromNats<number>(nsource) // number because cb is not called in sink
+		.fn(x => x.data)
+		.print("nats - consume")
+		.close()
 })()

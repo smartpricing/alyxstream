@@ -8,6 +8,8 @@ Out-of-the-box sources/sinks:
 - Redis
 - Pulsar
 - Cassandra
+- Nats Jetstream
+- Etcd
 
 Working usage examples are in the *usage-examples* folder.
 
@@ -24,8 +26,9 @@ Working usage examples are in the *usage-examples* folder.
 9. [Extend the library](#extend)
 10. [Kafka Exchange Mode](#exchange)
 11. [Multiprocess/Parallel Mode](#parallel)
-12. [Pulsar](#pulsar)
 12. [Nats JetStream](#jetstream)
+13. [Distributed locks](#locks)
+14. [Pulsar](#pulsar)
 
 ## Introduction <a name="introduction"></a>
 
@@ -603,7 +606,70 @@ await Task()
 .close()
 ```
 
+## NATS JetStream [ALPHA] <a name="jetstream"></a>
+
+Producer:
+
+```js
+import { Task, NatsClient } from '@dev.smartpricing/alyxstream';
+
+const nc = await NatsClient()
+
+const t = await Task()
+.toNats(nc, 'sp-test.a.a')
+
+for (var i = 0; i < 100; i += 1) {
+  await t.inject({key: i})
+}
+
+```
+
+Consumer:
+```js
+import { Task, NatsClient, NatsJetstreamSource } from '@dev.smartpricing/alyxstream';
+
+const nc = await NatsClient()
+const source = await NatsJetstreamSource(nc, [{
+  stream: 'sp-test',
+  durable_name: 'worker-4',
+  ack_policy: 'Explicit',
+  filter_subjects: ['sp-test.a.a', 'sp-test.a.b']
+}])
+
+await Task()
+.fromNats(source)
+.print('>')
+.close()
+```
+
+## Distributed locks [ALPHA] <a name="locks"></a>
+
+Using Smartlocks libs, we can acquire global locks and have atomic counters.
+
+Lock/Release:
+
+```js
+import { Mutex, StorageKind as MSKind } from 'smartlocks'
+const lockStorage = Mutex(MSKind.Cassandra, null)
+
+await Task()
+.parallel(5)
+.fromArray([{i: 1}, {i: 2}, {i: 3}])
+.fn(x => {
+  x.i = x.i * 2
+  return x
+})
+.lock(lockStorage, x => 'my-lock')
+.fn(x => {
+  console.log(x)
+})
+.release(lockStorage, x => 'my-lock')
+.close()
+```
+
 ## Pulsar [ALPHA] <a name="pulsar"></a>
+
+**Pulsar functions are not maintained**.
 
 Pulsar producer: 
 
@@ -658,40 +724,4 @@ import { Task, PulsarClient, PulsarSource } from '@dev.smartpricing/alyxstream';
   	.ackPulsar(pulsarSource)
   	.close()
 })()
-```
-
-## NATS JetStream [ALPHA] <a name="jetstream"></a>
-
-Producer:
-
-```js
-import { Task, NatsClient } from '@dev.smartpricing/alyxstream';
-
-const nc = await NatsClient()
-
-const t = await Task()
-.toNats(nc, 'sp-test.a.a')
-
-for (var i = 0; i < 100; i += 1) {
-  await t.inject({key: i})
-}
-
-```
-
-Consumer:
-```js
-import { Task, NatsClient, NatsJetstreamSource } from '@dev.smartpricing/alyxstream';
-
-const nc = await NatsClient()
-const source = await NatsJetstreamSource(nc, [{
-  stream: 'sp-test',
-  durable_name: 'worker-4',
-  ack_policy: 'Explicit',
-  filter_subjects: ['sp-test.a.a', 'sp-test.a.b']
-}])
-
-await Task()
-.fromNats(source)
-.print('>')
-.close()
 ```

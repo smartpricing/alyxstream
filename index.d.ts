@@ -202,7 +202,9 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
  
     ackPulsar: (sink: PlsSource) => Tsk<I, T, L, Ls, Ss, Ms>,
  
-    fromPulsarWs: never, // not implemented
+    // fromPulsarWs: never, // not implemented
+
+    fromEtcd: (storage: Storage, key: string | number, watch?: boolean) => Tsk<I, T, L, Ls, Ss, Ms>,
 
     /** Consumes messages from a NATS Jetstream stream */
     fromNats: <R = any>(source: NatsJsSource) => Tsk<I, NatsStreamMsg<R>, L, Ls, Ss, Ms>,
@@ -238,6 +240,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
         ttl?: number,
     ) => Promise<Tsk<I, T, L, Ls, Ss, Ms>>,
 
+    // prevents type errors for task extensions
     [x: string]: any
 }
 

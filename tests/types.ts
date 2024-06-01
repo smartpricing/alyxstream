@@ -184,6 +184,7 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		.slidingWindowCount(s1, 3, 0, 1000)
 		.print("nats - sliding window count")
 		.map(x => console.log(x))
+		.print()
 		.fn(_ => setTimeout(() => { process.exit(0) }, 1000))
 		.close()
 })()

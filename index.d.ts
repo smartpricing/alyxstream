@@ -160,12 +160,16 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
 
     slidingWindowTime: (storage: Storage, timeLengthMilliSeconds: number, slidingLengthMilliseconds: number, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Ss, Ms>
 
+    /** Procudes task messages iterating over the provided array. */ 
     fromArray: <R>(array: R[]) => Tsk<I, R, L, Ls, Ss, Ms>
 
+    /** Procudes a single task message from the provided object. */ 
     fromObject: <R>(object: R) => Tsk<I, R, L, Ls, Ss, Ms>
 
+    /** Procudes a single task message from the provided string. */ 
     fromString: (string: string) => Tsk<I, string, L, Ls, Ss, Ms>
 
+    /** Procudes task messages iterating by ticking at the provided time interval. */ 
     fromInterval: <R = number>(intervalMs: number, generatorFunc?: (counter: number) => R, maxSize?: number) => Tsk<I, R, L, Ls, Ss, Ms>/*TBD*/
 
     fromReadableStream: (filePath: fs.PathLike, useZlib?: boolean) => Tsk<I, fs.ReadStream, L, Ls, Ss, Ms>
@@ -285,7 +289,6 @@ export declare interface TaskOfKafkaMessage<I, T extends (Kafka.Message | Kafka.
 export declare interface TaskOfKafkaCommitParams<I, T extends KCommitParams, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Ss, Ms> {
     kafkaCommit: (kafkaSource: KSource, commitParams?: KCommitParams) => Tsk<I, T, L, Ls, Ss, Ms>
 }
-
 
 export type TaskExtension<T, U extends any[]> = (first: T, ...rest: U) => void;
 

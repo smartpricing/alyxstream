@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "ALYXSTREAM_LOG_LEVEL='-' node --experimental-vm-modules ./node_modules/.bin/jest --rootDir=tests",
-    "test-types": "tsx tests/types.ts"
+    "test-types": "tsc --noEmit --skipLibCheck ./tests/types.ts && tsx tests/types.ts"
   },
   "author": "Alice Viola Setti @ Smartpricing",
   "license": "Apache-2.0",

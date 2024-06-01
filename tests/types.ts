@@ -180,5 +180,6 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		.fromNats<number>(nsource) // number because cb is not called in sink
 		.fn(x => x.data)
 		.print("nats - consume")
+		.fn(_ => setTimeout(() => { process.exit(0) }, 1000))
 		.close()
 })()

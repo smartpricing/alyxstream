@@ -19,7 +19,17 @@ import * as fs from "fs"
 
 type TaskMessage<T> = {
     payload: T
-    key: string | number,
+    key?: string | number,
+    metadata: {
+        windowKey?: string | number | null,
+        startTime?: any,
+        endTime?: any,
+        windowTimeInSeconds?: number | null,
+        windowTimeInMinutes?: number | null,
+        windowTimeInHours?: number | null,
+        windowElements?: any[]
+    },
+    globalState: any,
     [x: string]: any
 }
 

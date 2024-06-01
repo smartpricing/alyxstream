@@ -1,6 +1,7 @@
 import * as AS from "../index";
-import { Message } from "kafkajs";
+import { Message, TopicPartitionOffsetAndMetadata } from "kafkajs";
 import { AckPolicy, DeliverPolicy, ReplayPolicy } from "nats"
+import { randomUUID } from "crypto"
 
 const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 // const s1 = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");
@@ -9,8 +10,13 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 // const s1 = AS.MakeStorage(AS.StorageKind.Etcd, null, "s1");
 // const s1 = AS.MakeStorage(AS.StorageKind.Opensearch, null, "s1");
 
-
 (async function () {
+	var done = false
+	setTimeout(() => {
+		if (done) process.exit(0)
+		else process.exit(1)
+	}, 100_000)
+
 	const t = AS.Task<string>()
 		.tokenize()
 		.print(1)
@@ -119,10 +125,11 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		servers: "localhost:4222",
 	})
 
-		; (await nc.jetstream().jetstreamManager()).streams.add({
-			name: "alyxstream-test-stream",
-			subjects: ["alyxstream.test.>"]
-		})
+	const jsm = await nc.jetstream().jetstreamManager()
+	await jsm.streams.add({
+		name: "alyxstream-test-stream",
+		subjects: ["alyxstream.test.>"]
+	})
 
 	const nsource = await AS.NatsJetstreamSource(nc, [{
 		stream: "alyxstream-test-stream",
@@ -135,7 +142,7 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 	}])
 
 	const ksource = await AS.KafkaSource(kc, {
-		groupId: "test-alyxstream-types-source",
+		groupId: randomUUID(),
 		topics: [{
 			topic: "alyxstream-test-topic"
 		}]
@@ -166,7 +173,9 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		.slidingWindowTime(s1, 100, 200, 1000)
 		.print("kafka - sliding window time")
 		.each()
+		.fn(x => (x as any).element as TopicPartitionOffsetAndMetadata)
 		.kafkaCommit(ksource)
+		.fn(_ => done = true)
 		.close()
 
 	await AS.Task()
@@ -184,7 +193,5 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		.slidingWindowCount(s1, 3, 0, 1000)
 		.print("nats - sliding window count")
 		.map(x => console.log(x))
-		.print()
-		.fn(_ => setTimeout(() => { process.exit(0) }, 1000))
 		.close()
 })()

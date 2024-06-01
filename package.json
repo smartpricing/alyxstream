@@ -9,7 +9,8 @@
   "scripts": {
     "test": "ALYXSTREAM_LOG_LEVEL='-' node --experimental-vm-modules ./node_modules/.bin/jest --rootDir=tests",
     "test-types": "tsc --noEmit --skipLibCheck ./tests/types.ts && tsx tests/types.ts",
-    "build": "rm -rf ./dist && npx tsc -p tsconfig-mjs.json && npx tsc -p tsconfig-cjs.json",
+    "prebuild": "rm -rf dist",
+    "build": "npx tsc -p tsconfig-mjs.json && npx tsc -p tsconfig-cjs.json",
     "postbuild": "echo '{\"type\": \"commonjs\" }' > dist/cjs/package.json && echo '{\"type\": \"module\" }' > dist/mjs/package.json"
   },
   "author": "Alice Viola Setti @ Smartpricing",

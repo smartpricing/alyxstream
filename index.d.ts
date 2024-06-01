@@ -10,13 +10,6 @@ import * as Nats from "nats"
 import * as Ws from "ws"
 import * as fs from "fs"
 
-// T = current value type
-// I = initial value type (needed for the "inject" method)
-// L = type of local storage properties (void by default, any if not set)
-// Ls = is local storage set (false by default)
-// Ss = is storage set (false by default)
-// Ms = is metadata set (false by default)
-
 type TaskMessage<T> = {
     payload: T
     key?: string | number,
@@ -33,19 +26,26 @@ type TaskMessage<T> = {
     [x: string]: any
 }
 
+// T = current value type
+// I = initial value type (needed for the "inject" method)
+// L = type of local storage properties (void by default, any if not set)
+// Ls = is local storage set (false by default)
+// Ss = is storage set (false by default)
+// Ms = is metadata set (false by default)
+
 // ternary type to determine the correct operator, depending on the message type
 type Tsk<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> = 
-/*  */T extends (infer U)[] // is T an array?
-/*    */ ? TaskOfArray<I, U[], L, Ls, Ss, Ms> 
-/*    */ : T extends string // not an array, is string?
-/*        */ ? TaskOfString<I, T, L, Ls, Ss, Ms> // is string
-/*        */ : T extends number 
-/*            */ ? TaskBase<I, T, L, Ls, Ss, Ms>
-/*            */ : T extends (Kafka.Message | Kafka.Message[])
-/*                */ ? TaskOfKafkaMessage<I, T, L, Ls, Ss, Ms> 
-/*                */ : T extends KCommitParams
-/*                    */ ? TaskOfKafkaCommitParams<I, T, L, Ls, Ss, Ms> 
-/*                    */ : TaskOfObject<I, T, L, Ls, Ss, Ms>  
+    T extends (infer U)[]
+    ? TaskOfArray<I, U[], L, Ls, Ss, Ms> 
+    : T extends string
+    ? TaskOfString<I, T, L, Ls, Ss, Ms>
+    : T extends number 
+    ? TaskBase<I, T, L, Ls, Ss, Ms>
+    : T extends (Kafka.Message | Kafka.Message[])
+    ? TaskOfKafkaMessage<I, T, L, Ls, Ss, Ms> 
+    : T extends KCommitParams
+    ? TaskOfKafkaCommitParams<I, T, L, Ls, Ss, Ms> 
+    : TaskOfObject<I, T, L, Ls, Ss, Ms>  
 
 
 export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> {
@@ -62,6 +62,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
         [x: number]: any
     }
 
+    /** Sets the message key to *"default"* */
     withDefaultKey: () => Tsk<I, T, L, Ls, Ss, Ms>
 
     /** Sets the event time from the message payload. */

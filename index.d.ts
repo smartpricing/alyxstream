@@ -1,8 +1,10 @@
-<<<<<<< HEAD
 import * as Cassandra from "cassandra-driver";
 import * as Pulsar from 'pulsar-client'
+import * as Etcd from "etcd3"
+import * as Opensearch from "@opensearch-project/opensearch"
 import * as Kafka from "kafkajs"
 import * as Redis from "ioredis";
+import * as Postgres from "pg";
 import * as Nats from "nats"
 import * as Ws from "ws"
 import * as fs from "fs"
@@ -207,17 +209,30 @@ export declare function ExtendTaskRaw(name: string, extension: TaskExtension<Tas
 /* STORAGE */
 
 export enum StorageKind {
-    Memory = "memory",
-    Redis = "redis",
-    Cassandra = "cassandra",
+    Memory = "Memory",
+    Redis = "Redis",
+    Cassandra = "Cassandra",
+    Etcd = "Etcd",
+    Opensearch = "Opensearch",
+    Postgres = "Postgres"
 }
+
+// from IOptions.node
+export type OpensearchNode = string | string[] | Opensearch.NodeOptions | Opensearch.NodeOptions[]
+
 export type StorageConfig<K extends StorageKind> = K extends StorageKind.Memory
     ? null // memory storage has no config obj
     : K extends StorageKind.Redis
     ? Redis.RedisOptions
     : K extends StorageKind.Cassandra
     ? Cassandra.ClientOptions
-    : never;
+    : K extends StorageKind.Etcd
+    ? Etcd.IOptions
+    : K extends StorageKind.Opensearch
+    ? OpensearchNode
+    : K extends StorageKind.Postgres
+    ? Postgres.ClientConfig
+    : never
 
 export declare interface Storage {
     db: () => any; /*TBD*/

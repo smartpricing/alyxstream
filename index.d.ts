@@ -10,6 +10,7 @@ import * as Nats from "nats"
 import * as Ws from "ws"
 import * as fs from "fs"
 
+/** Alyxstream Task Message.*/
 export declare type TaskMessage<T> = {
     payload: T
     metadata: TaskMessageMetadata //| TaskMessageMetadata[], // can be an array of metadata because of joinByKeyWithParallelism
@@ -28,300 +29,330 @@ export declare type TaskMessageMetadata = {
     windowElements?: any
 }
 
-// T = current value type
-// I = initial value type (needed for the "inject" method)
-// L = type of local storage properties (void by default, any if not set)
-// Ls = is local storage set (false by default)
-// Sk = task storage kind (null by default)
-// Ms = is metadata set (false by default)
-
-// ternary type to determine the correct operator, depending on the message type
-type Tsk<I, T, L, Ls extends boolean, Sk extends StorageKind, Ms extends boolean> = 
-    T extends (infer U)[]
-    ? TaskOfArray<I, U[], L, Ls, Sk, Ms> 
-    : T extends string
-    ? TaskOfString<I, T, L, Ls, Sk, Ms>
-    : T extends number 
-    ? TaskBase<I, T, L, Ls, Sk, Ms>
-    : T extends (Kafka.Message | Kafka.Message[])
-    ? TaskOfKafkaMessage<I, T, L, Ls, Sk, Ms> 
-    : T extends KCommitParams
-    ? TaskOfKafkaCommitParams<I, T, L, Ls, Sk, Ms> 
-    : TaskOfObject<I, T, L, Ls, Sk, Ms>  
-
-
-export declare interface TaskBase<I, T, L, Ls extends boolean, Sk extends StorageKind, Ms extends boolean> {
-    /** Initializes task metadata. Enables *setMetadata()* and *getMetadata()*. */
-    withMetadata: () => Tsk<I, T, L, Ls, Sk, true>
+/** Alyxstream Task instance.
+ * @I initial message type (needed for the *inject()* function)
+ * @T current message type 
+ * @L local storage value types
+ * @Ls is local storage set (default: *false*)
+ * @Ms are metadata set (default: *false*)
+ * @Sk task storage system kind (default: *null*) */
+export declare interface AlyxTask<I, T, L, Ls extends boolean, Sk extends StorageKind, Ms extends boolean> {
+    /** Initializes task metadata.
+     * @enables *setMetadata()*, *getMetadata()*. */
+    withMetadata: () => AlyxTask<I, T, L, Ls, Sk, true>
 
     /** Requires *task.withMetadata()*. */
-    setMetadata: Ms extends false ? never : (id: any) => Tsk<I, T, L, Ls, Sk, Ms>
+    setMetadata: Ms extends true 
+    ? (id: any) => AlyxTask<I, T, L, Ls, Sk, Ms>
+    : never
     
-    /** Returns task metadata. Requires *task.withMetadata()*. */
-    getMetadata: Ms extends false ? never : () => { 
+    /** Returns task metadata. 
+     * @requires *task.withMetadata()*. */
+    getMetadata: Ms extends true ? () => { 
         id: any, 
         [x: string]: any
         [x: number]: any
     }
+    : never
 
     /** Sets the message key to *"default"* */
-    withDefaultKey: () => Tsk<I, T, L, Ls, Sk, Ms>
+    withDefaultKey: () => AlyxTask<I, T, L, Ls, Sk, Ms>
 
     /** Sets the event time from the message payload. */
-    withEventTime: (cb: (x: T) => number) => Tsk<I, T, L, Ls, Sk, Ms>
+    withEventTime: (cb: (x: T) => number) => AlyxTask<I, T, L, Ls, Sk, Ms>
 
     /** Sets the message key from the message payload. */
-    keyBy: (cb: (x: T) => string | number) => Tsk<I, T, L, Ls, Sk, Ms>
+    keyBy: (cb: (x: T) => string | number) => AlyxTask<I, T, L, Ls, Sk, Ms>
 
-    filter: (cb: (x: T) => boolean) => Tsk<I, T, L, Ls, Sk, Ms>
+    filter: (cb: (x: T) => boolean) => AlyxTask<I, T, L, Ls, Sk, Ms>
 
-    print: (str?: any) => Tsk<I, T, L, Ls, Sk, Ms>
+    print: (str?: any) => AlyxTask<I, T, L, Ls, Sk, Ms>
 
     /** Splits the task execution into multiple subtasks. Waits for subtasks execution and continues to the next operator passing the array of subtasks results as message. */
-    branch: <R = any>(subtaskFuncs: ((x: T) => Promise<Tsk<any, R, any, any, any, any>>)[]) => Tsk<I, R[], L, Ls, Sk, Ms>
+    branch: <R = any>(subtaskFuncs: ((x: T) => Promise<AlyxTask<any, R, any, any, any, any>>)[]) => AlyxTask<I, R[], L, Ls, Sk, Ms>
 
-    readline: () => Tsk<I, string, L, Ls, Sk, Ms>
+    readline: () => AlyxTask<I, string, L, Ls, Sk, Ms>
 
     /** Execute a function on the message payload. Can be an async function. */
     fn: <R>(callback: (x: T) => R) => R extends Promise<infer U> 
-        ? Tsk<I, U, L, Ls, Sk, Ms> 
-        : Tsk<I, R, L, Ls, Sk, Ms>
+        ? AlyxTask<I, U, L, Ls, Sk, Ms> 
+        : AlyxTask<I, R, L, Ls, Sk, Ms>
     
     /** Execute a function on the raw task message. Can be an async fucntion. */
     fnRaw: <R>(callback: (x: TaskMessage<T>) => R) => R extends Promise<infer U> 
-        ? Tsk<I, U, L, Ls, Sk, Ms> 
-        : Tsk<I, R, L, Ls, Sk, Ms>
+        ? AlyxTask<I, U, L, Ls, Sk, Ms> 
+        : AlyxTask<I, R, L, Ls, Sk, Ms>
     
     /** @deprecated use fn() instead */
-    customFunction: <R>(callback: (x: T) => R) => Tsk<I, R, L, Ls, Sk, Ms>
+    customFunction: <R>(callback: (x: T) => R) => AlyxTask<I, R, L, Ls, Sk, Ms>
     
     /** @deprecated use fn() instead */
-    customAsyncFunction: <R>(callback: (x: T) => Promise<R>) => Tsk<I, R, L, Ls, Sk, Ms>
+    customAsyncFunction: <R>(callback: (x: T) => Promise<R>) => AlyxTask<I, R, L, Ls, Sk, Ms>
     
     /** @deprecated use fnRaw() instead */
-    customFunctionRaw: <R>(callback: (x: TaskMessage<T>) => R) => Tsk<I, R, L, Ls, Sk, Ms>
+    customFunctionRaw: <R>(callback: (x: TaskMessage<T>) => R) => AlyxTask<I, R, L, Ls, Sk, Ms>
     
     /** @deprecated use fnRaw() instead */
-    customAsyncFunctionRaw: <R>(callback: (x: TaskMessage<T>) => Promise<R>) => Tsk<I, R, L, Ls, Sk, Ms>
+    customAsyncFunctionRaw: <R>(callback: (x: TaskMessage<T>) => Promise<R>) => AlyxTask<I, R, L, Ls, Sk, Ms>
 
-    /**  */
+    // this creates an array of metadata (may cause type errors)
     joinByKeyWithParallelism: (
         storage: Storage<any>, 
         keyFunction: (x: TaskMessage<T>) => string | number, 
         parallelism: number
-    ) => Tsk<I, T[], L, Ls, Sk, Ms>
+    ) => AlyxTask<I, T[], L, Ls, Sk, Ms>
 
-    // TO BE CHECKED 
-    parallel: <Pf extends () => any>(numberOfProcess: number, produceFunction?: Pf) => Tsk<I, null, L, Ls, Sk, Ms>
+    parallel: <Pf extends () => any>(numberOfProcess: number, produceFunction?: Pf) => AlyxTask<I, null, L, Ls, Sk, Ms>
 
-    queueSize: (storage: Storage<QueueStorageKind>) => Tsk<I, number, L, Ls, Sk, Ms> // to check if it's really a number
+    queueSize: (storage: Storage<QueueStorageKind>) => AlyxTask<I, number, L, Ls, Sk, Ms> // to check if it's really a number
 
-    enqueue: (storage: Storage<QueueStorageKind>) => Tsk<I, number, T, Ls, Sk, Ms> 
+    enqueue: (storage: Storage<QueueStorageKind>) => AlyxTask<I, number, T, Ls, Sk, Ms> 
 
-    dequeue: <R = any>(storage: Storage<QueueStorageKind>) => Tsk<I, R, T, Ls, Sk, Ms>
+    dequeue: <R = any>(storage: Storage<QueueStorageKind>) => AlyxTask<I, R, T, Ls, Sk, Ms>
 
-    multiDequeue: <R = any>(storage: Storage<QueueStorageKind>) => Tsk<I, R, T, Ls, Sk, Ms> 
+    multiDequeue: <R = any>(storage: Storage<QueueStorageKind>) => AlyxTask<I, R, T, Ls, Sk, Ms> 
 
-    /** Sets the task internal storage system. Enables *toStorage()*, *fromStorage()*, *flushStorage*, *fromStorageToGlobalState()*, *disconnectStorage()*, *collect()* and *storage()*. */
-    withStorage: <K extends StorageKind>(storage: Storage<K>) => Tsk<I, T, L, Ls, K, Ms>
+    /** Sets the task internal storage system. 
+     * @enables *toStorage()*, *fromStorage()*, *flushStorage()*, *fromStorageToGlobalState()*, *disconnectStorage()*, *collect()*, *storage()*. */
+    withStorage: <K extends StorageKind>(storage: Storage<K>) => AlyxTask<I, T, L, Ls, K, Ms>
     
-    /** Requires *task.withStorage()*.*/
-    toStorage: Sk extends null ? never : (keyFunc: (x: TaskMessage<T>) => string | number, valueFunc?: (x: TaskMessage<T>) => any, ttl?: number) => Tsk<I, T, L, Ls, Sk, Ms> /*To check*/
+    /** @requires *task.withStorage()*.*/
+    toStorage: Sk extends StorageKind 
+    ? (keyFunc: (x: TaskMessage<T>) => string | number, valueFunc?: (x: TaskMessage<T>) => any, ttl?: number) => AlyxTask<I, T, L, Ls, Sk, Ms> /*To check*/
+    : never
+
+    /** @requires *task.withStorage()*.*/
+    toStorageList: Sk extends StorageKind 
+    ? (keyFunc: (x: TaskMessage<T>) => string | number, valueFunc?: (x: T) => any, ttl?: number) => AlyxTask<I, T, L, Ls, Sk, Ms> /*To check*/
+    : never
+
+    /** @requires *task.withStorage()*.*/
+    fromStorageList: Sk extends ListStorageKind 
+    ? <R = any>(keyFunc: (x: TaskMessage<T>) => (string | number)[], valueFunc: (x: T) => R[]) => AlyxTask<I, R[], L, Ls, Sk, Ms> 
+    : never
+
+    /** @requires *task.withStorage()*. */
+    fromStorageToGlobalState: Sk extends StorageKind 
+    ? (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => AlyxTask<I, T, L, Ls, Sk, Ms>
+    : never
+
+    /** @requires *task.withStorage()*. */
+    disconnectStorage: Sk extends StorageKind 
+    ? () => AlyxTask<I, T, L, Ls, Sk, Ms>
+    : never
     
-    /** Requires *task.withStorage()*.*/
-    toStorageList: Sk extends null ? never : (keyFunc: (x: TaskMessage<T>) => string | number, valueFunc?: (x: T) => any, ttl?: number) => Tsk<I, T, L, Ls, Sk, Ms> /*To check*/
-
-    /** Requires *task.withStorage()*.*/
-    fromStorageList: Sk extends ListStorageKind ? <R = any>(keyFunc: (x: TaskMessage<T>) => (string | number)[], valueFunc: (x: T) => R[]) => Tsk<I, R[], L, Ls, Sk, Ms> : never
-
-    /** Requires *task.withStorage()*. */
-    fromStorageToGlobalState: Sk extends null ? never : (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => Tsk<I, T, L, Ls, Sk, Ms>
+    /** @requires *task.withStorage()*. */
+    flushStorage: Sk extends StorageKind ? 
+    (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => AlyxTask<I, T, L, Ls, Sk, Ms>
+    : never
     
-    /** Requires *task.withStorage()*. */
-    disconnectStorage: Sk extends null ? never : () => Tsk<I, T, L, Ls, Sk, Ms>
-    
-    /** Requires *task.withStorage()*. */
-    flushStorage: Sk extends null ? never : (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => Tsk<I, T, L, Ls, Sk, Ms>
-    
-    /** Requires *task.withStorage()*. */
-    storage: Sk extends null ? never : () => Storage<any>
+    /** @requires *task.withStorage()*. */
+    storage: Sk extends StorageKind 
+    ? () => Storage<any>
+    : never
 
-    /** Sets the task in-memory key-value store. Enables *setLocalKV()*, *setLocalKVRaw()*, *getLocalKV*(), *mergeLocalKV()* and *flushLocalKV().* */
-    withLocalKVStorage: <newL = any>() => Tsk<I, T, newL, true, Sk, Ms> // define the type of items stored in storage keys
+    /** Sets the task in-memory key-value store. 
+     * @enables *setLocalKV()*, *setLocalKVRaw()*, *getLocalKV*(), *mergeLocalKV()*, *flushLocalKV().* */
+    withLocalKVStorage: <newL = any>() => AlyxTask<I, T, newL, true, Sk, Ms> // define the type of items stored in storage keys
 
-    /** Requires *task.withLocalKVStorage()*. */
-    setLocalKV: Ls extends false ? never : (key: string | number, func: (x: T) => L) => Tsk<I, T, L, Ls, Sk, Ms>
+    /** @requires *task.withLocalKVStorage()*. */
+    setLocalKV: Ls extends true 
+    ? (key: string | number, func: (x: T) => L) => AlyxTask<I, T, L, Ls, Sk, Ms>
+    : never
 
-    /** Requires *task.withLocalKVStorage()*. */
-    setLocalKVRaw: Ls extends false ? never : (key: string | number, func: (x: TaskMessage<T>) => L) => Tsk<I, T, L, Ls, Sk, Ms>
+    /** @requires *task.withLocalKVStorage()*. */
+    setLocalKVRaw: Ls extends true 
+    ? (key: string | number, func: (x: TaskMessage<T>) => L) => AlyxTask<I, T, L, Ls, Sk, Ms>
+    : never
    
-    /** Requires *task.withLocalKVStorage()*. */
-    getLocalKV: Ls extends false ? never : <K>(key?: K) => K extends Exclude<K, string | number> // check if key is provided
-        ? Tsk<I, { [x in string | number]: L }, L, Ls, Sk, Ms> // not provided => returns full storage
-        : Tsk<I, L, L, Ls, Sk, Ms> // provided => returns single storage value
+    /** @requires *task.withLocalKVStorage()*. */
+    getLocalKV: Ls extends true 
+    ? <K>(key?: K) => K extends Exclude<K, string | number> // check if key is provided
+        ? AlyxTask<I, { [x in string | number]: L }, L, Ls, Sk, Ms> // not provided => returns full storage
+        : AlyxTask<I, L, L, Ls, Sk, Ms> // provided => returns single storage value
+    : never
     
-    /** Requires *task.withLocalKVStorage()*. */
-    flushLocalKV: Ls extends false ? never : (key: string | number) => Tsk<I, T, L, Ls, Sk, Ms> 
+    /** @requires *task.withLocalKVStorage()*. */
+    flushLocalKV: Ls extends true 
+    ? (key: string | number) => AlyxTask<I, T, L, Ls, Sk, Ms>
+    : never
 
-    tumblingWindowCount: (storage: Storage<WindowStorageKind>, countLength: number, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Sk, Ms>
+    tumblingWindowCount: (storage: Storage<WindowStorageKind>, countLength: number, inactivityMilliseconds: number) => AlyxTask<I, T[], L, Ls, Sk, Ms>
 
-    tumblingWindowTime: (storage: Storage<WindowStorageKind>, timeLengthMilliSeconds: number, inactivityMilliseconds?: number) => Tsk<I, T[], L, Ls, Sk, Ms>
+    tumblingWindowTime: (storage: Storage<WindowStorageKind>, timeLengthMilliSeconds: number, inactivityMilliseconds?: number) => AlyxTask<I, T[], L, Ls, Sk, Ms>
 
-    sessionWindowTime: (storage: Storage<WindowStorageKind>, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Sk, Ms>
+    sessionWindowTime: (storage: Storage<WindowStorageKind>, inactivityMilliseconds: number) => AlyxTask<I, T[], L, Ls, Sk, Ms>
 
-    slidingWindowCount: (storage: Storage<WindowStorageKind>, countLength: number, slidingLength: number, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Sk, Ms>
+    slidingWindowCount: (storage: Storage<WindowStorageKind>, countLength: number, slidingLength: number, inactivityMilliseconds: number) => AlyxTask<I, T[], L, Ls, Sk, Ms>
 
-    slidingWindowTime: (storage: Storage<WindowStorageKind>, timeLengthMilliSeconds: number, slidingLengthMilliseconds: number, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Sk, Ms>
+    slidingWindowTime: (storage: Storage<WindowStorageKind>, timeLengthMilliSeconds: number, slidingLengthMilliseconds: number, inactivityMilliseconds: number) => AlyxTask<I, T[], L, Ls, Sk, Ms>
 
     /** Procudes task messages iterating over the provided array. */ 
-    fromArray: <R>(array: R[]) => Tsk<I, R, L, Ls, Sk, Ms>
+    fromArray: <R>(array: R[]) => AlyxTask<I, R, L, Ls, Sk, Ms>
 
     /** Procudes a single task message from the provided object. */ 
-    fromObject: <R>(object: R) => Tsk<I, R, L, Ls, Sk, Ms>
+    fromObject: <R>(object: R) => AlyxTask<I, R, L, Ls, Sk, Ms>
 
     /** Procudes a single task message from the provided string. */ 
-    fromString: (string: string) => Tsk<I, string, L, Ls, Sk, Ms>
+    fromString: (string: string) => AlyxTask<I, string, L, Ls, Sk, Ms>
 
     /** Procudes task messages iterating by ticking at the provided time interval. */ 
-    fromInterval: <R = number>(intervalMs: number, generatorFunc?: (counter: number) => R, maxSize?: number) => Tsk<I, R, L, Ls, Sk, Ms>/*TBD*/
+    fromInterval: <R = number>(intervalMs: number, generatorFunc?: (counter: number) => R, maxSize?: number) => AlyxTask<I, R, L, Ls, Sk, Ms>/*TBD*/
 
-    fromReadableStream: (filePath: fs.PathLike, useZlib?: boolean) => Tsk<I, fs.ReadStream, L, Ls, Sk, Ms>
+    fromReadableStream: (filePath: fs.PathLike, useZlib?: boolean) => AlyxTask<I, fs.ReadStream, L, Ls, Sk, Ms>
 
     /** Produces a message to a Kafka topic. */
-    toKafka: (kafkaSink: KSink, topic: string, callback: (x: T) => Kafka.Message | Kafka.Message[], options?: KSinkOptions) => Tsk<I, T, L, Ls, Sk, Ms>
+    toKafka: T extends (Kafka.Message | Kafka.Message[]) 
+    ? (kafkaSink: KSink, topic: string, callback?: (x: T) => Kafka.Message | Kafka.Message[], options?: KSinkOptions) => AlyxTask<I, T, L, Ls, Sk, Ms>
+    : (kafkaSink: KSink, topic: string, callback: (x: T) => Kafka.Message | Kafka.Message[], options?: KSinkOptions) => AlyxTask<I, T, L, Ls, Sk, Ms>
 
     /** Consume messages from a Kafka source. */
-    fromKafka: <R = any>(source: KSource) => Tsk<I, KMessage<R>, L, Ls, Sk, Ms>
+    fromKafka: <R = any>(source: KSource) => AlyxTask<I, KMessage<R>, L, Ls, Sk, Ms>
 
-    kafkaCommit: (kafkaSource: KSource, commitParams: KCommitParams) => Tsk<I, T, L, Ls, Sk, Ms>
+    kafkaCommit: T extends KCommitParams 
+    ? (kafkaSource: KSource, commitParams?: KCommitParams) => AlyxTask<I, T, L, Ls, Sk, Ms>
+    : (kafkaSource: KSource, commitParams: KCommitParams) => AlyxTask<I, T, L, Ls, Sk, Ms>
  
-    fromPulsar: (source: PlsSource) => Tsk<I, Pulsar.Message, L, Ls, Sk, Ms>
+    fromPulsar: (source: PlsSource) => AlyxTask<I, Pulsar.Message, L, Ls, Sk, Ms>
  
-    toPulsar: (sink: PlsSink, keyCb: (x: T) => any /*TBD*/, dataCb: (x: T) => any) => Tsk<I, T, L, Ls, Sk, Ms>
+    toPulsar: (sink: PlsSink, keyCb: (x: T) => any /*TBD*/, dataCb: (x: T) => any) => AlyxTask<I, T, L, Ls, Sk, Ms>
  
-    flushPulsar: (sink: PlsSink) => Tsk<I, T, L, Ls, Sk, Ms>,
+    flushPulsar: (sink: PlsSink) => AlyxTask<I, T, L, Ls, Sk, Ms>,
  
-    toPulsarWs: (sink: PlsWsSink, keyCb: (x: T) => any /*TBD*/, dataCb: (x: T) => any) => Tsk<I, T, L, Ls, Sk, Ms>,
+    toPulsarWs: (sink: PlsWsSink, keyCb: (x: T) => any /*TBD*/, dataCb: (x: T) => any) => AlyxTask<I, T, L, Ls, Sk, Ms>,
  
-    parsePulsar: <R = any>(parseWith?: (x: string) => R) => Tsk<I, R, L, Ls, Sk, Ms>,
+    parsePulsar: <R = any>(parseWith?: (x: string) => R) => AlyxTask<I, R, L, Ls, Sk, Ms>,
  
-    ackPulsar: (sink: PlsSource) => Tsk<I, T, L, Ls, Sk, Ms>,
- 
-    // fromPulsarWs: never, // not implemented
+    ackPulsar: (sink: PlsSource) => AlyxTask<I, T, L, Ls, Sk, Ms>,
 
     /** Watch changes over an Etcd key. */
-    fromEtcd: (storage: Storage<StorageKind.Etcd>, key: string | number, watch?: boolean) => Tsk<I, Etcd.IKeyValue, L, Ls, Sk, Ms>,
+    fromEtcd: (storage: Storage<StorageKind.Etcd>, key: string | number, watch?: boolean) => AlyxTask<I, Etcd.IKeyValue, L, Ls, Sk, Ms>,
 
     /** Consumes messages from a NATS Jetstream stream */
-    fromNats: <R = any>(source: NatsJsSource) => Tsk<I, NatsStreamMsg<R>, L, Ls, Sk, Ms>,
+    fromNats: <R = any>(source: NatsJsSource) => AlyxTask<I, NatsStreamMsg<R>, L, Ls, Sk, Ms>,
 
     // dataCb is not called in this sink
     /** Produces a message to a NATS Jetstream stream. */
-    toNats: (sink: Nats.NatsConnection, topic: string, dataCb?: (x: T) => any) => Tsk<I, T, L, Ls, Sk, Ms>,
+    toNats: (sink: Nats.NatsConnection, topic: string, dataCb?: (x: T) => any) => AlyxTask<I, T, L, Ls, Sk, Ms>,
 
     /** Acquires a lock on a storage key using a smartlocks library mutex. */
-    lock: (mutex: Smartlocks.Mutex, lockKeyFn: (x: T) => string | number, retryTimeMs?: number, ttl?: number) => Tsk<I, T, L, Ls, Sk, Ms>,
+    lock: (mutex: Smartlocks.Mutex, lockKeyFn: (x: T) => string | number, retryTimeMs?: number, ttl?: number) => AlyxTask<I, T, L, Ls, Sk, Ms>,
 
     /** Releases a lock on a storage key using a smartlocks library mutex. */
-    release: (mutex: Smartlocks.Mutex, lockKeyFn: (x: T) => string | number) => Tsk<I, T, L, Ls, Sk, Ms>,
+    release: (mutex: Smartlocks.Mutex, lockKeyFn: (x: T) => string | number) => AlyxTask<I, T, L, Ls, Sk, Ms>,
 
-    /** Progressively sums messages, returning the current counter value. Only works for when message type is *number* */
+    /** Progressively sums messages, returning the current counter value.
+     * @requires *number* */
     sum: T extends number 
-    ? () => Tsk<I, number, L, Ls, Sk, Ms>  
+    ? () => AlyxTask<I, number, L, Ls, Sk, Ms>  
     : never
 
     /** Push a new message to the task. */
-    inject: (data: I) => Promise<Tsk<I, T, L, Ls, Sk, Ms>>
+    inject: (data: I) => Promise<AlyxTask<I, T, L, Ls, Sk, Ms>>
 
     /** Starts the task execution when using a source. */
-    close: () => Promise<Tsk<I, T, L, Ls, Sk, Ms>>
+    close: () => Promise<AlyxTask<I, T, L, Ls, Sk, Ms>>
 
     /** Return the last result of the task. */
     finalize: <R = T>() => R
 
-    self: (cb: (task: Tsk<I, T, L, Ls, Sk, Ms>) => any) => Tsk<I, T, L, Ls, Sk, Ms>
+    self: (cb: (task: AlyxTask<I, T, L, Ls, Sk, Ms>) => any) => AlyxTask<I, T, L, Ls, Sk, Ms>
 
-    /** Requires *task.withStorage()*. */
-    collect: Sk extends CollectStorageKind ? <R = any>(
+    /** @requires *task.withStorage()*. */
+    collect: Sk extends CollectStorageKind 
+    ? <R = any>(
         idFunction: (x: TaskMessage<T>) => string, 
         keyFunction: (x: TaskMessage<T>) => string, 
         valueFunction: (x: TaskMessage<T>) => R | null, 
         waitUntil: (arr: any[], flat: any[]) => boolean, /* TBD */ 
         emitFunction: (arr: any[], flat: any[]) => boolean, /* TBD */
         ttl?: number,
-    ) => Tsk<I, T, L, Ls, Sk, Ms> : never,
+    ) => AlyxTask<I, T, L, Ls, Sk, Ms> 
+    : never,
+
+    sumMap: () => AlyxTask<I, { [x in keyof T]: number }, L, Ls, Sk, Ms>
+  
+    /** Executes a groupBy for every key of the object message. */
+    objectGroupBy: (keyFunction: (x: T) => string | number) => AlyxTask<I, { [x in string | number]: T[] }, L, Ls, Sk, Ms>
+  
+    /** Aggregates array element by key in a storage system. */
+    aggregate: <R = T>(storage: Storage<any>, name: string, keyFunction: (x: T) => string | number) => AlyxTask<I, { [x in string | number]: R[] }, L, Ls, Sk, Ms>  
+
+    /** @requires *task.withLocalKVStorage().* */
+    mergeLocalKV: Ls extends true 
+    ? <K extends string | number>(key: K) => AlyxTask<I, T & { [x in K]: L }, L, Ls, Sk, Ms>
+    : never
+
+    /** Transform array
+    * @requires *array* */
+    map: T extends (infer U)[] 
+    ? <R>(func: (x: U) => R) => AlyxTask<I, R[], L, Ls, Sk, Ms> 
+    : never
+    
+    /** Splits the task execution for each element of the array.
+     * @requires *array* */
+    each: T extends (infer U)[] 
+    ? (func?: (x: U) => any) => AlyxTask<I, U, L, Ls, Sk, Ms> 
+    : never
+    
+    /** Filters array elements.
+     *  @requires *array* */
+    filterArray: T extends (infer U)[] 
+    ? (func: (x: U) => boolean) => AlyxTask<I, T, L, Ls, Sk, Ms> 
+    : never
+    
+    // why does this implement a number only internal reduce function? (sum)
+    // reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => Tsk<I, R, L, Ls, Ss, Ms>
+    /** @requires *array* */
+    reduce: T extends (infer U)[] 
+    ? (func?: (x: U) => number) => AlyxTask<I, number, L, Ls, Sk, Ms> 
+    : never
+
+    /** Count array element by key.
+     * @requires *array* */
+    countInArray: T extends (infer U)[] 
+    ? (func: (x: U) => string | number) => AlyxTask<I, { [x in string | number]: number }, L, Ls, Sk, Ms> 
+    : never
+    
+    /** Returns the array length.
+     * @requires *array* */
+    length: T extends any[] 
+    ? () => AlyxTask<I, number, L, Ls, Sk, Ms> 
+    : never
+    
+    /** @requires *array* */
+    groupBy: T extends (infer U)[] 
+    ? (func: (elem: U, index?: number, array?: U[]) => any) => AlyxTask<I, { [x in string | number]: U[] }, L, Ls, Sk, Ms> 
+    : never
+
+    /** @requires *task.withStorage()*
+     * @requires *array* */
+    fromStorage: Sk extends null 
+    ? never 
+    : T extends any[] 
+    ? (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => AlyxTask<I, unknown[], L, Ls, Sk, Ms> 
+    : never
+    
+    /** Flattens an array. 
+     * @requires *array* */ 
+    flat: T extends any[] 
+    ? () => AlyxTask<I, NestedElem<T>[], L, Ls, Sk, Ms> 
+    : never
+
+    /** Splits a string (default separator: '\s'). 
+     * @requires *string* */
+    tokenize: T extends string 
+    ? (separator?: string) => AlyxTask<I, string[], L, Ls, Sk, Ms>
+    : never
 
     // prevents type errors for task extensions
     [x: string]: any
 }
 
-export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, Sk extends StorageKind, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Sk, Ms> {
-    map: <R>(func: (x: ElemOfArr<T>) => R) => Tsk<I, R[], L, Ls, Sk, Ms>
-    
-    /** Splits the task execution for each element of the array. */
-    each: (func?: (x: ElemOfArr<T>) => any) => Tsk<I, ElemOfArr<T>, L, Ls, Sk, Ms>
-    
-    filterArray: (func: (x: ElemOfArr<T>) => boolean) => Tsk<I, T, L, Ls, Sk, Ms>
-    
-    // why does this implement a number only internal reduce function? (sum)
-    // reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => Tsk<I, R, L, Ls, Ss, Ms>
-    reduce: (func?: (x: ElemOfArr<T>) => number) => Tsk<I, number, L, Ls, Sk, Ms>
-
-    /** Count array element by key. */
-    countInArray: (func: (x: ElemOfArr<T>) => string | number) => Tsk<I, { [x in string | number]: number }, L, Ls, Sk, Ms>
-    
-    /** Returns the array length. */
-    length: () => Tsk<I, number, L, Ls, Sk, Ms>
-    
-    groupBy: (func: (elem: ElemOfArr<T>, index?: number, array?: T[]) => any) => Tsk<I, { [x in string | number]: T[] }, L, Ls, Sk, Ms> 
-
-    /** Requires *task.withStorage()*. */
-    fromStorage: Sk extends null ? never : (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => Tsk<I, unknown[], L, Ls, Sk, Ms> /*To check*/
-    // it seems that fromStorage is available only if the message payload value is an array
-    // since it pushes the stored values into the message payload
-    
-    flat: () => Tsk<I, NestedElem<T>[], L, Ls, Sk, Ms>
-
-    [x: string]: any
-}
-
-export declare interface TaskOfObject<I, T, L, Ls extends boolean, Sk extends StorageKind, Ms extends boolean> extends TaskBase<I, T, L, Ls, Sk, Ms> {
-    //sumMap should belong to an hypothetical TaskOfObjectOfArrays or TaskOfObjectOfStrings type (because it sums fields lenghts)
-    /** Only works for objects whose values are arrays or strings (or anyting with a *length: number* property), otherwise will throw an error. */
-    sumMap: () => Tsk<I, { [x in keyof T]: number }, L, Ls, Sk, Ms>
-  
-    /** Executes a groupBy for every key of the object message. */
-    objectGroupBy: (keyFunction: (x: T) => string | number) => Tsk<I, { [x in string | number]: T[] }, L, Ls, Sk, Ms>
-  
-    /** Aggregates array element by key in a storage system. */
-    aggregate: <R = T>(storage: Storage<any>, name: string, keyFunction: (x: T) => string | number) => Tsk<I, { [x in string | number]: R[] }, L, Ls, Sk, Ms>  
-
-    /** Requires *task.withLocalKVStorage().* */
-    mergeLocalKV: Ls extends false ? never : <K extends string | number>(key: K) => Tsk<I, T & { [x in K]: L }, L, Ls, Sk, Ms> 
-}
-
-export declare interface TaskOfString<I, T extends string, L, Ls extends boolean, Sk extends StorageKind, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Sk, Ms> {
-    /** Splits the string message using a separator (space character the default separator). */
-    tokenize: (separator?: string) => Tsk<I, string[], L, Ls, Sk, Ms>
-}
-
-export declare interface TaskOfKafkaMessage<I, T extends (Kafka.Message | Kafka.Message[]), L, Ls extends boolean, Sk extends StorageKind, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Sk, Ms> {
-    /** Produces a message to a Kafka topic. */
-    toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Kafka.Message | Kafka.Message[], options?: KSinkOptions) => Tsk<I, T, L, Ls, Sk, Ms>
-    
-    /** Performs a Kafka commit on set of commit params (topic, offset, partition). */
-    kafkaCommit: (kafkaSource: KSource, commitParams?: KCommitParams) => Tsk<I, T, L, Ls, Sk, Ms>
-}
-
-export declare interface TaskOfKafkaCommitParams<I, T extends KCommitParams, L, Ls extends boolean, Sk extends StorageKind, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Sk, Ms> {
-    /** Performs a Kafka commit on set of commit params (topic, offset, partition). */
-    kafkaCommit: (kafkaSource: KSource, commitParams?: KCommitParams) => Tsk<I, T, L, Ls, Sk, Ms>
-}
-
 export declare type TaskExtension<T, U extends any[]> = (first: T, ...rest: U) => void;
 
 /** Intialize an Alyxstream task. Generic type can be used to provide the initial *inject()* message type. */
-export declare function Task<I = any>(id?: any): Tsk<I, I, void, false, null, false> /*TBD*/
+export declare function Task<I = any>(id?: any): AlyxTask<I, I, void, false, null, false> /*TBD*/
 
 /** Extends a task by creating a custom method. This function is **type unsafe**. Consider using **fn()** with a custom callback for type safety. */
 export declare function ExtendTask(name: string, extension: TaskExtension<any, any>): void
@@ -339,7 +370,11 @@ export declare enum StorageKind {
 }
 
 // from IOptions.node
-export declare type OpensearchNode = string | string[] | Opensearch.NodeOptions | Opensearch.NodeOptions[]
+export declare type OpensearchNode = 
+    string | 
+    string[] | 
+    Opensearch.NodeOptions | 
+    Opensearch.NodeOptions[]
 
 /** Conditional generic type for different storage configuration objects. */
 export declare type StorageConfig<K extends StorageKind> = K extends StorageKind.Memory
@@ -426,7 +461,7 @@ export declare interface KSink extends Kafka.Producer {}
 export declare type RekeyFunction = (s: any) => any /*TBD*/
 export declare type SinkDataFunction = (s: any) => Kafka.Message /*TBD*/
 
-type ExchangeEmitTask = Tsk<
+type ExchangeEmitTask = AlyxTask<
     { key: string | number, value: string }, 
     { key: string | number, value: string }, 
     void, false, null, false
@@ -435,7 +470,7 @@ type ExchangeEmitTask = Tsk<
 export declare interface KExchange<OnMessage, EmitMessage> {
     setKeyParser: (fn: (x: OnMessage) => string | number) => void;
     setValidationFunction: (fn: (x: OnMessage) => boolean | any) => void;
-    on: <R>(fn: (x: OnMessage) => R) => Promise<Tsk<void, R, OnMessage, true, null, false>>;
+    on: <R>(fn: (x: OnMessage) => R) => Promise<AlyxTask<void, R, OnMessage, true, null, false>>;
     emit: (mex: EmitMessage) => Promise<ExchangeEmitTask>
 }
 

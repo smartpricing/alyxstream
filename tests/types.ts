@@ -3,12 +3,23 @@ import { randomUUID } from "crypto"
 import { Message } from "kafkajs";
 import * as AS from "../index";
 
-let s1 = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");
+/**
+ * 
+ * requires Kafka, Nats, Etcd 
+ * 
+ * */
+
+type ExcludeEnum<T, U> = T extends U ? never : T;
+
+let s1: AS.Storage<ExcludeEnum<AS.StorageKind, AS.StorageKind.Etcd>> = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");
 s1 = AS.MakeStorage(AS.StorageKind.Postgres, null, "s1");
 s1 = AS.MakeStorage(AS.StorageKind.Redis, null, "s1");
-s1 = AS.MakeStorage(AS.StorageKind.Etcd, null, "s1");
 s1 = AS.MakeStorage(AS.StorageKind.Opensearch, null, "s1");
 s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
+
+let etcdStorage = AS.MakeStorage(AS.StorageKind.Etcd, {
+	hosts: ["localhost:2379"],	
+}, "s1");
 
 (async function () {
 	var done = false
@@ -16,112 +27,6 @@ s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		if (done) process.exit(0)
 		else process.exit(1)
 	}, 100_000)
-
-	const t = AS.Task<string>()
-		.tokenize()
-		.print(1)
-		.each()
-		.print(2)
-		.fn(x => x.length)
-		.print(4)
-		.fn(x => [x, 1, 2, 3, 4, "abcd"])
-		.print(4)
-		.map(x => x.toString())
-		.print(5)
-		.filterArray(x => x.length < 2)
-		.print(6)
-		.flat()
-		.print(7)
-		.reduce(x => parseInt(x))
-		.print(8)
-		.fn(x => [x, 1, 2, 2, 3, 4, "abcd"])
-		.print(9)
-		.countInArray(x => x)
-		.print(10)
-		.fn(x => Object.values(x))
-		.print(11)
-		.flat()
-		.print(12)
-		.withLocalKVStorage<number>()
-		.setLocalKV("k1", x => x[0] + 10)
-		.print(13)
-		.getLocalKV("k1")
-		.print(14)
-		.setLocalKVRaw("k2", r => parseInt(r.key as string))
-		.flushLocalKV("k1")
-		.getLocalKV("k1")
-		.print(15)
-		.fn(_ => 100)
-		.print(16)
-		.getLocalKV("k2")
-		.print(17)
-		.fn(x => ({ prop: x }))
-		.mergeLocalKV("k2")
-		.print(18)
-		.withStorage(s1)
-		.toStorage(_ => "sk1", x => "bla")
-		.fn(async _ => []) // check promise infer
-		.fnRaw(async _ => [])//from storage pushes in array
-		.fromStorage(_ => ["sk1"])
-		.fn(x => { console.log(19, x); return x })
-		.fromStorageToGlobalState(_ => ["sk1"])
-		.fnRaw(x => { console.log(20, x); return x })
-		.toStorageList(_ => "skl1", x => x, 100)
-		.fromStorageList(_ => ["skl1"], x => [])
-		.fn(x => { console.log(21, x); return x })
-		.flushStorage(x => ["skl1"])
-		.fromStorageList(_ => ["skl1"], x => [])
-		.print(22)
-		.disconnectStorage()
-		.fn(x => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-		.groupBy(x => x % 2 === 0 
-			? "even"
-			: "odd"
-		)
-		.print(23)
-		.objectGroupBy(x => "1")
-		.fn(x => { console.log(24, x); return x })
-		.fn(x => Object.values(x))
-		.map(x => x[1])
-		.flat()
-		.parallel(3, () => console.log("parallel"))
-		.fn(x => {
-			console.log("x: ", x)
-			if (x !== null) {
-				throw Error("should be null")
-			}
-		})
-
-	await t.inject("I like types!")
-
-	await AS.Task()
-		.fromArray([1, 2, 3, 4])
-		.fn(x => x * 2)
-		.close()
-
-	await AS.Task()
-		.fromArray([[1, 2, 3, 4]])
-		.map(x => x * 2)
-		.close()
-
-	AS.Task()
-		.fromObject({ a: 1, b: 2, c: { d: 3, e: 4 } })
-		.objectGroupBy(x => "1") // won't work (add ObjectOfArrays task??)
-	// .close()
-
-	await AS.Task()
-		.fromString("adkasjfdn")
-		.tokenize("a")
-		.each()
-		.print()
-		.close()
-
-	// how does this work?
-	// await AS.Task()
-	// 	.fromReadableStream("./tests/types.txt")
-	// 	.fn(x => x.read())
-	// 	.print()
-	// 	.close()
 
 	const kc = AS.KafkaClient({
 		brokers: ["localhost:9092"],
@@ -158,6 +63,87 @@ s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 	const ksink = await AS.KafkaSink(kc, {
 		allowAutoTopicCreation: true,
 	})
+
+	const t = AS.Task<string>()
+		.tokenize()
+		.each()
+		.fn(x => x.length)
+		.fn(x => [x, 1, 2, 3, 4, "abcd"])
+		.map(x => x.toString())
+		.filterArray(x => x.length < 2)
+		.flat()
+		.reduce(x => parseInt(x))
+		.fn(x => [x, 1, 2, 2, 3, 4, "abcd"])
+		.countInArray(x => x)
+		.fn(x => Object.values(x))
+		.flat()
+		.withLocalKVStorage<number>()
+		.setLocalKV("k1", x => x[0] + 10)
+		.getLocalKV("k1")
+		.setLocalKVRaw("k2", r => parseInt(r.key as string))
+		.flushLocalKV("k1")
+		.getLocalKV("k1")
+		.fn(_ => 100)
+		.getLocalKV("k2")
+		.fn(x => ({ prop: x }))
+		.mergeLocalKV("k2")
+		.withStorage(s1)
+		.toStorage(_ => "sk1", x => "bla")
+		.fn(async _ => []) // check promise infer
+		.fnRaw(async _ => [])//from storage pushes in array
+		.fromStorage(_ => ["sk1"])
+		.fromStorageToGlobalState(_ => ["sk1"])
+		.toStorageList(_ => "skl1", x => x, 100)
+		.fromStorageList(_ => ["skl1"], x => [])
+		.flushStorage(x => ["skl1"])
+		.fromStorageList(_ => ["skl1"], x => [])
+		.disconnectStorage()
+		.fn(x => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+		.groupBy(x => x % 2 === 0 
+			? "even"
+			: "odd"
+		)
+		.objectGroupBy(x => "1")
+		.fn(x => Object.values(x))
+		.map(x => x[1])
+		.flat()
+		.parallel(3, () => console.log("parallel"))
+		.fn(x => {
+			if (x !== null) {
+				throw Error("should be null")
+			}
+		})
+
+	await t.inject("I like types!")
+
+	await AS.Task()
+		.fromArray([1, 2, 3, 4])
+		.fn(x => x * 2)
+		.close()
+
+	await AS.Task()
+		.fromArray([[1, 2, 3, 4]])
+		.map(x => x * 2)
+		.close()
+
+	AS.Task()
+		.fromObject({ a: 1, b: 2, c: { d: 3, e: 4 } })
+		.objectGroupBy(x => "1") // won't work (add ObjectOfArrays task??)
+	// .close()
+
+	await AS.Task()
+		.fromString("abcdabcdabcd")
+		.tokenize("a")
+		.each()
+		.print()
+		.close()
+
+	// how does this work?
+	// await AS.Task()
+	// 	.fromReadableStream("./tests/types.txt")
+	// 	.fn(x => x.read())
+	// 	.print()
+	// 	.close()
 
 	await AS.Task()
 		.fromInterval(10, undefined, 3)
@@ -214,5 +200,23 @@ s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		.withDefaultKey()
 		.joinByKeyWithParallelism(s1, x => x.key!, 2) // this creates an array of metadata
 		.print("jkp >")
+		.close()
+
+	await AS.Task()
+		.fromEtcd(etcdStorage, "default")
+		.keyBy(x => x.key.toString())
+		.fn(x => x.value.toString())
+		.print("etcd - watch")
+		.close()
+
+	await AS.Task()
+		.fromInterval(10, undefined, 3)
+		.withDefaultKey()
+		.withStorage(etcdStorage)
+		.toStorage(
+			x => x.metadata.key, 
+			x => x.payload
+		)
+		.print("etcd - write")
 		.close()
 })()

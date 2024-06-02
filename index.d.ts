@@ -10,15 +10,14 @@ import * as Nats from "nats"
 import * as Ws from "ws"
 import * as fs from "fs"
 
-
-export type TaskMessage<T> = {
+export declare type TaskMessage<T> = {
     payload: T
     metadata: TaskMessageMetadata //| TaskMessageMetadata[], // can be an array of metadata because of joinByKeyWithParallelism
     globalState: any,
     [x: string]: any
 }
 
-export type TaskMessageMetadata = {
+export declare type TaskMessageMetadata = {
     key: string | number
     windowKey?: string | number | null,
     startTime?: any,
@@ -310,7 +309,7 @@ export declare interface TaskOfKafkaCommitParams<I, T extends KCommitParams, L, 
     kafkaCommit: (kafkaSource: KSource, commitParams?: KCommitParams) => Tsk<I, T, L, Ls, Sk, Ms>
 }
 
-export type TaskExtension<T, U extends any[]> = (first: T, ...rest: U) => void;
+export declare type TaskExtension<T, U extends any[]> = (first: T, ...rest: U) => void;
 
 /** Intialize an Alyxstream task. Generic type can be used to provide the initial *inject()* message type. */
 export declare function Task<I = any>(id?: any): Tsk<I, I, void, false, null, false> /*TBD*/
@@ -321,7 +320,7 @@ export declare function ExtendTask(name: string, extension: TaskExtension<any, a
 /** Extends a task by creating a custom method that operates on the raw task message. This function is **type unsafe**. Consider using **fnRaw()** with a custom callback for type safety. */
 export declare function ExtendTaskRaw(name: string, extension: TaskExtension<TaskMessage<any>, any>): void
 
-export enum StorageKind {
+export declare enum StorageKind {
     Memory = "Memory",
     Redis = "Redis",
     Cassandra = "Cassandra",
@@ -331,10 +330,10 @@ export enum StorageKind {
 }
 
 // from IOptions.node
-export type OpensearchNode = string | string[] | Opensearch.NodeOptions | Opensearch.NodeOptions[]
+export declare type OpensearchNode = string | string[] | Opensearch.NodeOptions | Opensearch.NodeOptions[]
 
 /** Conditional generic type for different storage configuration objects. */
-export type StorageConfig<K extends StorageKind> = K extends StorageKind.Memory
+export declare type StorageConfig<K extends StorageKind> = K extends StorageKind.Memory
     ? null // memory storage has no config obj
     : K extends StorageKind.Redis
     ? Redis.RedisOptions
@@ -348,6 +347,7 @@ export type StorageConfig<K extends StorageKind> = K extends StorageKind.Memory
     ? Postgres.ClientConfig
     : never
 
+/** Storage sytem to be used in Alyxstream tasks. */
 export declare interface Storage<K extends StorageKind> {
     __kind: K // not a real Storage field - just to make K generic effective
     db: () => any; /*TBD*/
@@ -384,7 +384,7 @@ type KCompressionType =
     Kafka.CompressionTypes.Snappy |
     Kafka.CompressionTypes.ZSTD 
 
-type KSinkOptions = { 
+export declare type KSinkOptions = { 
     compressionType: KCompressionType
 }
 
@@ -397,8 +397,8 @@ export declare interface KSource {
 
 export declare interface KSink extends Kafka.Producer {}
 
-export type RekeyFunction = (s: any) => any /*TBD*/
-export type SinkDataFunction = (s: any) => Kafka.Message /*TBD*/
+export declare type RekeyFunction = (s: any) => any /*TBD*/
+export declare type SinkDataFunction = (s: any) => Kafka.Message /*TBD*/
 
 type ExchangeEmitTask = Tsk<
     { key: string | number, value: string }, 
@@ -413,7 +413,7 @@ export declare interface KExchange<OnMessage, EmitMessage> {
     emit: (mex: EmitMessage) => Promise<ExchangeEmitTask>
 }
 
-export type DefaultExchangeMessageKind = {
+export declare type DefaultExchangeMessageKind = {
     kind: NonNullable<any>
     metadata: NonNullable<{
         key: NonNullable<string>
@@ -421,11 +421,20 @@ export type DefaultExchangeMessageKind = {
     spec: NonNullable<any>
 }
 
+/** Initialize Kafka client. */
 export declare function KafkaClient(config: Kafka.KafkaConfig): Kafka.Kafka
+
+/** Initialize a Kafka Admin client. */
 export declare function KafkaAdmin(client: Kafka.Kafka): Promise<Kafka.Admin>
+
+/** Initialize a Kafka source (consumer). */
 export declare function KafkaSource(client: Kafka.Kafka, config: Kafka.ConsumerConfig & { topics: [{ topic: string, [x: string]: any }] }): Promise<KSource>
+
+/** Initialize a Kafka sink (producer). */
 export declare function KafkaSink(client: Kafka.Kafka, config: Kafka.ProducerConfig): Promise<KSink>
+
 export declare function KafkaCommit(source: KSource, params: KCommitParams): Promise<KCommitParams>
+
 export declare function KafkaRekey(kafkaSource: KSource, rekeyFunction: RekeyFunction, kafkaSink: KSink, sinkTopic: string, sinkDataFunction: SinkDataFunction): void
 
 // DefaultExchangeMessageKind instead of any will break existent code (maybe any is better?)
@@ -442,8 +451,6 @@ export declare function Exchange<
     sourceOptions?: Kafka.ConsumerConfig, 
     sinkOptions?: Kafka.ProducerConfig
 ): KExchange<OnMessage, EmitMessage>
-
-/* PULSAR */
 
 export declare interface PlsSource {
     stream: (cb: any) => Promise<void> /*TBD*/
@@ -465,8 +472,6 @@ export declare function PulsarSourceWs(source: string /*????*/, options: Ws.Clie
 export declare function PulsarSink(client: Pulsar.Client, producerConfig: Pulsar.ProducerConfig): Promise<PlsSink>
 export declare function PulsarSinkWs(sources: string | string[], options: Ws.ClientOptions): Promise<PlsWsSink>
 
-/* NATS */
- 
 export declare interface NatsJsSource {
     stream: (cb: any) => Promise<void> /*TBD*/
     consumer: () => void
@@ -480,7 +485,10 @@ export declare interface NatsStreamMsg<T> {
     }
 }
 
+/** Initialize a Nats connection */
 export declare function NatsClient(server: Nats.ConnectionOptions): Promise<Nats.NatsConnection>
+
+/** Initialize a Nats Jetstream source */
 export declare function NatsJetstreamSource(natsCliens: Nats.NatsConnection, sources: (Nats.ConsumerConfig & { stream: string })[]): Promise<NatsJsSource>
 
 type ElemOfArr<T extends any[]> = T extends (infer U)[] ? U : never;

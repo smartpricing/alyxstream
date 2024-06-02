@@ -5,11 +5,11 @@ import * as AS from "../index";
 
 /**
  * 
- * requires Kafka, Nats, Etcd 
+ * requires Kafka/Redpanda, Nats, Etcd, Cassandra/Scylla
  * 
  * */
+// 
 
-// let s1 = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");
 // let s1 = AS.MakeStorage(AS.StorageKind.Postgres, null, "s1");
 // let s1 = AS.MakeStorage(AS.StorageKind.Redis, null, "s1");
 // let s1 = AS.MakeStorage(AS.StorageKind.Opensearch, null, "s1");
@@ -24,7 +24,7 @@ let etcdStorage = AS.MakeStorage(AS.StorageKind.Etcd, {
 	setTimeout(() => {
 		if (done) process.exit(0)
 		else process.exit(1)
-	}, 100_000)
+	}, 10_000)
 
 	const kc = AS.KafkaClient({
 		brokers: ["localhost:9092"],
@@ -60,7 +60,7 @@ let etcdStorage = AS.MakeStorage(AS.StorageKind.Etcd, {
 
 	const ksink = await AS.KafkaSink(kc, {
 		allowAutoTopicCreation: true,
-	})
+	});
 
 	const t = AS.Task<string>()
 		.tokenize()
@@ -216,5 +216,44 @@ let etcdStorage = AS.MakeStorage(AS.StorageKind.Etcd, {
 			x => x.payload
 		)
 		.print("etcd - write")
+		.close()
+
+	const cassandraInit = AS.MakeStorage(AS.StorageKind.Cassandra, {
+		contactPoints: ['localhost:9042'],
+		localDataCenter: 'datacenter1'
+	}, "init")
+
+	await cassandraInit.db().execute(`CREATE KEYSPACE IF NOT EXISTS alyxstream WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};`)
+	await cassandraInit.db().execute(`CREATE TABLE IF NOT EXISTS alyxstream.storage (
+  id text,
+  key text,
+  value text,
+  s_uuid uuid,
+  PRIMARY KEY (id, key)
+);`)
+
+	await cassandraInit.db().execute(`CREATE TABLE IF NOT EXISTS alyxstream.liststorage (
+  id text,
+  key text,
+  s_uuid timeuuid,
+  value text,
+  PRIMARY KEY (id, key, s_uuid)
+) WITH CLUSTERING ORDER BY (key ASC, s_uuid ASC);`)
+
+	const cassandraStorage = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");
+
+	await AS.Task()
+		.fromArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+		.withStorage(cassandraStorage)
+		.print("collect - item")
+		.collect(
+			x => (x.payload * 100).toString(), //id
+			x => (x.payload * 200).toString(), //key
+			x => (x.payload * 300), //value
+			x => x.length == 6,
+			x => x.length == 6
+		)
+		.print("collect - result")
+		.flushStorage(_ => ["default"])
 		.close()
 })()

@@ -114,14 +114,16 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Sk extends Storag
     // TO BE CHECKED 
     parallel: <Pf extends () => any>(numberOfProcess: number, produceFunction?: Pf) => Tsk<I, null, L, Ls, Sk, Ms>
 
-    queueSize: (storage: Storage<any>) => Tsk<I, number, L, Ls, Sk, Ms> // to check if it's really a number
+    queueSize: (storage: Storage<QueueStorageKind>) => Tsk<I, number, L, Ls, Sk, Ms> // to check if it's really a number
 
-    enqueue: (storage: Storage<any>) => Tsk<I, number, T, Ls, Sk, Ms> 
+    enqueue: (storage: Storage<QueueStorageKind>) => Tsk<I, number, T, Ls, Sk, Ms> 
 
-    dequeue: <R = any>(storage: Storage<any>) => Tsk<I, R, T, Ls, Sk, Ms>  // R is expected result
+    dequeue: <R = any>(storage: Storage<QueueStorageKind>) => Tsk<I, R, T, Ls, Sk, Ms>
+
+    multiDequeue: <R = any>(storage: Storage<QueueStorageKind>) => Tsk<I, R, T, Ls, Sk, Ms> 
 
     /** Sets the task internal storage system. Enables *toStorage()*, *fromStorage()*, *flushStorage*, *fromStorageToGlobalState()*, *disconnectStorage()*, *collect()* and *storage()*. */
-    withStorage: <K extends StorageKind>(storage: Storage<StorageKind>) => Tsk<I, T, L, Ls, K, Ms>
+    withStorage: <K extends StorageKind>(storage: Storage<K>) => Tsk<I, T, L, Ls, K, Ms>
     
     /** Requires *task.withStorage()*.*/
     toStorage: Sk extends null ? never : (keyFunc: (x: TaskMessage<T>) => string | number, valueFunc?: (x: TaskMessage<T>) => any, ttl?: number) => Tsk<I, T, L, Ls, Sk, Ms> /*To check*/
@@ -130,7 +132,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Sk extends Storag
     toStorageList: Sk extends null ? never : (keyFunc: (x: TaskMessage<T>) => string | number, valueFunc?: (x: T) => any, ttl?: number) => Tsk<I, T, L, Ls, Sk, Ms> /*To check*/
 
     /** Requires *task.withStorage()*.*/
-    fromStorageList: Sk extends null ? never : <R = any>(keyFunc: (x: TaskMessage<T>) => (string | number)[], valueFunc: (x: T) => R[]) => Tsk<I, R[], L, Ls, Sk, Ms> 
+    fromStorageList: Sk extends ListStorageKind ? <R = any>(keyFunc: (x: TaskMessage<T>) => (string | number)[], valueFunc: (x: T) => R[]) => Tsk<I, R[], L, Ls, Sk, Ms> : never
 
     /** Requires *task.withStorage()*. */
     fromStorageToGlobalState: Sk extends null ? never : (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => Tsk<I, T, L, Ls, Sk, Ms>
@@ -240,14 +242,14 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Sk extends Storag
     self: (cb: (task: Tsk<I, T, L, Ls, Sk, Ms>) => any) => Tsk<I, T, L, Ls, Sk, Ms>
 
     /** Requires *task.withStorage()*. */
-    collect: Sk extends null ? never : (
-        idFunction: (x: TaskMessage<T>) => string | number, 
-        keyFunction: (x: TaskMessage<T>) => string | number, 
-        valueFunction: <R = any>(x: TaskMessage<T>) => R | null, 
+    collect: Sk extends CollectStorageKind ? <R = any>(
+        idFunction: (x: TaskMessage<T>) => string, 
+        keyFunction: (x: TaskMessage<T>) => string, 
+        valueFunction: (x: TaskMessage<T>) => R | null, 
         waitUntil: (arr: any[], flat: any[]) => boolean, /* TBD */ 
         emitFunction: (arr: any[], flat: any[]) => boolean, /* TBD */
         ttl?: number,
-    ) => Promise<Tsk<I, T, L, Ls, Sk, Ms>>,
+    ) => Tsk<I, T, L, Ls, Sk, Ms> : never,
 
     // prevents type errors for task extensions
     [x: string]: any
@@ -356,18 +358,35 @@ export declare type StorageConfig<K extends StorageKind> = K extends StorageKind
 
 /** Storage sytem to be used in Alyxstream tasks. */
 export declare interface Storage<K extends StorageKind> {
-    __kind: K // not a real Storage field - just to make K generic effective
-    db: () => any; /*TBD*/
+    db: () => StorageEngine<K>
     set: (key: string, value: any, ttl?: number | null) => Promise<void>; /*TBD*/
     get: (key: string) => Promise<any>; /*TBD*/
     push: (key: string, value: any) => Promise<void>; /*TBD*/
-    getList: (key: string) => Promise<any[]>; /*TBD*/
     flush: (key: string) => Promise<void>; /*TBD*/
-    slice: (key: string, numberOfItemsToRemove: number) => Promise<void>; /*TBD*/
-    sliceByTime: (key: string, startTime: number) => Promise<void>; /*TBD*/
-    disconnect: () => Promise<void>; /*TBD*/
-    flushStorage: () => Promise<void>; /*TBD*/
+    getList: K extends ListStorageKind ? (key: string) => Promise<any[]> : never; /*TBD*/
+    slice: K extends WindowStorageKind ? (key: string, numberOfItemsToRemove: number) => Promise<void> : never, /*TBD*/
+    sliceByTime: K extends WindowStorageKind ? (key: string, startTime: number) => Promise<void> : never, /*TBD*/
+    disconnect: K extends WindowStorageKind ? () => Promise<void> : never, /*TBD*/
+    flushStorage: K extends WindowStorageKind ? () => Promise<void> : never, /*TBD*/
+    queueSize: K extends QueueStorageKind ? (data?: any) => Promise<number> : never,
+    enqueue: K extends QueueStorageKind ? (data: any) => Promise<number> : never,
+    dequeue: K extends QueueStorageKind ? <R = any>() => Promise<R> : never
 }
+
+type StorageEngine<K extends StorageKind> =
+    K extends StorageKind.Memory
+    ? any // internal state
+    : K extends StorageKind.Redis
+    ? Redis.Redis
+    : K extends StorageKind.Cassandra
+    ? Cassandra.Client
+    : K extends StorageKind.Etcd
+    ? Etcd.Etcd3
+    : K extends StorageKind.Opensearch
+    ? Opensearch.Client
+    : K extends StorageKind.Postgres
+    ? Postgres.Client
+    : never
 
 /** Initialize an Alyxstream storage system to be used in a task. */
 export declare function MakeStorage<K extends StorageKind>(kind: K, config?: StorageConfig<K> | null, id?: string | number): Storage<K>
@@ -507,8 +526,22 @@ type NestedElem<T> = T extends readonly (infer U)[]
     : U 
     : never;
 
-/** List of storage systems that are suitable for windowing */
+/** List of storage systems that are suitable for windowing. */
 type WindowStorageKind = 
     StorageKind.Memory |
     StorageKind.Redis |
     StorageKind.Cassandra
+
+/** List of storage systems that are suitable for queuing. */
+type QueueStorageKind = 
+    StorageKind.Redis  
+
+/** List of storage systems that are suitable for lists. */
+type ListStorageKind = 
+    StorageKind.Redis |
+    StorageKind.Cassandra |
+    StorageKind.Memory  
+
+/** List of storage systems that are suitable for collect operator. */
+type CollectStorageKind = 
+    StorageKind.Cassandra 

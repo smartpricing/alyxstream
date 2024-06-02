@@ -41,7 +41,7 @@ export declare interface AlyxTask<I, T, L, Ls extends boolean, Sk extends Storag
      * @enables *setMetadata()*, *getMetadata()*. */
     withMetadata: () => AlyxTask<I, T, L, Ls, Sk, true>
 
-    /** Requires *task.withMetadata()*. */
+    /** @requires *task.withMetadata()*. */
     setMetadata: Ms extends true 
     ? (id: any) => AlyxTask<I, T, L, Ls, Sk, Ms>
     : never
@@ -126,7 +126,8 @@ export declare interface AlyxTask<I, T, L, Ls extends boolean, Sk extends Storag
     ? (keyFunc: (x: TaskMessage<T>) => string | number, valueFunc?: (x: T) => any, ttl?: number) => AlyxTask<I, T, L, Ls, Sk, Ms> /*To check*/
     : never
 
-    /** @requires *task.withStorage()*.*/
+    /** @requires *task.withStorage()*
+     * @requires lists-compatible storage system */
     fromStorageList: Sk extends ListStorageKind 
     ? <R = any>(keyFunc: (x: TaskMessage<T>) => (string | number)[], valueFunc: (x: T) => R[]) => AlyxTask<I, R[], L, Ls, Sk, Ms> 
     : never
@@ -177,14 +178,19 @@ export declare interface AlyxTask<I, T, L, Ls extends boolean, Sk extends Storag
     ? (key: string | number) => AlyxTask<I, T, L, Ls, Sk, Ms>
     : never
 
+    /** @requires windowing-compatible storage system */
     tumblingWindowCount: (storage: Storage<WindowStorageKind>, countLength: number, inactivityMilliseconds: number) => AlyxTask<I, T[], L, Ls, Sk, Ms>
 
+    /** @requires windowing-compatible storage system */
     tumblingWindowTime: (storage: Storage<WindowStorageKind>, timeLengthMilliSeconds: number, inactivityMilliseconds?: number) => AlyxTask<I, T[], L, Ls, Sk, Ms>
 
+    /** @requires windowing-compatible storage system */
     sessionWindowTime: (storage: Storage<WindowStorageKind>, inactivityMilliseconds: number) => AlyxTask<I, T[], L, Ls, Sk, Ms>
 
+    /** @requires windowing-compatible storage system */
     slidingWindowCount: (storage: Storage<WindowStorageKind>, countLength: number, slidingLength: number, inactivityMilliseconds: number) => AlyxTask<I, T[], L, Ls, Sk, Ms>
 
+    /** @requires windowing-compatible storage system */
     slidingWindowTime: (storage: Storage<WindowStorageKind>, timeLengthMilliSeconds: number, slidingLengthMilliseconds: number, inactivityMilliseconds: number) => AlyxTask<I, T[], L, Ls, Sk, Ms>
 
     /** Procudes task messages iterating over the provided array. */ 
@@ -258,7 +264,8 @@ export declare interface AlyxTask<I, T, L, Ls extends boolean, Sk extends Storag
 
     self: (cb: (task: AlyxTask<I, T, L, Ls, Sk, Ms>) => any) => AlyxTask<I, T, L, Ls, Sk, Ms>
 
-    /** @requires *task.withStorage()*. */
+    /** @requires *task.withStorage()*
+     * @requires collect-compatible storage system */
     collect: Sk extends CollectStorageKind 
     ? <R = any>(
         idFunction: (x: TaskMessage<T>) => string, 

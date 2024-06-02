@@ -185,8 +185,10 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Sk extends Storag
 
     fromReadableStream: (filePath: fs.PathLike, useZlib?: boolean) => Tsk<I, fs.ReadStream, L, Ls, Sk, Ms>
 
+    /** Produces a message to a Kafka topic. */
     toKafka: (kafkaSink: KSink, topic: string, callback: (x: T) => Kafka.Message | Kafka.Message[], options?: KSinkOptions) => Tsk<I, T, L, Ls, Sk, Ms>
 
+    /** Consume messages from a Kafka source. */
     fromKafka: <R = any>(source: KSource) => Tsk<I, KMessage<R>, L, Ls, Sk, Ms>
 
     kafkaCommit: (kafkaSource: KSource, commitParams: KCommitParams) => Tsk<I, T, L, Ls, Sk, Ms>
@@ -205,6 +207,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Sk extends Storag
  
     // fromPulsarWs: never, // not implemented
 
+    /** Watch changes over an Etcd key. */
     fromEtcd: (storage: Storage<StorageKind.Etcd>, key: string | number, watch?: boolean) => Tsk<I, Etcd.IKeyValue, L, Ls, Sk, Ms>,
 
     /** Consumes messages from a NATS Jetstream stream */
@@ -301,11 +304,15 @@ export declare interface TaskOfString<I, T extends string, L, Ls extends boolean
 }
 
 export declare interface TaskOfKafkaMessage<I, T extends (Kafka.Message | Kafka.Message[]), L, Ls extends boolean, Sk extends StorageKind, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Sk, Ms> {
+    /** Produces a message to a Kafka topic. */
     toKafka: (kafkaSink: KSink, topic: string, callback?: (x: T) => Kafka.Message | Kafka.Message[], options?: KSinkOptions) => Tsk<I, T, L, Ls, Sk, Ms>
+    
+    /** Performs a Kafka commit on set of commit params (topic, offset, partition). */
     kafkaCommit: (kafkaSource: KSource, commitParams?: KCommitParams) => Tsk<I, T, L, Ls, Sk, Ms>
 }
 
 export declare interface TaskOfKafkaCommitParams<I, T extends KCommitParams, L, Ls extends boolean, Sk extends StorageKind, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Sk, Ms> {
+    /** Performs a Kafka commit on set of commit params (topic, offset, partition). */
     kafkaCommit: (kafkaSource: KSource, commitParams?: KCommitParams) => Tsk<I, T, L, Ls, Sk, Ms>
 }
 
@@ -365,7 +372,7 @@ export declare interface Storage<K extends StorageKind> {
 /** Initialize an Alyxstream storage system to be used in a task. */
 export declare function MakeStorage<K extends StorageKind>(kind: K, config?: StorageConfig<K> | null, id?: string | number): Storage<K>
 
-/** Initialize an HTTP that exposes the state of a set of Alyxstream storage systems. Endpoint: /api/v1/state/:prefix/:keys. */
+/** Initialize an HTTP server that exposes the state of a set of Alyxstream storage systems. Endpoint: /api/v1/state/:prefix/:keys. */
 export declare function ExposeStorageState(storageMap: { [x in string | number]: Storage<any> }, config?: { port?: number }): void
 
 export declare interface KMessage<T> {

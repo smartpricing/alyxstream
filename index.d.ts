@@ -365,7 +365,7 @@ export declare interface Storage<K extends StorageKind> {
 /** Initialize an Alyxstream storage system to be used in a task. */
 export declare function MakeStorage<K extends StorageKind>(kind: K, config?: StorageConfig<K> | null, id?: string | number): Storage<K>
 
-/** Initialize an HTTP that exposes the state of a set of Alyxstream storage systems. Endpoint: /api/v1/state/:prefix/:keys. */
+/** Initialize an HTTP server that exposes the state of a set of Alyxstream storage systems. Endpoint: /api/v1/state/:prefix/:keys. */
 export declare function ExposeStorageState(storageMap: { [x in string | number]: Storage<any> }, config?: { port?: number }): void
 
 export declare interface KMessage<T> {

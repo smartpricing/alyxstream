@@ -3,6 +3,12 @@ import { randomUUID } from "crypto"
 import { Message } from "kafkajs";
 import * as AS from "../index";
 
+/**
+ * 
+ * requires Kafka, Nats, Etcd 
+ * 
+ * */
+
 type ExcludeEnum<T, U> = T extends U ? never : T;
 
 let s1: AS.Storage<ExcludeEnum<AS.StorageKind, AS.StorageKind.Etcd>> = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");

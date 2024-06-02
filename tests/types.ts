@@ -1,14 +1,14 @@
-import * as AS from "../index";
-import { Message, TopicPartitionOffsetAndMetadata } from "kafkajs";
 import { AckPolicy, DeliverPolicy, ReplayPolicy } from "nats"
 import { randomUUID } from "crypto"
+import { Message } from "kafkajs";
+import * as AS from "../index";
 
-const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
-// const s1 = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");
-// const s1 = AS.MakeStorage(AS.StorageKind.Postgres, null, "s1");
-// const s1 = AS.MakeStorage(AS.StorageKind.Redis, null, "s1");
-// const s1 = AS.MakeStorage(AS.StorageKind.Etcd, null, "s1");
-// const s1 = AS.MakeStorage(AS.StorageKind.Opensearch, null, "s1");
+let s1 = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");
+s1 = AS.MakeStorage(AS.StorageKind.Postgres, null, "s1");
+s1 = AS.MakeStorage(AS.StorageKind.Redis, null, "s1");
+s1 = AS.MakeStorage(AS.StorageKind.Etcd, null, "s1");
+s1 = AS.MakeStorage(AS.StorageKind.Opensearch, null, "s1");
+s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 
 (async function () {
 	var done = false
@@ -84,6 +84,13 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		.fn(x => Object.values(x))
 		.map(x => x[1])
 		.flat()
+		.parallel(3, () => console.log("parallel"))
+		.fn(x => {
+			console.log("x: ", x)
+			if (x !== null) {
+				throw Error("should be null")
+			}
+		})
 
 	await t.inject("I like types!")
 
@@ -173,7 +180,8 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		.slidingWindowTime(s1, 100, 200, 1000)
 		.print("kafka - sliding window time")
 		.each()
-		.fn(x => (x as any).element as TopicPartitionOffsetAndMetadata)
+		.filter(x => !!x)
+		.print("kafka - consume")
 		.kafkaCommit(ksource)
 		.fn(_ => done = true)
 		.close()
@@ -193,5 +201,18 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		.slidingWindowCount(s1, 3, 0, 1000)
 		.print("nats - sliding window count")
 		.map(x => console.log(x))
+		.close()
+
+	await AS.Task()
+		.fromArray([1, 1, 1, 1])
+		.sum()
+		.print("SUM")
+		.close()
+
+	await AS.Task()
+		.fromArray([1, 2, 3, 4])
+		.withDefaultKey()
+		.joinByKeyWithParallelism(s1, x => x.key!, 2) // this creates an array of metadata
+		.print("jkp >")
 		.close()
 })()

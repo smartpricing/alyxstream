@@ -10,6 +10,24 @@ import * as Nats from "nats"
 import * as Ws from "ws"
 import * as fs from "fs"
 
+export type TaskMessage<T> = {
+    payload: T
+    key?: string | number,
+    metadata: TaskMessageMetadata | TaskMessageMetadata[], // can be an array of metadata because of joinByKeyWithParallelism
+    globalState: any,
+    [x: string]: any
+}
+
+export type TaskMessageMetadata = {
+    windowKey?: string | number | null,
+    startTime?: any,
+    endTime?: any,
+    windowTimeInSeconds?: number | null,
+    windowTimeInMinutes?: number | null,
+    windowTimeInHours?: number | null,
+    windowElements?: any[]
+}
+
 // T = current value type
 // I = initial value type (needed for the "inject" method)
 // L = type of local storage properties (void by default, any if not set)
@@ -17,35 +35,19 @@ import * as fs from "fs"
 // Ss = is storage set (false by default)
 // Ms = is metadata set (false by default)
 
-type TaskMessage<T> = {
-    payload: T
-    key?: string | number,
-    metadata: {
-        windowKey?: string | number | null,
-        startTime?: any,
-        endTime?: any,
-        windowTimeInSeconds?: number | null,
-        windowTimeInMinutes?: number | null,
-        windowTimeInHours?: number | null,
-        windowElements?: any[]
-    },
-    globalState: any,
-    [x: string]: any
-}
-
 // ternary type to determine the correct operator, depending on the message type
 type Tsk<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> = 
-/*  */T extends (infer U)[] // is T an array?
-/*    */ ? TaskOfArray<I, U[], L, Ls, Ss, Ms> 
-/*    */ : T extends string // not an array, is string?
-/*        */ ? TaskOfString<I, T, L, Ls, Ss, Ms> // is string
-/*        */ : T extends number 
-/*            */ ? TaskBase<I, T, L, Ls, Ss, Ms>
-/*            */ : T extends (Kafka.Message | Kafka.Message[])
-/*                */ ? TaskOfKafkaMessage<I, T, L, Ls, Ss, Ms> 
-/*                */ : T extends KCommitParams
-/*                    */ ? TaskOfKafkaCommitParams<I, T, L, Ls, Ss, Ms> 
-/*                    */ : TaskOfObject<I, T, L, Ls, Ss, Ms>  
+    T extends (infer U)[]
+    ? TaskOfArray<I, U[], L, Ls, Ss, Ms> 
+    : T extends string
+    ? TaskOfString<I, T, L, Ls, Ss, Ms>
+    : T extends number 
+    ? TaskBase<I, T, L, Ls, Ss, Ms>
+    : T extends (Kafka.Message | Kafka.Message[])
+    ? TaskOfKafkaMessage<I, T, L, Ls, Ss, Ms> 
+    : T extends KCommitParams
+    ? TaskOfKafkaCommitParams<I, T, L, Ls, Ss, Ms> 
+    : TaskOfObject<I, T, L, Ls, Ss, Ms>  
 
 
 export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> {
@@ -62,6 +64,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
         [x: number]: any
     }
 
+    /** Sets the message key to *"default"* */
     withDefaultKey: () => Tsk<I, T, L, Ls, Ss, Ms>
 
     /** Sets the event time from the message payload. */
@@ -98,7 +101,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     /** @deprecated use fnRaw() instead */
     customFunctionRaw: <R>(callback: (x: TaskMessage<T>) => R) => Tsk<I, R, L, Ls, Ss, Ms>
     
-    /** @deprecated use fn() instead */
+    /** @deprecated use fnRaw() instead */
     customAsyncFunctionRaw: <R>(callback: (x: TaskMessage<T>) => Promise<R>) => Tsk<I, R, L, Ls, Ss, Ms>
 
     /**  */
@@ -109,9 +112,7 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     ) => Tsk<I, T[], L, Ls, Ss, Ms>
 
     // TO BE CHECKED 
-    parallel: <Pf extends () => any>(numberOfProcess: number, produceFunction?: Pf) => Pf extends null 
-        ? Tsk<I, null, L, Ls, Ss, Ms> 
-        : Tsk<I, T, L, Ls, Ss, Ms> 
+    parallel: <Pf extends () => any>(numberOfProcess: number, produceFunction?: Pf) => Tsk<I, null, L, Ls, Ss, Ms>
 
     queueSize: (storage: Storage) => Tsk<I, number, L, Ls, Ss, Ms> // to check if it's really a number
 
@@ -128,7 +129,6 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     /** Requires *task.withStorage()*.*/
     toStorageList: Ss extends false ? never : (keyFunc: (x: TaskMessage<T>) => string | number, valueFunc?: (x: T) => any, ttl?: number) => Tsk<I, T, L, Ls, Ss, Ms> /*To check*/
 
-    // not sure of types here
     /** Requires *task.withStorage()*.*/
     fromStorageList: Ss extends false ? never : <R = any>(keyFunc: (x: TaskMessage<T>) => (string | number)[], valueFunc: (x: T) => R[]) => Tsk<I, R[], L, Ls, Ss, Ms> 
 
@@ -203,7 +203,9 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
  
     ackPulsar: (sink: PlsSource) => Tsk<I, T, L, Ls, Ss, Ms>,
  
-    fromPulsarWs: never, // not implemented
+    // fromPulsarWs: never, // not implemented
+
+    fromEtcd: (storage: Storage, key: string | number, watch?: boolean) => Tsk<I, T, L, Ls, Ss, Ms>,
 
     /** Consumes messages from a NATS Jetstream stream */
     fromNats: <R = any>(source: NatsJsSource) => Tsk<I, NatsStreamMsg<R>, L, Ls, Ss, Ms>,
@@ -217,6 +219,11 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
 
     /** Releases a lock on a storage key using a smartlocks library mutex. */
     release: (mutex: Smartlocks.Mutex, lockKeyFn: (x: T) => string | number) => Tsk<I, T, L, Ls, Ss, Ms>,
+
+    /** Progressively sums messages, returning the current counter value. Only works for when message type is *number* */
+    sum: T extends number 
+    ? () => Tsk<I, number, L, Ls, Ss, Ms>  
+    : never
 
     /** Push a new message to the task. */
     inject: (data: I) => Promise<Tsk<I, T, L, Ls, Ss, Ms>>
@@ -239,12 +246,14 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
         ttl?: number,
     ) => Promise<Tsk<I, T, L, Ls, Ss, Ms>>,
 
+    // prevents type errors for task extensions
     [x: string]: any
 }
 
 export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Ss, Ms> {
     map: <R>(func: (x: ElemOfArr<T>) => R) => Tsk<I, R[], L, Ls, Ss, Ms>
     
+    /** Splits the task execution for each element of the array. */
     each: (func?: (x: ElemOfArr<T>) => any) => Tsk<I, ElemOfArr<T>, L, Ls, Ss, Ms>
     
     filterArray: (func: (x: ElemOfArr<T>) => boolean) => Tsk<I, T, L, Ls, Ss, Ms>
@@ -253,38 +262,37 @@ export declare interface TaskOfArray<I, T extends any[], L, Ls extends boolean, 
     // reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => Tsk<I, R, L, Ls, Ss, Ms>
     reduce: (func?: (x: ElemOfArr<T>) => number) => Tsk<I, number, L, Ls, Ss, Ms>
 
-    
+    /** Count array element by key. */
     countInArray: (func: (x: ElemOfArr<T>) => string | number) => Tsk<I, { [x in string | number]: number }, L, Ls, Ss, Ms>
     
+    /** Returns the array length. */
     length: () => Tsk<I, number, L, Ls, Ss, Ms>
     
     groupBy: (func: (elem: ElemOfArr<T>, index?: number, array?: T[]) => any) => Tsk<I, { [x in string | number]: T[] }, L, Ls, Ss, Ms> 
-    
-    flat: () => Tsk<I, NestedElem<T>[], L, Ls, Ss, Ms>
 
     /** Requires *task.withStorage()*. */
     fromStorage: Ss extends false ? never : (keysFunc: (x: TaskMessage<T>) => (string | number)[]) => Tsk<I, unknown[], L, Ls, Ss, Ms> /*To check*/
     // it seems that fromStorage is available only if the message payload value is an array
     // since it pushes the stored values into the message payload
+    
+    flat: () => Tsk<I, NestedElem<T>[], L, Ls, Ss, Ms>
 
     [x: string]: any
 }
 
 export declare interface TaskOfObject<I, T, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskBase<I, T, L, Ls, Ss, Ms> {
     //sumMap should belong to an hypothetical TaskOfObjectOfArrays or TaskOfObjectOfStrings type (because it sums fields lenghts)
+    /** Only works for objects whose values are arrays or strings (or anyting with a *length: number* property), otherwise will throw an error. */
     sumMap: () => Tsk<I, { [x in keyof T]: number }, L, Ls, Ss, Ms>
   
     /** Executes a groupBy for every key of the object message. */
     objectGroupBy: (keyFunction: (x: T) => string | number) => Tsk<I, { [x in string | number]: T[] }, L, Ls, Ss, Ms>
   
-    aggregate: <R = T>(storage: Storage, name: string, keyFunction: (x: T) => string | number) => Tsk<I, { [x in string | number]: R[] }, L, Ls, Ss, Ms>
-
-    sum: () => Tsk<I, number, L, Ls, Ss, Ms>    
+    /** Aggregates array element by key in a storage system. */
+    aggregate: <R = T>(storage: Storage, name: string, keyFunction: (x: T) => string | number) => Tsk<I, { [x in string | number]: R[] }, L, Ls, Ss, Ms>  
 
     /** Requires *task.withLocalKVStorage().* */
     mergeLocalKV: Ls extends false ? never : <K extends string | number>(key: K) => Tsk<I, T & { [x in K]: L }, L, Ls, Ss, Ms> 
- 
-    [x: string]: any
 }
 
 export declare interface TaskOfString<I, T extends string, L, Ls extends boolean, Ss extends boolean, Ms extends boolean> extends TaskOfObject<I, T, L, Ls, Ss, Ms> {

@@ -12,6 +12,7 @@
     "prebuild": "rm -rf dist",
     "build": "npx tsc -p tsconfig-mjs.json && npx tsc -p tsconfig-cjs.json",
     "postbuild": "echo '{\"type\": \"commonjs\" }' > dist/cjs/package.json && echo '{\"type\": \"module\" }' > dist/mjs/package.json"
+    "prepublish": "npm run build",
   },
   "author": "Alice Viola Setti @ Smartpricing",
   "license": "Apache-2.0",

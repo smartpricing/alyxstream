@@ -25,7 +25,7 @@ export declare type TaskMessageMetadata = {
     windowTimeInSeconds?: number | null,
     windowTimeInMinutes?: number | null,
     windowTimeInHours?: number | null,
-    windowElements?: any[]
+    windowElements?: any
 }
 
 // T = current value type

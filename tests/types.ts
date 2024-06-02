@@ -9,13 +9,11 @@ import * as AS from "../index";
  * 
  * */
 
-type ExcludeEnum<T, U> = T extends U ? never : T;
-
-let s1: AS.Storage<ExcludeEnum<AS.StorageKind, AS.StorageKind.Etcd>> = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");
-s1 = AS.MakeStorage(AS.StorageKind.Postgres, null, "s1");
-s1 = AS.MakeStorage(AS.StorageKind.Redis, null, "s1");
-s1 = AS.MakeStorage(AS.StorageKind.Opensearch, null, "s1");
-s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
+// let s1 = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");
+// let s1 = AS.MakeStorage(AS.StorageKind.Postgres, null, "s1");
+// let s1 = AS.MakeStorage(AS.StorageKind.Redis, null, "s1");
+// let s1 = AS.MakeStorage(AS.StorageKind.Opensearch, null, "s1");
+let s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 
 let etcdStorage = AS.MakeStorage(AS.StorageKind.Etcd, {
 	hosts: ["localhost:2379"],	

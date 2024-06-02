@@ -162,15 +162,15 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Sk extends Storag
     /** Requires *task.withLocalKVStorage()*. */
     flushLocalKV: Ls extends false ? never : (key: string | number) => Tsk<I, T, L, Ls, Sk, Ms> 
 
-    tumblingWindowCount: (storage: Storage<any>, countLength: number, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Sk, Ms>
+    tumblingWindowCount: (storage: Storage<WindowStorageKind>, countLength: number, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Sk, Ms>
 
-    tumblingWindowTime: (storage: Storage<any>, timeLengthMilliSeconds: number, inactivityMilliseconds?: number) => Tsk<I, T[], L, Ls, Sk, Ms>
+    tumblingWindowTime: (storage: Storage<WindowStorageKind>, timeLengthMilliSeconds: number, inactivityMilliseconds?: number) => Tsk<I, T[], L, Ls, Sk, Ms>
 
-    sessionWindowTime: (storage: Storage<any>, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Sk, Ms>
+    sessionWindowTime: (storage: Storage<WindowStorageKind>, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Sk, Ms>
 
-    slidingWindowCount: (storage: Storage<any>, countLength: number, slidingLength: number, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Sk, Ms>
+    slidingWindowCount: (storage: Storage<WindowStorageKind>, countLength: number, slidingLength: number, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Sk, Ms>
 
-    slidingWindowTime: (storage: Storage<any>, timeLengthMilliSeconds: number, slidingLengthMilliseconds: number, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Sk, Ms>
+    slidingWindowTime: (storage: Storage<WindowStorageKind>, timeLengthMilliSeconds: number, slidingLengthMilliseconds: number, inactivityMilliseconds: number) => Tsk<I, T[], L, Ls, Sk, Ms>
 
     /** Procudes task messages iterating over the provided array. */ 
     fromArray: <R>(array: R[]) => Tsk<I, R, L, Ls, Sk, Ms>
@@ -491,3 +491,9 @@ type NestedElem<T> = T extends readonly (infer U)[]
     ? V 
     : U 
     : never;
+
+/** List of storage systems that are suitable for windowing */
+type WindowStorageKind = 
+    StorageKind.Memory |
+    StorageKind.Redis |
+    StorageKind.Cassandra

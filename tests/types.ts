@@ -1,14 +1,14 @@
-import * as AS from "../index";
-import { Message, TopicPartitionOffsetAndMetadata } from "kafkajs";
 import { AckPolicy, DeliverPolicy, ReplayPolicy } from "nats"
 import { randomUUID } from "crypto"
+import { Message } from "kafkajs";
+import * as AS from "../index";
 
-const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
-// const s1 = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");
-// const s1 = AS.MakeStorage(AS.StorageKind.Postgres, null, "s1");
-// const s1 = AS.MakeStorage(AS.StorageKind.Redis, null, "s1");
-// const s1 = AS.MakeStorage(AS.StorageKind.Etcd, null, "s1");
-// const s1 = AS.MakeStorage(AS.StorageKind.Opensearch, null, "s1");
+let s1 = AS.MakeStorage(AS.StorageKind.Cassandra, null, "s1");
+s1 = AS.MakeStorage(AS.StorageKind.Postgres, null, "s1");
+s1 = AS.MakeStorage(AS.StorageKind.Redis, null, "s1");
+s1 = AS.MakeStorage(AS.StorageKind.Etcd, null, "s1");
+s1 = AS.MakeStorage(AS.StorageKind.Opensearch, null, "s1");
+s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 
 (async function () {
 	var done = false
@@ -207,5 +207,12 @@ const s1 = AS.MakeStorage(AS.StorageKind.Memory, null, "s1");
 		.fromArray([1, 1, 1, 1])
 		.sum()
 		.print("SUM")
+		.close()
+
+	await AS.Task()
+		.fromArray([1, 2, 3, 4])
+		.withDefaultKey()
+		.joinByKeyWithParallelism(s1, x => x.key!, 2) // this creates an array of metadata
+		.print("jkp >")
 		.close()
 })()

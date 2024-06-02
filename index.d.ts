@@ -10,20 +10,22 @@ import * as Nats from "nats"
 import * as Ws from "ws"
 import * as fs from "fs"
 
-type TaskMessage<T> = {
+export type TaskMessage<T> = {
     payload: T
     key?: string | number,
-    metadata: {
-        windowKey?: string | number | null,
-        startTime?: any,
-        endTime?: any,
-        windowTimeInSeconds?: number | null,
-        windowTimeInMinutes?: number | null,
-        windowTimeInHours?: number | null,
-        windowElements?: any[]
-    },
+    metadata: TaskMessageMetadata | TaskMessageMetadata[], // can be an array of metadata because of joinByKeyWithParallelism
     globalState: any,
     [x: string]: any
+}
+
+export type TaskMessageMetadata = {
+    windowKey?: string | number | null,
+    startTime?: any,
+    endTime?: any,
+    windowTimeInSeconds?: number | null,
+    windowTimeInMinutes?: number | null,
+    windowTimeInHours?: number | null,
+    windowElements?: any[]
 }
 
 // T = current value type
@@ -127,7 +129,6 @@ export declare interface TaskBase<I, T, L, Ls extends boolean, Ss extends boolea
     /** Requires *task.withStorage()*.*/
     toStorageList: Ss extends false ? never : (keyFunc: (x: TaskMessage<T>) => string | number, valueFunc?: (x: T) => any, ttl?: number) => Tsk<I, T, L, Ls, Ss, Ms> /*To check*/
 
-    // not sure of types here
     /** Requires *task.withStorage()*.*/
     fromStorageList: Ss extends false ? never : <R = any>(keyFunc: (x: TaskMessage<T>) => (string | number)[], valueFunc: (x: T) => R[]) => Tsk<I, R[], L, Ls, Ss, Ms> 
 

@@ -84,6 +84,16 @@ export function Make (config, id) {
       }
     },
 
+    set: async function (key, value) {
+      try {
+        const valueRes = await db.put(key).value(`${value}`)
+        return valueRes
+      } catch (error) {
+        console.log(error)
+        return null
+      }
+    },
+
     get: async function (key) {
       try {
         const value = await db.get(key).string()

@@ -28,6 +28,7 @@ export function Make (config, id) {
       if (this.state[this._composeKey(key)] === undefined) {
         this.state[this._composeKey(key)] = []
       }
+      
       this.state[this._composeKey(key)].push(value)
       this.state[this._composeMetadataKey(key)] = metadata
     },

@@ -64,6 +64,7 @@ export const withStorage = {
       const returnArray = valueFunction(s)
       for (const key of keyFunction(s)) {
         const storedValue = await storage.getList(key)
+        if (storedValue === undefined) continue
         for (const r of storedValue) {
           returnArray.push(r)
         }

@@ -4,6 +4,5 @@
         "module": "commonjs",
         "outDir": "dist/cjs/",
         "target": "ES6",        
-        "esModuleInterop": true
     }
 }

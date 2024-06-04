@@ -1,7 +1,10 @@
 node_modules
 examples
 localdb
-docs
-tests
-usage-examples
-jest.config.js
+/docs
+/tests
+/usage-examples
+/jest.config.js
+/.pre-commit-config.yaml
+/.gitignore
+/src

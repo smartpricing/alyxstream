@@ -3,20 +3,20 @@
   "version": "0.4.24",
   "description": "",
   "type": "module",
-  "main": "dist/cjs/index.js",
+  "main": "lib/cjs/index.js",
   "types": "./index.d.ts",
   "scripts": {
     "test": "ALYXSTREAM_LOG_LEVEL='-' node --experimental-vm-modules ./node_modules/.bin/jest --rootDir=tests",
     "test-types": "tsc --noEmit --skipLibCheck ./tests/types.ts && tsx tests/types.ts",
-    "prebuild": "rm -rf dist",
+    "prebuild": "rm -rf lib",
     "build": "npx tsc -p tsconfig-mjs.json && npx tsc -p tsconfig-cjs.json",
-    "postbuild": "echo '{\"type\": \"commonjs\" }' > dist/cjs/package.json && echo '{\"type\": \"module\" }' > dist/mjs/package.json",
+    "postbuild": "echo '{\"type\": \"commonjs\" }' > lib/cjs/package.json && echo '{\"type\": \"module\" }' > lib/mjs/package.json",
     "prepublish": "npm run build"
   },
   "exports": {
     ".": {
-      "import": "./dist/mjs/index.js",
-      "require": "./dist/cjs/index.js"
+      "import": "./lib/mjs/index.js",
+      "require": "./lib/cjs/index.js"
     }
   },
   "author": "Alice Viola Setti @ Smartpricing",

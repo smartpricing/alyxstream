@@ -3,4 +3,4 @@ examples
 localdb
 datasets/*.json
 dev
-dist
+lib

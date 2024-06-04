@@ -2,4 +2,6 @@ node_modules
 examples
 localdb
 docs
-src
+tests
+usage-examples
+jest.config.js

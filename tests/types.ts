@@ -212,7 +212,7 @@ let etcdStorage = AS.MakeStorage(AS.StorageKind.Etcd, {
 		.withDefaultKey()
 		.withStorage(etcdStorage)
 		.toStorage(
-			x => x.metadata.key, 
+			x => x.metadata.key!, 
 			x => x.payload
 		)
 		.print("etcd - write")

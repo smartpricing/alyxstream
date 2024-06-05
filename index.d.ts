@@ -19,7 +19,7 @@ export declare type TaskMessage<T> = {
 }
 
 export declare type TaskMessageMetadata = {
-    key: string | number
+    key?: string | number
     windowKey?: string | number | null,
     startTime?: any,
     endTime?: any,

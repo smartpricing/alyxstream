@@ -508,7 +508,7 @@ export declare function KafkaSource(client: Kafka.Kafka, config: {
 }): Promise<KSource>
 
 /** Initialize a Kafka sink (producer). */
-export declare function KafkaSink(client: Kafka.Kafka, config: Kafka.ProducerConfig): Promise<KSink>
+export declare function KafkaSink(client: Kafka.Kafka, config?: Kafka.ProducerConfig): Promise<KSink>
 
 export declare function KafkaCommit(source: KSource, params: KCommitParams): Promise<KCommitParams>
 

@@ -496,7 +496,16 @@ export declare function KafkaClient(config: Kafka.KafkaConfig): Kafka.Kafka
 export declare function KafkaAdmin(client: Kafka.Kafka): Promise<Kafka.Admin>
 
 /** Initialize a Kafka source (consumer). */
-export declare function KafkaSource(client: Kafka.Kafka, config: Kafka.ConsumerConfig & { topics: [{ topic: string, [x: string]: any }] }): Promise<KSource>
+export declare function KafkaSource(client: Kafka.Kafka, config: {
+    groupId: string,
+    topics: Array<{ 
+        topic: string, 
+        fromBeginning?: boolean
+        autoCommit?: boolean
+        autoHeartbeat?: number
+        parseWith?: (x: string) => any // this should be removed for type safety
+    }>
+}): Promise<KSource>
 
 /** Initialize a Kafka sink (producer). */
 export declare function KafkaSink(client: Kafka.Kafka, config: Kafka.ProducerConfig): Promise<KSink>

@@ -474,7 +474,7 @@ type ExchangeEmitTask = T<
     void, false, null, false
 >
 
-export declare interface KExchange<OnMessage, EmitMessage> {
+export declare interface KExchange<OnMessage = any, EmitMessage = any> {
     setKeyParser: (fn: (x: OnMessage) => string | number) => void;
     setValidationFunction: (fn: (x: OnMessage) => boolean | any) => void;
     on: <R>(fn: (x: OnMessage) => R) => Promise<T<void, R, OnMessage, true, null, false>>;
@@ -525,9 +525,13 @@ export declare function Exchange<
     client: Kafka.Kafka, 
     topic: string, 
     groupId: string, 
-    sourceOptions?: Kafka.ConsumerConfig, 
+    sourceOptions?: {
+        fromBeginning?: boolean
+        autoCommit?: boolean
+        autoHeartbeat?: number
+    }, 
     sinkOptions?: Kafka.ProducerConfig
-): KExchange<OnMessage, EmitMessage>
+): Promise<KExchange<OnMessage, EmitMessage>>
 
 export declare interface PlsSource {
     stream: (cb: any) => Promise<void> /*TBD*/

@@ -10,7 +10,7 @@
     "prebuild": "rm -rf lib",
     "build": "npx tsc -p tsconfig-mjs.json && npx tsc -p tsconfig-cjs.json",
     "postbuild": "echo '{\"type\": \"commonjs\" }' > lib/cjs/package.json && echo '{\"type\": \"module\" }' > lib/mjs/package.json && cp index.d.ts lib/mjs/index.d.ts && cp index.d.ts lib/cjs/index.d.ts",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "exports": {
     "import": {
@@ -57,7 +57,8 @@
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
     "jest": "^29.3.1",
-    "standard": "^17.1.0"
+    "standard": "^17.1.0",
+    "typescript": "^5.5.3"
   },
   "keywords": [
     "stream",

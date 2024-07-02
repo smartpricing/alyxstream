@@ -4,3 +4,5 @@ localdb
 datasets/*.json
 dev
 lib
+*.sublime-project
+*.sublime-workspace

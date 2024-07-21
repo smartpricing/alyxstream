@@ -36,7 +36,7 @@ export declare type TaskMessageMetadata = {
  * @Ls is local storage set (default: *false*)
  * @Ms are metadata set (default: *false*)
  * @Sk task storage system kind (default: *null*) */
-export declare interface T<I, C, G, G, L, Ls extends boolean, Sk extends StorageKind, Ms extends boolean> {
+export declare interface T<I, C, G, L, Ls extends boolean, Sk extends StorageKind, Ms extends boolean> {
     /** Initializes task metadata.
      * @enables *setMetadata()*, *getMetadata()*. */
     withMetadata: () => T<I, C, G, L, Ls, Sk, true>

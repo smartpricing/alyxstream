@@ -260,7 +260,7 @@ export declare interface T<I, C, G, L, Ls extends boolean, Sk extends StorageKin
     close: () => Promise<T<I, C, G, L, Ls, Sk, Ms>>
 
     /** Return the last result of the task. */
-    finalize: <R = C>() => R
+    finalize: <R = C>() => TaskMessage<R, G>
 
     self: (cb: (task: T<I, C, G, L, Ls, Sk, Ms>) => any) => T<I, C, G, L, Ls, Sk, Ms>
 

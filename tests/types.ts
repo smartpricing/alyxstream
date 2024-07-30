@@ -54,7 +54,11 @@ let etcdStorage = AS.MakeStorage(AS.StorageKind.Etcd, {
 	const ksource = await AS.KafkaSource(kc, {
 		groupId: randomUUID(),
 		topics: [{
-			topic: "alyxstream-test-topic"
+			topic: "alyxstream-test-topic",
+			parseWith: x => JSON.parse(x) as { x: number }
+		},{
+			topic: "alyxstream-test-topic",
+			parseWith: x => JSON.parse(x) as { x: number }
 		}]
 	})
 
@@ -212,7 +216,7 @@ let etcdStorage = AS.MakeStorage(AS.StorageKind.Etcd, {
 		.withDefaultKey()
 		.withStorage(etcdStorage)
 		.toStorage(
-			x => x.metadata.key, 
+			x => x.metadata.key!, 
 			x => x.payload
 		)
 		.print("etcd - write")

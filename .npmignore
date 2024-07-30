@@ -1,4 +1,13 @@
 node_modules
 examples
 localdb
-docs
+/docs
+/tests
+/usage-examples
+/jest.config.js
+/.pre-commit-config.yaml
+/.gitignore
+/src
+/tsconfig.json
+/tsconfig-mjs.json
+/tsconfig-cjs.json

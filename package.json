@@ -2,11 +2,25 @@
   "name": "@dev.smartpricing/alyxstream",
   "version": "0.4.24",
   "description": "",
-  "main": "index.js",
   "type": "module",
+  "types": "./index.d.ts",
   "scripts": {
     "test": "ALYXSTREAM_LOG_LEVEL='-' node --experimental-vm-modules ./node_modules/.bin/jest --rootDir=tests",
-    "test-types": "tsc --noEmit --skipLibCheck ./tests/types.ts && tsx tests/types.ts"
+    "test-types": "tsc --noEmit --skipLibCheck ./tests/types.ts && tsx tests/types.ts",
+    "prebuild": "rm -rf lib",
+    "build": "npx tsc -p tsconfig-mjs.json && npx tsc -p tsconfig-cjs.json",
+    "postbuild": "echo '{\"type\": \"commonjs\" }' > lib/cjs/package.json && echo '{\"type\": \"module\" }' > lib/mjs/package.json && cp index.d.ts lib/mjs/index.d.ts && cp index.d.ts lib/cjs/index.d.ts",
+    "prepare": "npm run build"
+  },
+  "exports": {
+    "import": {
+      "default": "./lib/mjs/index.js",
+      "types": "./lib/mjs/index.d.ts"
+    },
+    "require": {
+      "default": "./lib/cjs/index.js",
+      "types": "./lib/csj/index.d.ts"
+    }
   },
   "author": "Alice Viola Setti @ Smartpricing",
   "license": "Apache-2.0",
@@ -44,7 +58,7 @@
     "esdoc-standard-plugin": "^1.0.0",
     "jest": "^29.3.1",
     "standard": "^17.1.0",
-    "ts": "^0.2.2"
+    "typescript": "^5.5.3"
   },
   "keywords": [
     "stream",

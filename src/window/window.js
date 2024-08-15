@@ -289,11 +289,26 @@ export function MakeWindowSlidingTime (storage) {
       return null
     } else if (newMetadata.eventTime > currentMetadata.endTimestamp) {
       // emit current window and push in the new one
-      const startTimestamp = currentMetadata.startTimestamp + newMetadata.slideSize
-      const endTimestamp = currentMetadata.endTimestamp + newMetadata.slideSize
-      // console.log((await this._storage.getList(key)))
+      let startTimestamp = null
+      let endTimestamp = null
+      if (newMetadata.eventTime > currentMetadata.endTimestamp + newMetadata.slideSize) {
+        const roundDownTo = roundTo => x => Math.floor(x / roundTo) * roundTo
+        const roundUpTo = roundTo => x => Math.ceil(x / roundTo) * roundTo
+        const timeMilliSeconds = currentMetadata.endTimestamp - currentMetadata.startTimestamp
+        startTimestamp = roundDownTo(timeMilliSeconds)(newMetadata.eventTimeDate)
+        endTimestamp = roundUpTo(timeMilliSeconds)(newMetadata.eventTimeDate)
+    
+        // This is needed because the round functions does not work
+        // when the eventTime is aligned with the epoch (edge case)
+        if (startTimestamp === endTimestamp) {
+          endTimestamp = roundUpTo(timeMilliSeconds)(newMetadata.eventTime + 1)
+        }
+      } else {
+        startTimestamp = currentMetadata.startTimestamp + newMetadata.slideSize
+        endTimestamp = currentMetadata.endTimestamp + newMetadata.slideSize        
+      }
+  
       const winres = (await this._storage.getList(key)).map(x => x.element)
-
       const newMetadataUpdated = {
         startTimestamp,
         endTimestamp,
@@ -324,7 +339,7 @@ export function MakeWindowSlidingTime (storage) {
   }
 
   baseWindow.onInactivityEmit = async function (key) {
-    const winres = (await this._storage.getList(key))
+    const winres = (await this._storage.getList(key)).map(x => x.element)
     const currentMetadata = await this._getMetadata(key)
     const newMetadataUpdated = {
       startTimestamp: null,

@@ -43,7 +43,8 @@ export default function (task, storage, timeMilliSeconds, slidingLengthMilliSeco
       slideSize: slidingLengthMilliSeconds,
       startTimestamp,
       endTimestamp,
-      eventTime: watermark
+      eventTime: watermark,
+      eventTimeDate: eventTime,
     })
     if (winres !== null) {
       if (inactivityTimeMilliseconds !== null) {

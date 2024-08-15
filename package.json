@@ -1,6 +1,6 @@
 {
   "name": "@dev.smartpricing/alyxstream",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "",
   "type": "module",
   "types": "./index.d.ts",
@@ -22,7 +22,7 @@
       "types": "./lib/csj/index.d.ts"
     }
   },
-  "author": "Alice Viola Setti @ Smartpricing",
+  "author": "Smartpricing",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 {
   "name": "@dev.smartpricing/alyxstream",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "",
   "type": "module",
   "types": "./index.d.ts",

@@ -291,22 +291,26 @@ export function MakeWindowSlidingTime (storage) {
       // emit current window and push in the new one
       let startTimestamp = null
       let endTimestamp = null
-      if (newMetadata.eventTime > currentMetadata.endTimestamp + newMetadata.slideSize) {
-        const roundDownTo = roundTo => x => Math.floor(x / roundTo) * roundTo
-        const roundUpTo = roundTo => x => Math.ceil(x / roundTo) * roundTo
-        const timeMilliSeconds = currentMetadata.endTimestamp - currentMetadata.startTimestamp
-        startTimestamp = roundDownTo(timeMilliSeconds)(newMetadata.eventTimeDate)
-        endTimestamp = roundUpTo(timeMilliSeconds)(newMetadata.eventTimeDate)
-    
-        // This is needed because the round functions does not work
-        // when the eventTime is aligned with the epoch (edge case)
-        if (startTimestamp === endTimestamp) {
-          endTimestamp = roundUpTo(timeMilliSeconds)(newMetadata.eventTime + 1)
-        }
-      } else {
-        startTimestamp = currentMetadata.startTimestamp + newMetadata.slideSize
-        endTimestamp = currentMetadata.endTimestamp + newMetadata.slideSize        
-      }
+      //if (newMetadata.eventTime > currentMetadata.endTimestamp + newMetadata.slideSize) {
+      //  console.log('A', newMetadata.eventTime, currentMetadata.endTimestamp, newMetadata.slideSize)
+      //  const roundDownTo = roundTo => x => Math.floor(x / roundTo) * roundTo
+      //  const roundUpTo = roundTo => x => Math.ceil(x / roundTo) * roundTo
+      //  const timeMilliSeconds = newMetadata.winSize
+      //  startTimestamp = roundDownTo(timeMilliSeconds)(newMetadata.eventTimeDate)
+      //  endTimestamp = roundUpTo(timeMilliSeconds)(newMetadata.eventTimeDate)
+      //
+      //  // This is needed because the round functions does not work
+      //  // when the eventTime is aligned with the epoch (edge case)
+      //  if (startTimestamp === endTimestamp) {
+      //    endTimestamp = roundUpTo(timeMilliSeconds)(newMetadata.eventTime + 1)
+      //  }
+      //} else {
+      //  console.log('B')
+      //  startTimestamp = currentMetadata.startTimestamp + newMetadata.slideSize
+      //  endTimestamp = currentMetadata.endTimestamp + newMetadata.slideSize        
+      //}
+      startTimestamp = currentMetadata.startTimestamp + newMetadata.slideSize
+      endTimestamp = currentMetadata.endTimestamp + newMetadata.slideSize        
   
       const winres = (await this._storage.getList(key)).map(x => x.element)
       const newMetadataUpdated = {

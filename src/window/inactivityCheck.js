@@ -15,7 +15,9 @@ export async function set (task, index, baseWindow, key, ms) {
   }
   await check()
   const winres = await baseWindow.onInactivityEmit(key)
-  await task._nextAtIndex(index)(Message(winres.payload, winres.metadata))
+  if (winres !== undefined && winres !== null) {
+    await task._nextAtIndex(index)(Message(winres.payload, winres.metadata))  
+  }
 }
 
 export function unset (key) {

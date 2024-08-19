@@ -343,7 +343,12 @@ export function MakeWindowSlidingTime (storage) {
   }
 
   baseWindow.onInactivityEmit = async function (key) {
-    const winres = (await this._storage.getList(key)).map(x => x.element)
+    const winresDataRaw = (await this._storage.getList(key))
+    if (winresDataRaw === null || winresDataRaw === undefined) {
+      await this._unload(key)
+      return null
+    }
+    const winres = winresDataRaw.map(x => x.element)
     const currentMetadata = await this._getMetadata(key)
     const newMetadataUpdated = {
       startTimestamp: null,

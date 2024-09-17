@@ -1,17 +1,6 @@
 'use strict'
 
-import KafkaJS from 'kafkajs'
-import SnappyCodec from 'kafkajs-snappy'
-import LZ4 from 'lz4-kafkajs'
-import ZstdCodec from '@kafkajs/zstd'
-
 import KafkaCommit from '../kafka/commit.js'
-
-const { CompressionTypes, CompressionCodecs } = KafkaJS
-
-CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec
-CompressionCodecs[CompressionTypes.LZ4] = new LZ4().codec
-CompressionCodecs[CompressionTypes.ZSTD] = ZstdCodec()
 
 export const toKafka = {
   toKafka (sink, topic, cb = null, options = null) {

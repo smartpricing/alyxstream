@@ -445,15 +445,10 @@ export declare interface KMessage<T> {
     value: T
 }
 
-type KCompressionType = 
-    Kafka.CompressionTypes.GZIP |
-    Kafka.CompressionTypes.LZ4 |
-    Kafka.CompressionTypes.None |
-    Kafka.CompressionTypes.Snappy |
-    Kafka.CompressionTypes.ZSTD 
-
-export declare type KSinkOptions = { 
-    compressionType: KCompressionType
+export declare type KSinkOptions = {
+    acks?: number
+    timeout?: number
+    compression?: Kafka.CompressionTypes
 }
 
 type KCommitParams = Pick<Kafka.TopicPartitionOffsetAndMetadata, 'topic' | 'partition' | 'offset'>

@@ -1,7 +1,17 @@
 'use strict'
 
-import { CompressionTypes } from 'kafkajs'
+import KafkaJS from 'kafkajs'
+import SnappyCodec from 'kafkajs-snappy'
+import LZ4 from 'lz4-kafkajs'
+import ZstdCodec from '@kafkajs/zstd'
+
 import KafkaCommit from '../kafka/commit.js'
+
+const { CompressionTypes, CompressionCodecs } = KafkaJS
+
+CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec
+CompressionCodecs[CompressionTypes.LZ4] = new LZ4().codec
+CompressionCodecs[CompressionTypes.ZSTD] = ZstdCodec()
 
 export const toKafka = {
   toKafka (sink, topic, cb = null, options = null) {
@@ -12,10 +22,8 @@ export const toKafka = {
       data = Array.isArray(data) === true ? data : [data]
       const obj = {
         topic,
-        messages: data
-      }
-      if (options !== null && options.compressionType !== null && options.compressionType !== undefined) {
-        obj.compression = CompressionTypes[options.compressionType] // CompressionTypes.GZIP
+        messages: data,
+        ...options
       }
       await sink.send(obj)
       await task._nextAtIndex(index)(s)

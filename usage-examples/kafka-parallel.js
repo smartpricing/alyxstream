@@ -20,19 +20,24 @@ import {
   const kafkaClient = KafkaClient({
     brokers: ['localhost:9092']
   })
-  const kafkaSource = await KafkaSource(kafkaClient, {
-    topics: [{
-      topic,
-      fromBeginning: true,
-      autoCommit: true
-    }],
-    groupId: 'alyxstream-kafka-example-consumer-2'
-  })
+  let kafkaSource = null
   const kafkaSink = await KafkaSink(kafkaClient)
 
   /** Consumer **/
   await Task()
-    .fromKafka(kafkaSource)
+    .parallel(5, null, async () => {
+      kafkaSource = await KafkaSource(kafkaClient, {
+          topics: [{
+            topic,
+            fromBeginning: true,
+            autoCommit: true
+          }],
+          groupId: 'alyxstream-kafka-example-consumer-3'
+        })
+    })
+    .fromKafka(async () => {
+      return kafkaSource
+    })
     .keyBy(x => x.partition)
     .tumblingWindowCount(MakeStorage(StorageKind.Memory, null, 'alyxstream-kafka-example-storage'), 10)
     .print('>')

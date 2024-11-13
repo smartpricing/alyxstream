@@ -10,7 +10,13 @@ export const fromKafka = {
     const task = this
     const index = task._nextIndex()
     task._setNext(async () => {
-      await source.stream(async (message) => {
+      let _source = null
+      if (typeof source === 'function') {
+        _source = await source()
+      } else {
+        _source = source
+      }
+      await _source.stream(async (message) => {
         await task._nextAtIndex(index)(message)
       })
     })

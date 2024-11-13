@@ -29,7 +29,7 @@ import {
       fromBeginning: true,
       autoCommit: false
     }],
-    groupId: 'alyxstream-kafka-example-kafka-commit-consumer'
+    groupId: 'alyxstream-kafka-example-kafka-commit-consumer-3'
   })
   const kafkaSink = await KafkaSink(kafkaClient)
 

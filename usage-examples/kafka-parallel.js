@@ -30,7 +30,7 @@ import {
           topics: [{
             topic,
             fromBeginning: true,
-            autoCommit: true
+            autoCommit: false
           }],
           groupId: 'alyxstream-kafka-example-consumer-3'
         })
@@ -41,6 +41,10 @@ import {
     .keyBy(x => x.partition)
     .tumblingWindowCount(MakeStorage(StorageKind.Memory, null, 'alyxstream-kafka-example-storage'), 10)
     .print('>')
+    .each()
+    .kafkaCommit(async () => { 
+      return kafkaSource 
+    })
     .close()
 
   /** Producer **/

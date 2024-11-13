@@ -27,7 +27,13 @@ export const kafkaCommit = {
     const index = task._nextIndex()
     task._setNext(async (s) => {
       const x = s.payload
-      KafkaCommit(kafkaSource, commitParams == null ? x : commitParams)
+      let _source = null
+      if (typeof kafkaSource === 'function') {
+        _source = await kafkaSource()
+      } else {
+        _source = kafkaSource
+      }      
+      KafkaCommit(_source, commitParams == null ? x : commitParams)
       await task._nextAtIndex(index)(s)
     })
     return task

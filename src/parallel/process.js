@@ -10,7 +10,7 @@ export const parallel = {
     const index = task._nextIndex()
 
     if (cluster.isPrimary) {
-      for (let i = 0; i < numberOfProcess; i++) {
+      for (let i = 0; i < numberOfProcess - 1; i++) {
         Log('debug', ['Forking process', i])
         cluster.fork()
       }
@@ -23,11 +23,11 @@ export const parallel = {
     task._setNext(async () => {
       if (cluster.isPrimary && produceFunction !== null) {
         await produceFunction()
-        await task._nextAtIndex(index)(Message(null))
       }
-      if (!cluster.isPrimary) {
-        await task._nextAtIndex(index)(Message(null))
-      }
+      await task._nextAtIndex(index)(Message(null))
+      // if (!cluster.isPrimary) {
+      //   await task._nextAtIndex(index)(Message(null))
+      // }
     })
     return task
   }

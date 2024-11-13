@@ -1,6 +1,5 @@
 'use strict'
 
-import { CompressionTypes } from 'kafkajs'
 import KafkaCommit from '../kafka/commit.js'
 
 export const toKafka = {
@@ -12,10 +11,8 @@ export const toKafka = {
       data = Array.isArray(data) === true ? data : [data]
       const obj = {
         topic,
-        messages: data
-      }
-      if (options !== null && options.compressionType !== null && options.compressionType !== undefined) {
-        obj.compression = CompressionTypes[options.compressionType] // CompressionTypes.GZIP
+        messages: data,
+        ...options
       }
       await sink.send(obj)
       await task._nextAtIndex(index)(s)

@@ -31,7 +31,7 @@ export declare type TaskMessageMetadata = {
 
 /** Alyxstream Task instance.
  * @I initial message type (needed for the *inject()* function)
- * @C current message type 
+ * @C current message type
  * @L local storage value types
  * @Ls is local storage set (default: *false*)
  * @Ms are metadata set (default: *false*)
@@ -42,14 +42,14 @@ export declare interface T<I, C, G, L, Ls extends boolean, Sk extends StorageKin
     withMetadata: () => T<I, C, G, L, Ls, Sk, true>
 
     /** @requires *task.withMetadata()*. */
-    setMetadata: Ms extends true 
+    setMetadata: Ms extends true
     ? (id: any) => T<I, C, G, L, Ls, Sk, Ms>
     : never
-    
-    /** Returns task metadata. 
+
+    /** Returns task metadata.
      * @requires *task.withMetadata()*. */
-    getMetadata: Ms extends true ? () => { 
-        id: any, 
+    getMetadata: Ms extends true ? () => {
+        id: any,
         [x: string]: any
         [x: number]: any
     }
@@ -74,31 +74,31 @@ export declare interface T<I, C, G, L, Ls extends boolean, Sk extends StorageKin
     readline: () => T<I, string, G, L, Ls, Sk, Ms>
 
     /** Execute a function on the message payload. Can be an async function. */
-    fn: <R>(callback: (x: C) => R) => R extends Promise<infer U> 
-        ? T<I, U, G, L, Ls, Sk, Ms> 
+    fn: <R>(callback: (x: C) => R) => R extends Promise<infer U>
+        ? T<I, U, G, L, Ls, Sk, Ms>
         : T<I, R, G, L, Ls, Sk, Ms>
-    
+
     /** Execute a function on the raw task message. Can be an async fucntion. */
-    fnRaw: <R>(callback: (x: TaskMessage<C, G>) => R) => R extends Promise<infer U> 
-        ? T<I, U, G, L, Ls, Sk, Ms> 
+    fnRaw: <R>(callback: (x: TaskMessage<C, G>) => R) => R extends Promise<infer U>
+        ? T<I, U, G, L, Ls, Sk, Ms>
         : T<I, R, G, L, Ls, Sk, Ms>
-    
+
     /** @deprecated use fn() instead */
     customFunction: <R>(callback: (x: C) => R) => T<I, R, G, L, Ls, Sk, Ms>
-    
+
     /** @deprecated use fn() instead */
     customAsyncFunction: <R>(callback: (x: C) => Promise<R>) => T<I, R, G, L, Ls, Sk, Ms>
-    
+
     /** @deprecated use fnRaw() instead */
     customFunctionRaw: <R>(callback: (x: TaskMessage<C, G>) => R) => T<I, R, G, L, Ls, Sk, Ms>
-    
+
     /** @deprecated use fnRaw() instead */
     customAsyncFunctionRaw: <R>(callback: (x: TaskMessage<C, G>) => Promise<R>) => T<I, R, G, L, Ls, Sk, Ms>
 
     // this creates an array of metadata (may cause type errors)
     joinByKeyWithParallelism: (
-        storage: Storage<any>, 
-        keyFunction: (x: TaskMessage<C, G>) => string | number, 
+        storage: Storage<any>,
+        keyFunction: (x: TaskMessage<C, G>) => string | number,
         parallelism: number
     ) => T<I, C[], G, L, Ls, Sk, Ms>
 
@@ -106,75 +106,75 @@ export declare interface T<I, C, G, L, Ls extends boolean, Sk extends StorageKin
 
     queueSize: (storage: Storage<QueueStorageKind>) => T<I, number, G, L, Ls, Sk, Ms> // to check if it's really a number
 
-    enqueue: (storage: Storage<QueueStorageKind>) => T<I, number, G, C, Ls, Sk, Ms> 
+    enqueue: (storage: Storage<QueueStorageKind>) => T<I, number, G, C, Ls, Sk, Ms>
 
     dequeue: <R = any>(storage: Storage<QueueStorageKind>) => T<I, R, G, C, Ls, Sk, Ms>
 
-    multiDequeue: <R = any>(storage: Storage<QueueStorageKind>) => T<I, R, G, C, Ls, Sk, Ms> 
+    multiDequeue: <R = any>(storage: Storage<QueueStorageKind>) => T<I, R, G, C, Ls, Sk, Ms>
 
-    /** Sets the task internal storage system. 
+    /** Sets the task internal storage system.
      * @enables *toStorage()*, *fromStorage()*, *flushStorage()*, *fromStorageToGlobalState()*, *disconnectStorage()*, *collect()*, *storage()*. */
     withStorage: <K extends StorageKind>(storage: Storage<K>) => T<I, C, G, L, Ls, K, Ms>
-    
+
     /** @requires *task.withStorage()*.*/
-    toStorage: Sk extends StorageKind 
+    toStorage: Sk extends StorageKind
     ? (keyFunc: (x: TaskMessage<C, G>) => string | number, valueFunc?: (x: TaskMessage<C, G>) => any, ttl?: number) => T<I, C, G, L, Ls, Sk, Ms> /*To check*/
     : never
 
     /** @requires *task.withStorage()*.*/
-    toStorageList: Sk extends StorageKind 
+    toStorageList: Sk extends StorageKind
     ? (keyFunc: (x: TaskMessage<C, G>) => string | number, valueFunc?: (x: C) => any, ttl?: number) => T<I, C, G, L, Ls, Sk, Ms> /*To check*/
     : never
 
     /** @requires *task.withStorage()*
      * @requires lists-compatible storage system */
-    fromStorageList: Sk extends ListStorageKind 
-    ? <R = any>(keyFunc: (x: TaskMessage<C, G>) => (string | number)[], valueFunc: (x: C) => R[]) => T<I, R[], G, L, Ls, Sk, Ms> 
+    fromStorageList: Sk extends ListStorageKind
+    ? <R = any>(keyFunc: (x: TaskMessage<C, G>) => (string | number)[], valueFunc: (x: C) => R[]) => T<I, R[], G, L, Ls, Sk, Ms>
     : never
 
     /** @requires *task.withStorage()*. */
-    fromStorageToGlobalState: Sk extends StorageKind 
+    fromStorageToGlobalState: Sk extends StorageKind
     ? (keysFunc: (x: TaskMessage<C, G>) => (string | number)[]) => T<I, C, { [x: string]: any }, L, Ls, Sk, Ms>
     : never
 
     /** @requires *task.withStorage()*. */
-    disconnectStorage: Sk extends StorageKind 
+    disconnectStorage: Sk extends StorageKind
     ? () => T<I, C, G, L, Ls, Sk, Ms>
     : never
-    
+
     /** @requires *task.withStorage()*. */
-    flushStorage: Sk extends StorageKind ? 
+    flushStorage: Sk extends StorageKind ?
     (keysFunc: (x: TaskMessage<C, G>) => (string | number)[]) => T<I, C, G, L, Ls, Sk, Ms>
     : never
-    
+
     /** @requires *task.withStorage()*. */
-    storage: Sk extends StorageKind 
+    storage: Sk extends StorageKind
     ? () => Storage<any>
     : never
 
-    /** Sets the task in-memory key-value store. 
+    /** Sets the task in-memory key-value store.
      * @enables *setLocalKV()*, *setLocalKVRaw()*, *getLocalKV*(), *mergeLocalKV()*, *flushLocalKV().* */
     withLocalKVStorage: <newL = any>() => T<I, C, G, newL, true, Sk, Ms> // define the type of items stored in storage keys
 
     /** @requires *task.withLocalKVStorage()*. */
-    setLocalKV: Ls extends true 
+    setLocalKV: Ls extends true
     ? (key: string | number, func: (x: C) => L) => T<I, C, G, L, Ls, Sk, Ms>
     : never
 
     /** @requires *task.withLocalKVStorage()*. */
-    setLocalKVRaw: Ls extends true 
+    setLocalKVRaw: Ls extends true
     ? (key: string | number, func: (x: TaskMessage<C, G>) => L) => T<I, C, G, L, Ls, Sk, Ms>
     : never
-   
+
     /** @requires *task.withLocalKVStorage()*. */
-    getLocalKV: Ls extends true 
+    getLocalKV: Ls extends true
     ? <K>(key?: K) => K extends Exclude<K, string | number> // check if key is provided
         ? T<I, { [x in string | number]: L }, G, L, Ls, Sk, Ms> // not provided => returns full storage
         : T<I, L, G, L, Ls, Sk, Ms> // provided => returns single storage value
     : never
-    
+
     /** @requires *task.withLocalKVStorage()*. */
-    flushLocalKV: Ls extends true 
+    flushLocalKV: Ls extends true
     ? (key: string | number) => T<I, C, G, L, Ls, Sk, Ms>
     : never
 
@@ -193,42 +193,42 @@ export declare interface T<I, C, G, L, Ls extends boolean, Sk extends StorageKin
     /** @requires windowing-compatible storage system */
     slidingWindowTime: (storage: Storage<WindowStorageKind>, timeLengthMilliSeconds: number, slidingLengthMilliseconds: number, inactivityMilliseconds: number) => T<I, C[], G, L, Ls, Sk, Ms>
 
-    /** Procudes task messages iterating over the provided array. */ 
+    /** Procudes task messages iterating over the provided array. */
     fromArray: <R>(array: R[]) => T<I, R, G, L, Ls, Sk, Ms>
 
-    /** Procudes a single task message from the provided object. */ 
+    /** Procudes a single task message from the provided object. */
     fromObject: <R>(object: R) => T<I, R, G, L, Ls, Sk, Ms>
 
-    /** Procudes a single task message from the provided string. */ 
+    /** Procudes a single task message from the provided string. */
     fromString: (string: string) => T<I, string, G, L, Ls, Sk, Ms>
 
-    /** Procudes task messages iterating by ticking at the provided time interval. */ 
+    /** Procudes task messages iterating by ticking at the provided time interval. */
     fromInterval: <R = number>(intervalMs: number, generatorFunc?: (counter: number) => R, maxSize?: number) => T<I, R, G, L, Ls, Sk, Ms>/*TBD*/
 
     fromReadableStream: (filePath: fs.PathLike, useZlib?: boolean) => T<I, fs.ReadStream, G, L, Ls, Sk, Ms>
 
     /** Produces a message to a Kafka topic. */
-    toKafka: C extends (Kafka.Message | Kafka.Message[]) 
+    toKafka: C extends (Kafka.Message | Kafka.Message[])
     ? (kafkaSink: KSink, topic: string, callback?: (x: C) => Kafka.Message | Kafka.Message[], options?: KSinkOptions) => T<I, C, G, L, Ls, Sk, Ms>
     : (kafkaSink: KSink, topic: string, callback: (x: C) => Kafka.Message | Kafka.Message[], options?: KSinkOptions) => T<I, C, G, L, Ls, Sk, Ms>
 
     /** Consume messages from a Kafka source. */
     fromKafka: <R = any>(source: KSource) => T<I, KMessage<R>, G, L, Ls, Sk, Ms>
 
-    kafkaCommit: C extends KCommitParams 
+    kafkaCommit: C extends KCommitParams
     ? (kafkaSource: KSource, commitParams?: KCommitParams) => T<I, C, G, L, Ls, Sk, Ms>
     : (kafkaSource: KSource, commitParams: KCommitParams) => T<I, C, G, L, Ls, Sk, Ms>
- 
+
     fromPulsar: (source: PlsSource) => T<I, Pulsar.Message, G, L, Ls, Sk, Ms>
- 
+
     toPulsar: (sink: PlsSink, keyCb: (x: C) => any /*TBD*/, dataCb: (x: C) => any) => T<I, C, G, L, Ls, Sk, Ms>
- 
+
     flushPulsar: (sink: PlsSink) => T<I, C, G, L, Ls, Sk, Ms>,
- 
+
     toPulsarWs: (sink: PlsWsSink, keyCb: (x: C) => any /*TBD*/, dataCb: (x: C) => any) => T<I, C, G, L, Ls, Sk, Ms>,
- 
+
     parsePulsar: <R = any>(parseWith?: (x: string) => R) => T<I, R, G, L, Ls, Sk, Ms>,
- 
+
     ackPulsar: (sink: PlsSource) => T<I, C, G, L, Ls, Sk, Ms>,
 
     /** Watch changes over an Etcd key. */
@@ -249,8 +249,8 @@ export declare interface T<I, C, G, L, Ls extends boolean, Sk extends StorageKin
 
     /** Progressively sums messages, returning the current counter value.
      * @requires *number* */
-    sum: C extends number 
-    ? () => T<I, number, G, L, Ls, Sk, Ms>  
+    sum: C extends number
+    ? () => T<I, number, G, L, Ls, Sk, Ms>
     : never
 
     /** Push a new message to the task. */
@@ -266,89 +266,89 @@ export declare interface T<I, C, G, L, Ls extends boolean, Sk extends StorageKin
 
     /** @requires *task.withStorage()*
      * @requires collect-compatible storage system */
-    collect: Sk extends CollectStorageKind 
+    collect: Sk extends CollectStorageKind
     ? <R = any>(
-        idFunction: (x: TaskMessage<C, G>) => string, 
-        keyFunction: (x: TaskMessage<C, G>) => string, 
-        valueFunction: (x: TaskMessage<C, G>) => R | null, 
-        waitUntil: (arr: any[], flat: any[]) => boolean, /* TBD */ 
+        idFunction: (x: TaskMessage<C, G>) => string,
+        keyFunction: (x: TaskMessage<C, G>) => string,
+        valueFunction: (x: TaskMessage<C, G>) => R | null,
+        waitUntil: (arr: any[], flat: any[]) => boolean, /* TBD */
         emitFunction: (arr: any[], flat: any[]) => boolean, /* TBD */
         ttl?: number,
-    ) => T<I, C, G, L, Ls, Sk, Ms> 
+    ) => T<I, C, G, L, Ls, Sk, Ms>
     : never,
 
     sumMap: () => T<I, { [x in keyof C]: number }, G, L, Ls, Sk, Ms>
-  
+
     /** Executes a groupBy for every key of the object message. */
     objectGroupBy: (keyFunction: (x: C) => string | number) => T<I, { [x in string | number]: C[] }, G, L, Ls, Sk, Ms>
-  
+
     /** Aggregates array element by key in a storage system. */
-    aggregate: <R = C>(storage: Storage<any>, name: string, keyFunction: (x: C) => string | number) => T<I, { [x in string | number]: R[] }, G, L, Ls, Sk, Ms>  
+    aggregate: <R = C>(storage: Storage<any>, name: string, keyFunction: (x: C) => string | number) => T<I, { [x in string | number]: R[] }, G, L, Ls, Sk, Ms>
 
     /** @requires *task.withLocalKVStorage().* */
-    mergeLocalKV: Ls extends true 
+    mergeLocalKV: Ls extends true
     ? <K extends string | number>(key: K) => T<I, C & { [x in K]: L }, G, L, Ls, Sk, Ms>
     : never
 
     /** Transform array
     * @requires *array* */
-    map: C extends (infer U)[] 
-    ? <R>(func: (x: U) => R) => T<I, R[], G, L, Ls, Sk, Ms> 
+    map: C extends (infer U)[]
+    ? <R>(func: (x: U) => R) => T<I, R[], G, L, Ls, Sk, Ms>
     : never
-    
+
     /** Splits the task execution for each element of the array.
      * @requires *array* */
-    each: C extends (infer U)[] 
-    ? (func?: (x: U) => any) => T<I, U, G, L, Ls, Sk, Ms> 
+    each: C extends (infer U)[]
+    ? (func?: (x: U) => any) => T<I, U, G, L, Ls, Sk, Ms>
     : never
-    
+
     /** Filters array elements.
      *  @requires *array* */
-    filterArray: C extends (infer U)[] 
-    ? (func: (x: U) => boolean) => T<I, C, G, L, Ls, Sk, Ms> 
+    filterArray: C extends (infer U)[]
+    ? (func: (x: U) => boolean) => T<I, C, G, L, Ls, Sk, Ms>
     : never
-    
+
     // why does this implement a number only internal reduce function? (sum)
     // reduce: <R>(func: (prev: ElemOfArr<T>, curr: ElemOfArr<T>, currIdx?: number) => R, initialValue?: R) => Tsk<I, R, L, Ls, Ss, Ms>
     /** @requires *array* */
-    reduce: C extends (infer U)[] 
-    ? (func?: (x: U) => number) => T<I, number, G, L, Ls, Sk, Ms> 
+    reduce: C extends (infer U)[]
+    ? (func?: (x: U) => number) => T<I, number, G, L, Ls, Sk, Ms>
     : never
 
     /** Count array element by key.
      * @requires *array* */
-    countInArray: C extends (infer U)[] 
-    ? (func: (x: U) => string | number) => T<I, { [x in string | number]: number }, G, L, Ls, Sk, Ms> 
+    countInArray: C extends (infer U)[]
+    ? (func: (x: U) => string | number) => T<I, { [x in string | number]: number }, G, L, Ls, Sk, Ms>
     : never
-    
+
     /** Returns the array length.
      * @requires *array* */
-    length: C extends any[] 
-    ? () => T<I, number, G, L, Ls, Sk, Ms> 
+    length: C extends any[]
+    ? () => T<I, number, G, L, Ls, Sk, Ms>
     : never
-    
+
     /** @requires *array* */
-    groupBy: C extends (infer U)[] 
-    ? (func: (elem: U, index?: number, array?: U[]) => any) => T<I, { [x in string | number]: U[] }, G, L, Ls, Sk, Ms> 
+    groupBy: C extends (infer U)[]
+    ? (func: (elem: U, index?: number, array?: U[]) => any) => T<I, { [x in string | number]: U[] }, G, L, Ls, Sk, Ms>
     : never
 
     /** @requires *task.withStorage()*
      * @requires *array* */
-    fromStorage: Sk extends null 
-    ? never 
-    : C extends any[] 
-    ? (keysFunc: (x: TaskMessage<C, G>) => (string | number)[]) => T<I, unknown[], G, L, Ls, Sk, Ms> 
-    : never
-    
-    /** Flattens an array. 
-     * @requires *array* */ 
-    flat: C extends any[] 
-    ? () => T<I, NestedElem<C>[], G, L, Ls, Sk, Ms> 
+    fromStorage: Sk extends null
+    ? never
+    : C extends any[]
+    ? (keysFunc: (x: TaskMessage<C, G>) => (string | number)[]) => T<I, unknown[], G, L, Ls, Sk, Ms>
     : never
 
-    /** Splits a string (default separator: '\s'). 
+    /** Flattens an array.
+     * @requires *array* */
+    flat: C extends any[]
+    ? () => T<I, NestedElem<C>[], G, L, Ls, Sk, Ms>
+    : never
+
+    /** Splits a string (default separator: '\s').
      * @requires *string* */
-    tokenize: C extends string 
+    tokenize: C extends string
     ? (separator?: string) => T<I, string[], G, L, Ls, Sk, Ms>
     : never
 
@@ -377,10 +377,10 @@ export declare enum StorageKind {
 }
 
 // from IOptions.node
-export declare type OpensearchNode = 
-    string | 
-    string[] | 
-    Opensearch.NodeOptions | 
+export declare type OpensearchNode =
+    string |
+    string[] |
+    Opensearch.NodeOptions |
     Opensearch.NodeOptions[]
 
 /** Conditional generic type for different storage configuration objects. */
@@ -437,23 +437,18 @@ export declare function MakeStorage<K extends StorageKind>(kind: K, config?: Sto
 export declare function ExposeStorageState(storageMap: { [x in string | number]: Storage<any> }, config?: { port?: number }): void
 
 export declare interface KMessage<T> {
-    topic: string, 
+    topic: string,
     offset: string,
-    partition: number, 
+    partition: number,
     headers: any, /*TBD*/
     key: string,
     value: T
 }
 
-type KCompressionType = 
-    Kafka.CompressionTypes.GZIP |
-    Kafka.CompressionTypes.LZ4 |
-    Kafka.CompressionTypes.None |
-    Kafka.CompressionTypes.Snappy |
-    Kafka.CompressionTypes.ZSTD 
-
-export declare type KSinkOptions = { 
-    compressionType: KCompressionType
+export declare type KSinkOptions = {
+    acks?: number
+    timeout?: number
+    compression?: Kafka.CompressionTypes
 }
 
 type KCommitParams = Pick<Kafka.TopicPartitionOffsetAndMetadata, 'topic' | 'partition' | 'offset'>
@@ -469,8 +464,8 @@ export declare type RekeyFunction = (s: any) => any /*TBD*/
 export declare type SinkDataFunction = (s: any) => Kafka.Message /*TBD*/
 
 type ExchangeEmitTask = T<
-    { key: string | number, value: string }, 
-    { key: string | number, value: string }, 
+    { key: string | number, value: string },
+    { key: string | number, value: string },
     any, void, false, null, false
 >
 
@@ -498,8 +493,8 @@ export declare function KafkaAdmin(client: Kafka.Kafka): Promise<Kafka.Admin>
 /** Initialize a Kafka source (consumer). */
 export declare function KafkaSource(client: Kafka.Kafka, config: {
     groupId: string,
-    topics: Array<{ 
-        topic: string, 
+    topics: Array<{
+        topic: string,
         fromBeginning?: boolean
         autoCommit?: boolean
         autoHeartbeat?: number
@@ -515,22 +510,22 @@ export declare function KafkaCommit(source: KSource, params: KCommitParams): Pro
 export declare function KafkaRekey(kafkaSource: KSource, rekeyFunction: RekeyFunction, kafkaSink: KSink, sinkTopic: string, sinkDataFunction: SinkDataFunction): void
 
 // DefaultExchangeMessageKind instead of any will break existent code (maybe any is better?)
-// A better option would be not to use a enbedded message validator, but to provide an defaultMessageValidator 
-// and defaultKeyValidator that one can import and use 
+// A better option would be not to use a enbedded message validator, but to provide an defaultMessageValidator
+// and defaultKeyValidator that one can import and use
 /** Initialize a Kafka Exchange. */
 export declare function Exchange<
-    OnMessage = DefaultExchangeMessageKind, 
+    OnMessage = DefaultExchangeMessageKind,
     EmitMessage = DefaultExchangeMessageKind
 >(
-    client: Kafka.Kafka, 
-    topic: string, 
-    groupId: string, 
+    client: Kafka.Kafka,
+    topic: string,
+    groupId: string,
     sourceOptions?: {
         fromBeginning?: boolean
         autoCommit?: boolean
         autoHeartbeat?: number
-    }, 
-    sinkOptions?: Kafka.ProducerConfig
+    },
+    sinkOptions?: KSinkOptions
 ): Promise<KExchange<OnMessage, EmitMessage>>
 
 export declare interface PlsSource {
@@ -559,7 +554,7 @@ export declare interface NatsJsSource {
 }
 
 export declare interface NatsStreamMsg<T> {
-    data: T, 
+    data: T,
     m: {
         msg: Nats.JsMsg,
         didAck: boolean,
@@ -576,27 +571,27 @@ type ElemOfArr<T extends any[]> = T extends (infer U)[] ? U : never;
 
 /** returns the nested element of both 1d and 2d arrays */
 type NestedElem<T> = T extends readonly (infer U)[]
-    ? U extends readonly (infer V)[] 
-    ? V 
-    : U 
+    ? U extends readonly (infer V)[]
+    ? V
+    : U
     : never;
 
 /** List of storage systems that are suitable for windowing. */
-type WindowStorageKind = 
+type WindowStorageKind =
     StorageKind.Memory |
     StorageKind.Redis |
     StorageKind.Cassandra
 
 /** List of storage systems that are suitable for queuing. */
-type QueueStorageKind = 
-    StorageKind.Redis  
+type QueueStorageKind =
+    StorageKind.Redis
 
 /** List of storage systems that are suitable for lists. */
-type ListStorageKind = 
+type ListStorageKind =
     StorageKind.Redis |
     StorageKind.Cassandra |
-    StorageKind.Memory  
+    StorageKind.Memory
 
 /** List of storage systems that are suitable for collect operator. */
-type CollectStorageKind = 
-    StorageKind.Cassandra 
+type CollectStorageKind =
+    StorageKind.Cassandra

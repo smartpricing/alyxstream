@@ -23,6 +23,7 @@ export const parallel = {
     task._setNext(async () => {
       if (cluster.isPrimary && produceFunction !== null) {
         await produceFunction()
+        await task._nextAtIndex(index)(Message(null))
       }
       if (!cluster.isPrimary) {
         await task._nextAtIndex(index)(Message(null))

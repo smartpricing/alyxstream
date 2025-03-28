@@ -5,7 +5,7 @@ import Message from '../message/message.js'
 export default async function (kafkaClient, consumerConfig) {
   const topics = consumerConfig.topics
 
-  const consumer = await kafkaClient.consumer({ groupId: consumerConfig.groupId })
+  const consumer = await kafkaClient.consumer({ groupId: consumerConfig.groupId, sessionTimeout: consumerConfig.sessionTimeout })
   for (const topic of topics) {
     await consumer.subscribe({ topic: topic.topic, fromBeginning: topic.fromBeginning })
   }

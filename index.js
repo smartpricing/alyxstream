@@ -26,13 +26,6 @@ import kafkaSink from './src/kafka/sink.js'
 import kafkaRekey from './src/kafka/rekey.js'
 import kafkaCommit from './src/kafka/commit.js'
 
-/** Pulsar things */
-import pulsarClient from './src/pulsar/client.js'
-import pulsarSource from './src/pulsar/source.js'
-import pulsarSourceWs from './src/pulsar/source-ws.js'
-import pulsarSink from './src/pulsar/sink.js'
-import pulsarSinkWs from './src/pulsar/sink-ws.js'
-
 /** Nats things */
 import natsClient from './src/nats/client.js'
 import natsSourceJetstream from './src/nats/source-jetstream.js'
@@ -70,11 +63,6 @@ export const KafkaSource = kafkaSource
 export const KafkaSink = kafkaSink
 export const KafkaRekey = kafkaRekey
 export const KafkaCommit = kafkaCommit
-export const PulsarClient = pulsarClient
-export const PulsarSource = pulsarSource
-export const PulsarSourceWs = pulsarSourceWs
-export const PulsarSink = pulsarSink
-export const PulsarSinkWs = pulsarSinkWs
 export const NatsClient = natsClient
 export const NatsJetstreamSource = natsSourceJetstream
 export const TumblingWindowTime = tumblingWindowTime

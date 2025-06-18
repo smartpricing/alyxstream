@@ -6,7 +6,6 @@ Out-of-the-box sources/sinks:
 
 - Kafka
 - Redis
-- Pulsar
 - Cassandra
 - Nats Jetstream
 - Etcd
@@ -28,7 +27,6 @@ Working usage examples are in the *usage-examples* folder.
 11. [Multiprocess/Parallel Mode](#parallel)
 12. [Nats JetStream](#jetstream)
 13. [Distributed locks](#locks)
-14. [Pulsar](#pulsar)
 
 ## Introduction <a name="introduction"></a>
 
@@ -665,63 +663,4 @@ await Task()
 })
 .release(lockStorage, x => 'my-lock')
 .close()
-```
-
-## Pulsar [ALPHA] <a name="pulsar"></a>
-
-**Pulsar functions are not maintained**.
-
-Pulsar producer: 
-
-```js
-import { Task, PulsarClient, PulsarSink } from '@dev.smartpricing/alyxstream';
-
-(async () => {
-  	const client = PulsarClient({
-  	  serviceUrl: 'pulsar://localhost:6650'
-  	})
-	
-  	const pulsarSink = await PulsarSink(client, {
-      topic: 'non-persistent://public/default/my-topic-1',
-      batchingEnabled: true,
-      batchingMaxPublishDelayMs: 10
-    })  
-	
-  	const t = await Task()
-    .toPulsar(pulsarSink, x => x.val, x => x)
-    .flushPulsar(pulsarSink)
-
-    for (var i = 0; i < 1000; i += 1) {
-      await t.inject({val: i})
-    }
-})()
-```
-
-Pulsar consumer:
-
-```js
-import { Task, PulsarClient, PulsarSource } from '@dev.smartpricing/alyxstream';
-
-(async () => {
-  	const client = PulsarClient({
-  	  serviceUrl: 'pulsar://localhost:6650'
-  	})
-	
-  	const pulsarSource = await PulsarSource(client, {
-  	  topic: 'non-persistent://public/default/my-topic-1',
-  	  subscription: 'sub1',
-  	  subscriptionType: "Shared", //'Failover'
-  	  parseWith: (x) => x
-  	})  
-	
-  	await Task()
-  	.withLocalKVStorage()
-  	.fromPulsar(pulsarSource)
-  	.setLocalKV('local-mex', x => x)
-  	.parsePulsar()
-  	.print('>>>')
-  	.getLocalKV('local-mex')
-  	.ackPulsar(pulsarSource)
-  	.close()
-})()
 ```

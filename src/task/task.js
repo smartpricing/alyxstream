@@ -3,7 +3,6 @@
 import { extensions } from './extend.js'
 import Messagge from '../message/message.js'
 import * as SourceOperators from '../operators/source.js'
-import * as PulsarOperators from '../operators/pulsar.js'
 import * as NatsOperators from '../operators/nats.js'
 import * as SinkOperators from '../operators/sink.js'
 import * as BaseOperators from '../operators/base.js'
@@ -121,14 +120,6 @@ export default function (id) {
 
     SinkOperators.toKafka,
     SinkOperators.kafkaCommit,
-
-    PulsarOperators.fromPulsar,
-    PulsarOperators.flushPulsar,
-    PulsarOperators.toPulsar,
-    PulsarOperators.toPulsarWs,
-    PulsarOperators.parsePulsar,
-    PulsarOperators.ackPulsar,
-    PulsarOperators.fromPulsarWs,
 
     NatsOperators.fromNats,
     NatsOperators.toNats,

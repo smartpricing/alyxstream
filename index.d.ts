@@ -1,13 +1,11 @@
 import * as Opensearch from "@opensearch-project/opensearch"
 import * as Cassandra from "cassandra-driver";
 import * as Smartlocks from "smartlocks"
-import * as Pulsar from 'pulsar-client'
 import * as Redis from "ioredis";
 import * as Kafka from "kafkajs"
 import * as Postgres from "pg";
 import * as Etcd from "etcd3"
 import * as Nats from "nats"
-import * as Ws from "ws"
 import * as fs from "fs"
 
 /** Alyxstream Task Message.*/
@@ -218,18 +216,6 @@ export declare interface T<I, C, G, L, Ls extends boolean, Sk extends StorageKin
     kafkaCommit: C extends KCommitParams
     ? (kafkaSource: KSource, commitParams?: KCommitParams) => T<I, C, G, L, Ls, Sk, Ms>
     : (kafkaSource: KSource, commitParams: KCommitParams) => T<I, C, G, L, Ls, Sk, Ms>
-
-    fromPulsar: (source: PlsSource) => T<I, Pulsar.Message, G, L, Ls, Sk, Ms>
-
-    toPulsar: (sink: PlsSink, keyCb: (x: C) => any /*TBD*/, dataCb: (x: C) => any) => T<I, C, G, L, Ls, Sk, Ms>
-
-    flushPulsar: (sink: PlsSink) => T<I, C, G, L, Ls, Sk, Ms>,
-
-    toPulsarWs: (sink: PlsWsSink, keyCb: (x: C) => any /*TBD*/, dataCb: (x: C) => any) => T<I, C, G, L, Ls, Sk, Ms>,
-
-    parsePulsar: <R = any>(parseWith?: (x: string) => R) => T<I, R, G, L, Ls, Sk, Ms>,
-
-    ackPulsar: (sink: PlsSource) => T<I, C, G, L, Ls, Sk, Ms>,
 
     /** Watch changes over an Etcd key. */
     fromEtcd: (storage: Storage<StorageKind.Etcd>, key: string | number, watch?: boolean) => T<I, Etcd.IKeyValue, G, L, Ls, Sk, Ms>,
@@ -527,26 +513,6 @@ export declare function Exchange<
     },
     sinkOptions?: KSinkOptions
 ): Promise<KExchange<OnMessage, EmitMessage>>
-
-export declare interface PlsSource {
-    stream: (cb: any) => Promise<void> /*TBD*/
-    consumer: () => Pulsar.Consumer
-}
-
-export declare interface PlsWsSource {
-    stream: (cb: any) => Promise<void> /*TBD*/
-    consumer: () => void
-}
-
-export declare interface PlsSink extends Pulsar.Producer {}
-
-export declare interface PlsWsSink extends Ws.WebSocket {}
-
-export declare function PulsarClient(config: Pulsar.ClientConfig): Pulsar.Client
-export declare function PulsarSource(client: Pulsar.Client, consumerConfig: Pulsar.ConsumerConfig): Promise<PlsSource>
-export declare function PulsarSourceWs(source: string /*????*/, options: Ws.ClientOptions): Promise<PlsWsSource>
-export declare function PulsarSink(client: Pulsar.Client, producerConfig: Pulsar.ProducerConfig): Promise<PlsSink>
-export declare function PulsarSinkWs(sources: string | string[], options: Ws.ClientOptions): Promise<PlsWsSink>
 
 export declare interface NatsJsSource {
     stream: (cb: any) => Promise<void> /*TBD*/

@@ -1,6 +1,12 @@
 'use strict'
 
 import Message from '../message/message.js'
+import Log from '../logger/default.js'
+
+const isRebalancing = e =>
+  e.type === 'REBALANCE_IN_PROGRESS' ||
+  e.type === 'NOT_COORDINATOR_FOR_GROUP' ||
+  e.type === 'ILLEGAL_GENERATION'
 
 export default async function (kafkaClient, consumerConfig) {
   const topics = consumerConfig.topics
@@ -20,8 +26,16 @@ export default async function (kafkaClient, consumerConfig) {
       eachMessage: async ({ topic, partition, message, heartbeat, pause }) => {
         let heartbeatInterval = null
         if (autoHeartbeat !== null && heartbeatInterval == null) {
-          heartbeatInterval = setInterval(() => {
-            heartbeat()
+          heartbeatInterval = setInterval(async () => {
+            try {
+              await heartbeat()
+            } catch (e) {
+              if (isRebalancing(e)) {
+                return Log('warning', ['Kafka consumer heartbeat failed due to rebalancing. This is expected and will resolve automatically.'])
+              }
+
+              Log('error', ['Kafka consumer heartbeat failed with an unexpected error.', e])
+            }
           }, autoHeartbeat)
         }
         for (const action of onMessaggeAction) {

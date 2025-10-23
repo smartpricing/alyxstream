@@ -4,7 +4,7 @@ import express from 'express'
 
 import { RestDefaultConfig } from '../config/rest.js'
 
-export function ExposeStorageState (storageMap, config = {}) {
+export function ExposeStorageState(storageMap, config = {}) {
   const app = express()
 
   Object.keys(storageMap).forEach((prefix) => {

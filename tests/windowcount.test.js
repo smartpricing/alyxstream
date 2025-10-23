@@ -1,5 +1,7 @@
 'use strict'
 
+import { randomBytes } from 'crypto';
+
 import {
   Task,
   StorageKind,
@@ -9,9 +11,11 @@ import {
 const testData = [1, 2, 3]
 
 test('tumblingWindowCountMemory', async () => {
+  const key = randomBytes(20).toString('hex')
+
   const t = await Task()
     .fromArray(testData)
-    .tumblingWindowCount(MakeStorage(StorageKind.Memory, null, 'test'), 3)
+    .tumblingWindowCount(MakeStorage(StorageKind.Memory, null, key), 3)
     .customFunction((x) => {
       expect(x).toStrictEqual([1, 2, 3])
     })
@@ -19,10 +23,12 @@ test('tumblingWindowCountMemory', async () => {
 })
 
 test('tumblingWindowCountRedis', async () => {
-  const rs = MakeStorage(StorageKind.Redis, null, 'test')
+  const key = randomBytes(20).toString('hex')
+
+  const rs = MakeStorage(StorageKind.Redis, null, key)
   const t = await Task()
     .withStorage(rs)
-    .flushStorage(x => ['test'])
+    .flushStorage(x => [key])
     .fromArray(testData)
     .tumblingWindowCount(rs, 3)
     .customFunction((x) => {

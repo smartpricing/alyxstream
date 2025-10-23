@@ -1,5 +1,8 @@
 'use strict'
 
+import { randomBytes } from 'crypto';
+import cassandra from 'cassandra-driver'
+
 import {
   Task,
   StorageKind,
@@ -34,14 +37,60 @@ test('withRedisStorage', async () => {
 })
 
 test('withCassandraStorage', async () => {
+  // ==== SETUP ==== //
+  const client = new cassandra.Client({
+    contactPoints: ['localhost:9042'],
+    localDataCenter: 'datacenter1',
+  });
+
+  await client.connect()
+
+  const keyspace = 'alyxstream'
+  const queries = [
+    `
+    CREATE KEYSPACE IF NOT EXISTS ${keyspace}
+    WITH replication = {
+      'class': 'SimpleStrategy',
+      'replication_factor': 1
+    }`,
+    `CREATE TABLE IF NOT EXISTS ${keyspace}.storage (
+      id text,
+      key text,
+      value text,
+      s_uuid uuid,
+      PRIMARY KEY (id, key)
+    )`,
+    `CREATE TABLE IF NOT EXISTS ${keyspace}.liststorage(
+      id text,
+      key text,
+      s_uuid uuid,
+      value text,
+      PRIMARY KEY(id, key, s_uuid)
+    ) WITH CLUSTERING ORDER BY(key asc, s_uuid asc)`
+  ];
+
+  try {
+    for (const query of queries) {
+      await client.execute(query)
+    }
+  } catch (error) {
+    console.error('failed to initialize cassandra for tests', error)
+    throw error
+  } finally {
+    await client.shutdown()
+  }
+
+  // ==== TEST ==== //
+  const key = randomBytes(20).toString('hex')
+
   const t = await Task()
     .withStorage(MakeStorage(StorageKind.Cassandra, null, 'test'))
     .flushStorage(x => ['test'])
     .fromString('alice')
-    .toStorage(x => 'myname', x => x)
-    .fromStorageToGlobalState(x => ['myname'])
+    .toStorage(x => key, x => x)
+    .fromStorageToGlobalState(x => [key])
     .customFunctionRaw((x) => {
-      expect(x.globalState.myname.payload).toStrictEqual('alice')
+      expect(x.globalState?.[key].payload).toStrictEqual('alice')
     })
     .disconnectStorage()
     .close()

@@ -5,6 +5,8 @@
   "type": "module",
   "types": "./index.d.ts",
   "scripts": {
+    "test-setup": "docker compose -f ./.dev/docker-compose.yml up --wait",
+    "test-teardown": "docker compose -f ./.dev/docker-compose.yml down --remove-orphans",
     "test": "ALYXSTREAM_LOG_LEVEL='-' node --experimental-vm-modules ./node_modules/.bin/jest --rootDir=tests",
     "test-types": "tsc --noEmit --skipLibCheck ./tests/types.ts && tsx tests/types.ts",
     "prebuild": "rm -rf lib",

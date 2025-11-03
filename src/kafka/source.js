@@ -1,70 +1,82 @@
 'use strict'
 
 import Message from '../message/message.js'
-import Log from '../logger/default.js'
-
-const isRebalancing = e =>
-  e.type === 'REBALANCE_IN_PROGRESS' ||
-  e.type === 'NOT_COORDINATOR_FOR_GROUP' ||
-  e.type === 'ILLEGAL_GENERATION'
 
 export default async function (kafkaClient, consumerConfig) {
   const topics = consumerConfig.topics
 
-  const consumer = await kafkaClient.consumer({ groupId: consumerConfig.groupId, sessionTimeout: consumerConfig.sessionTimeout })
+  // Validate deprecated per-topic options
   for (const topic of topics) {
-    await consumer.subscribe({ topic: topic.topic, fromBeginning: topic.fromBeginning })
+    if (topic.fromBeginning !== undefined || topic.autoCommit !== undefined) {
+      throw new Error('fromBeginning and autoCommit must be set at consumer creation, not per topic')
+    }
+    if (topic.autoHeartbeat !== undefined) {
+      throw new Error('autoHeartbeat is no longer supported. Heartbeat is automatically managed')
+    }
   }
+
+  const kafkaJSConfig = {
+    groupId: consumerConfig.groupId,
+    fromBeginning: consumerConfig.fromBeginning,
+    autoCommit: consumerConfig.autoCommit,
+    autoCommitInterval: consumerConfig.autoCommitInterval,
+    heartbeatInterval: consumerConfig.heartbeatInterval,
+    rebalanceTimeout: consumerConfig.rebalanceTimeout,
+    maxBytesPerPartition: consumerConfig.maxBytesPerPartition,
+    minBytes: consumerConfig.minBytes,
+    maxWaitTimeInMs: consumerConfig.maxWaitTimeInMs,
+    maxBytes: consumerConfig.maxBytes,
+    metadataMaxAge: consumerConfig.metadataMaxAge,
+    allowAutoTopicCreation: consumerConfig.allowAutoTopicCreation
+  }
+
+  Object.keys(kafkaJSConfig).forEach(key => {
+    if (kafkaJSConfig[key] === undefined) {
+      delete kafkaJSConfig[key]
+    }
+  })
+
+  const consumer = kafkaClient.consumer({ kafkaJS: kafkaJSConfig })
   await consumer.connect()
 
-  const onMessaggeAction = []
-  for (const t of topics) {
-    const autoHeartbeat = t.autoHeartbeat === undefined ? null : parseInt(t.autoHeartbeat)
-    const payloadParser = typeof t.parseWith === 'function' ? t.parseWith : (v) => { return JSON.parse(v) }
-    consumer.run({
-      autoCommit: t.autoCommit !== false,
-      eachMessage: async ({ topic, partition, message, heartbeat, pause }) => {
-        let heartbeatInterval = null
-        if (autoHeartbeat !== null && heartbeatInterval == null) {
-          heartbeatInterval = setInterval(async () => {
-            try {
-              await heartbeat()
-            } catch (e) {
-              if (isRebalancing(e)) {
-                return Log('warning', ['Kafka consumer heartbeat failed due to rebalancing. This is expected and will resolve automatically.'])
-              }
+  for (const topic of topics) {
+    await consumer.subscribe({ topic: topic.topic })
+  }
 
-              Log('error', ['Kafka consumer heartbeat failed with an unexpected error.', e])
-            }
-          }, autoHeartbeat)
-        }
-        for (const action of onMessaggeAction) {
-          try {
-            await action(Message({
-              topic,
-              offset: message.offset,
-              partition,
-              headers: message.headers,
-              key: message.key.toString(),
-              value: payloadParser(message.value)
-            }))
-          } catch (error) {
-            console.log(new Date(), '#> Error at kafka source', error)
-            if (heartbeatInterval !== null) {
-              clearInterval(heartbeatInterval)
-            }
-          }
-        }
-        if (heartbeatInterval !== null) {
-          clearInterval(heartbeatInterval)
+  const onMessaggeAction = []
+  const payloadParsers = new Map()
+  for (const t of topics) {
+    const payloadParser = typeof t.parseWith === 'function' ? t.parseWith : (v) => { return JSON.parse(v) }
+    payloadParsers.set(t.topic, payloadParser)
+  }
+
+  consumer.run({
+    eachMessage: async ({ topic, partition, message }) => {
+      const payloadParser = payloadParsers.get(topic) || ((v) => { return JSON.parse(v) })
+      for (const action of onMessaggeAction) {
+        try {
+          await action(Message({
+            topic,
+            offset: message.offset,
+            partition,
+            headers: message.headers,
+            key: message.key.toString(),
+            value: payloadParser(message.value)
+          }))
+        } catch (error) {
+          console.log(new Date(), '#> Error at kafka source', error)
         }
       }
-    })
-  }
+    }
+  })
+
   return {
     stream: async (cb) => {
       onMessaggeAction.push(cb)
     },
-    consumer: () => { return consumer }
+    consumer: () => { return consumer },
+    disconnect: async () => {
+      await consumer.disconnect()
+    }
   }
 }

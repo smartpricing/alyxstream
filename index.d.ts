@@ -207,8 +207,8 @@ export declare interface T<I, C, G, L, Ls extends boolean, Sk extends StorageKin
 
     /** Produces a message to a Kafka topic. */
     toKafka: C extends (Kafka.Message | Kafka.Message[])
-    ? (kafkaSink: KSink, topic: string, callback?: (x: C) => Kafka.Message | Kafka.Message[], options?: KSinkOptions) => T<I, C, G, L, Ls, Sk, Ms>
-    : (kafkaSink: KSink, topic: string, callback: (x: C) => Kafka.Message | Kafka.Message[], options?: KSinkOptions) => T<I, C, G, L, Ls, Sk, Ms>
+    ? (kafkaSink: KSink, topic: string, callback?: (x: C) => Kafka.Message | Kafka.Message[]) => T<I, C, G, L, Ls, Sk, Ms>
+    : (kafkaSink: KSink, topic: string, callback: (x: C) => Kafka.Message | Kafka.Message[]) => T<I, C, G, L, Ls, Sk, Ms>
 
     /** Consume messages from a Kafka source. */
     fromKafka: <R = any>(source: KSource) => T<I, KMessage<R>, G, L, Ls, Sk, Ms>
@@ -432,16 +432,30 @@ export declare interface KMessage<T> {
 }
 
 export declare type KSinkOptions = {
-    acks?: number
-    timeout?: number
-    compression?: Kafka.CompressionTypes
+    // Producer options (must be set at producer creation, not per-send)
+    acks?: number, // -1 = all brokers in ISR, default: -1
+    compression?: Kafka.CompressionTypes, // GZIP, SNAPPY, LZ4, ZSTD, NONE - default: NONE
+    timeout?: number, // ack timeout in milliseconds, default: 30000
+    metadataMaxAge?: number, // time in ms after which to refresh metadata, default: 5 minutes
+    allowAutoTopicCreation?: boolean, // create topic if doesn't exist, default: true
+    transactionTimeout?: number, // max time in ms for transaction status update, default: 60000
+    idempotent?: boolean, // exactly-once delivery, default: false
+    maxInFlightRequests?: number, // max in-flight requests per broker connection, default: null (unbounded)
+    transactionalId?: string, // transactional producer identifier, default: null
+    retry?: {
+        maxRetryTime?: number, // max time to backoff retry in ms, default: 30000
+        initialRetryTime?: number, // min time to backoff retry in ms, default: 300
+        retries?: number // total cap on retries (only for Produce requests), default: 5
+    }
 }
+
 
 type KCommitParams = Pick<Kafka.TopicPartitionOffsetAndMetadata, 'topic' | 'partition' | 'offset'>
 
 export declare interface KSource {
     stream: (cb: any) => Promise<void> /*TBD*/
     consumer: () => Kafka.Consumer
+    disconnect: () => Promise<void>
 }
 
 export declare interface KSink extends Kafka.Producer {}
@@ -479,17 +493,29 @@ export declare function KafkaAdmin(client: Kafka.Kafka): Promise<Kafka.Admin>
 /** Initialize a Kafka source (consumer). */
 export declare function KafkaSource(client: Kafka.Kafka, config: {
     groupId: string,
+    // Global consumer options (cannot be set per-topic)
+    fromBeginning?: boolean,
+    autoCommit?: boolean,
+    autoCommitInterval?: number,
+    heartbeatInterval?: number,
+    rebalanceTimeout?: number,
+    maxBytesPerPartition?: number,
+    minBytes?: number,
+    maxWaitTimeInMs?: number,
+    maxBytes?: number,
+    metadataMaxAge?: number,
+    allowAutoTopicCreation?: boolean,
     topics: Array<{
         topic: string,
-        fromBeginning?: boolean
-        autoCommit?: boolean
-        autoHeartbeat?: number
+        // fromBeginning, autoCommit, autoHeartbeat removed - must be set at consumer level
         parseWith?: (x: string) => any // this should be removed for type safety
     }>
 }): Promise<KSource>
 
-/** Initialize a Kafka sink (producer). */
-export declare function KafkaSink(client: Kafka.Kafka, config?: Kafka.ProducerConfig): Promise<KSink>
+/** Initialize a Kafka sink (producer).
+ * Options like acks, compression, timeout must be set here (not per-send).
+ */
+export declare function KafkaSink(client: Kafka.Kafka, config?: { kafkaJS?: KSinkOptions }): Promise<KSink>
 
 export declare function KafkaCommit(source: KSource, params: KCommitParams): Promise<KCommitParams>
 
@@ -509,9 +535,11 @@ export declare function Exchange<
     sourceOptions?: {
         fromBeginning?: boolean
         autoCommit?: boolean
-        autoHeartbeat?: number
-    },
-    sinkOptions?: KSinkOptions
+        autoCommitInterval?: number
+        heartbeatInterval?: number
+        rebalanceTimeout?: number
+        // autoHeartbeat removed - heartbeat is automatically managed by librdkafka
+    }
 ): Promise<KExchange<OnMessage, EmitMessage>>
 
 export declare interface NatsJsSource {

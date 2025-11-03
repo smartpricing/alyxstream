@@ -1,6 +1,6 @@
 {
   "name": "@dev.smartpricing/alyxstream",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "",
   "type": "module",
   "types": "./index.d.ts",
@@ -39,12 +39,12 @@
     ]
   },
   "dependencies": {
+    "@confluentinc/kafka-javascript": "^1.6.0",
     "@opensearch-project/opensearch": "^2.7.0",
     "cassandra-driver": "^4.8.0",
     "etcd3": "^1.1.2",
     "express": "^5.1.0",
     "ioredis": "^5.8.2",
-    "kafkajs": "^2.2.4",
     "nats": "^2.29.3",
     "pg": "^8.16.3",
     "smartlocks": "^0.0.4",

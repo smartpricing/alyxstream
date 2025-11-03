@@ -3,16 +3,16 @@
 import KafkaCommit from '../kafka/commit.js'
 
 export const toKafka = {
-  toKafka (sink, topic, cb = null, options = null) {
+  toKafka (sink, topic, cb = null) {
     const task = this
     const index = task._nextIndex()
     task._setNext(async (s) => {
       let data = cb == null ? s.payload : cb(s.payload)
       data = Array.isArray(data) === true ? data : [data]
+      
       const obj = {
         topic,
-        messages: data,
-        ...options
+        messages: data
       }
       await sink.send(obj)
       await task._nextAtIndex(index)(s)

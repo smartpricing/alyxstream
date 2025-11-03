@@ -21,12 +21,12 @@ import {
     brokers: ['localhost:9092']
   })
   const kafkaSource = await KafkaSource(kafkaClient, {
+    groupId: 'alyxstream-kafka-example-consumer-2',
+    fromBeginning: true,
+    autoCommit: true,
     topics: [{
-      topic,
-      fromBeginning: true,
-      autoCommit: true
-    }],
-    groupId: 'alyxstream-kafka-example-consumer-2'
+      topic
+    }]
   })
   const kafkaSink = await KafkaSink(kafkaClient)
 

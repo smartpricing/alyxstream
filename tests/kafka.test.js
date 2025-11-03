@@ -7,9 +7,9 @@ import {
   KafkaSink,
   KafkaSource
 } from '../index.js'
-import { Partitioners } from 'kafkajs'
 
-const topic = 'test'
+const topic1 = 'test-topic-1'
+const topic2 = 'test-topic-2'
 let kafkaClient
 let admin
 
@@ -33,26 +33,17 @@ beforeAll(async () => {
     brokers: ['localhost:9092']
   })
   admin = await KafkaAdmin(kafkaClient)
-  await ensureTopicExists(topic)
+  await ensureTopicExists(topic1)
+  await ensureTopicExists(topic2)
 })
 
 afterAll(async () => {
   await admin.disconnect()
 })
 
-test('kafka producer and consumer', async () => {
-  const sink = await KafkaSink(kafkaClient, {
-    createPartitioner: Partitioners.LegacyPartitioner
-  })
+test('kafka producer and consumer with multiple topics', async () => {
+  const sink = await KafkaSink(kafkaClient)
   
-  await sink.send({
-    topic,
-    messages: [
-      { key: '1', value: JSON.stringify({ test: 'message1' }) },
-      { key: '2', value: JSON.stringify({ test: 'message2' }) }
-    ]
-  })
-
   const receivedMessages = []
   let resolvePromise
   const messagePromise = new Promise(resolve => {
@@ -60,12 +51,12 @@ test('kafka producer and consumer', async () => {
   })
 
   const source = await KafkaSource(kafkaClient, {
-    groupId: 'test-group',
-    topics: [{
-      topic,
-      fromBeginning: true,
-      autoCommit: true
-    }]
+    groupId: `test-group-multi-${Date.now()}`,
+    autoCommit: true,
+    topics: [
+      { topic: topic1 },
+      { topic: topic2 }
+    ]
   })
 
   await Task()
@@ -78,12 +69,34 @@ test('kafka producer and consumer', async () => {
     })
     .close()
 
-  await messagePromise
+  // Wait for consumer to be ready and join the group
+  await new Promise(resolve => setTimeout(resolve, 2000))
+  
+  // Send messages after consumer is ready
+  await sink.send({
+    topic: topic1,
+    messages: [
+      { key: '1', value: JSON.stringify({ test: 'message1' }) }
+    ]
+  })
+  
+  await sink.send({
+    topic: topic2,
+    messages: [
+      { key: '2', value: JSON.stringify({ test: 'message2' }) }
+    ]
+  })
+
+  // Wait for messages with timeout
+  await Promise.race([
+    messagePromise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout waiting for messages')), 10000))
+  ])
 
   expect(receivedMessages.length).toBe(2)
-  expect(receivedMessages[0].test).toBe('message1')
-  expect(receivedMessages[1].test).toBe('message2')
-  await source.consumer().disconnect()
+  expect(receivedMessages.some(m => m.test === 'message1')).toBe(true)
+  expect(receivedMessages.some(m => m.test === 'message2')).toBe(true)
+  await source.disconnect()
   await sink.disconnect()
-})
+}, 10000)
 

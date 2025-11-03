@@ -27,13 +27,13 @@ import {
   await Task()
     .parallel(5, null, async () => {
       kafkaSource = await KafkaSource(kafkaClient, {
-          topics: [{
-            topic,
-            fromBeginning: true,
-            autoCommit: false
-          }],
-          groupId: 'alyxstream-kafka-example-consumer-3'
-        })
+        groupId: 'alyxstream-kafka-example-consumer-3',
+        fromBeginning: true,
+        autoCommit: false,
+        topics: [{
+          topic
+        }]
+      })
     })
     .fromKafka(async () => {
       return kafkaSource

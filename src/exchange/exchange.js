@@ -6,14 +6,20 @@ import {
   KafkaSink
 } from '../../index.js'
 
-export default async function (client, topic, groupId, sourceOptions = {}, sinkOptions = {}) {
+export default async function (client, topic, groupId, sourceOptions = {}) {
+  if (sourceOptions.autoHeartbeat !== undefined) {
+    throw new Error('autoHeartbeat is no longer supported. Heartbeat is automatically managed')
+  }
+
   const source = await KafkaSource(client, {
     groupId,
+    fromBeginning: sourceOptions.fromBeginning === undefined ? false : sourceOptions.fromBeginning,
+    autoCommit: sourceOptions.autoCommit === undefined ? true : sourceOptions.autoCommit,
+    autoCommitInterval: sourceOptions.autoCommitInterval,
+    heartbeatInterval: sourceOptions.heartbeatInterval,
+    rebalanceTimeout: sourceOptions.rebalanceTimeout,
     topics: [{
-      topic,
-      fromBeginning: sourceOptions.fromBeginning === undefined ? false : sourceOptions.fromBeginning,
-      autoCommit: sourceOptions.autoCommit === undefined ? true : sourceOptions.autoCommit,
-      autoHeartbeat: sourceOptions.autoHeartbeat === undefined ? null : sourceOptions.autoHeartbeat
+      topic
     }]
   })
   const sink = await KafkaSink(client)
@@ -63,7 +69,7 @@ export default async function (client, topic, groupId, sourceOptions = {}, sinkO
         throw new Error('Messagge format invalid')
       }
       return await Task()
-        .toKafka(sink, topic, null, sinkOptions)
+        .toKafka(sink, topic, null)
         .inject({ key: keyFromMex(mex), value: JSON.stringify(mex) })
     }
   }

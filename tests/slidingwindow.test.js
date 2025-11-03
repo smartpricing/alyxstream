@@ -1,5 +1,7 @@
 'use strict'
 
+import { randomBytes } from 'crypto';
+
 import {
   Task,
   StorageKind,
@@ -14,11 +16,13 @@ const testData = [
 ]
 
 test('slidingWindowTimeMemory', async () => {
+  const key = randomBytes(20).toString('hex')
+
   const t = await Task()
     .fromArray(testData)
     .withDefaultKey()
     .withEventTime(x => new Date(x.date))
-    .slidingWindowTime(MakeStorage(StorageKind.Memory, null, 'testslide'), 4000, 500)
+    .slidingWindowTime(MakeStorage(StorageKind.Memory, null, key), 4000, 500)
     .map(x => x.value)
     .customFunction((x) => {
       expect(x).toStrictEqual([1, 2, 3])
@@ -27,10 +31,12 @@ test('slidingWindowTimeMemory', async () => {
 })
 
 test('slidingWindowTimeRedis', async () => {
-  const storage = MakeStorage(StorageKind.Redis, null, 'testslide')
+  const key = randomBytes(20).toString('hex')
+
+  const storage = MakeStorage(StorageKind.Redis, null, key)
   const t = await Task()
     .withStorage(storage)
-    .flushStorage(x => ['testslide'])
+    .flushStorage(x => [key])
     .fromArray(testData)
     .withDefaultKey()
     .withEventTime(x => new Date(x.date))

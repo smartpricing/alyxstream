@@ -1,0 +1,35 @@
+services:
+  redis:
+    image: docker.io/redis:8.2.2-alpine
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 100Mb
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 2s
+
+  scylladb:
+    image: docker.io/scylladb/scylla:2025.3
+    ports:
+      - "9042:9042"
+    command: --smp 1
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 2GB
+    healthcheck:
+      # https://docs.scylladb.com/manual/branch-2025.3/operating-scylla/nodetool-commands/status.html
+      # UN -> Up and Normal behavior
+      test: ["CMD-SHELL", "nodetool", "status", "|", "grep", "^UN"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

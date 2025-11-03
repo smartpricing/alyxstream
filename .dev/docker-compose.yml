@@ -33,3 +33,30 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v25.2.10
+    ports:
+      - "9092:9092"
+    command:
+      - redpanda
+      - start
+      - --smp 1
+      - --memory 1G
+      - --reserve-memory 0M
+      - --overprovisioned
+      - --node-id 0
+      - --check=false
+      - --kafka-addr PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda:9092
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 1G
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster info || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s

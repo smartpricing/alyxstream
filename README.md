@@ -65,6 +65,13 @@ await Task()
 .close()
 ```
 
+### Breaking Changes (v0.9.3+ / Migration to Confluent Kafka)
+
+Configuration for producers (`KafkaSink`) and consumers (`KafkaSource`) is now set globally at creation time, not per-call.
+- **Producer**: Options like `compression` must be set when creating `KafkaSink`. The `options` parameter in `.toKafka()` has been removed. To use different configurations (e.g., compression), create multiple `KafkaSink` instances.
+- **Consumer**: Options like `fromBeginning` and `autoCommit` are now top-level properties in the `KafkaSource` config, not specified per-topic. `autoHeartbeat` is removed (now automatic) and `sessionTimeout` is replaced by `rebalanceTimeout`.
+
+
 ## Stream/batch sources  <a name="sources"></a>
 
 Alyxstream supports multiple sources by default, both for streaming and batch processing. It'also very easy to build your custom sources.

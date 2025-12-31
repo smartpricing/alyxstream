@@ -39,11 +39,11 @@
     ]
   },
   "dependencies": {
-    "@confluentinc/kafka-javascript": "^1.6.0",
+    "@confluentinc/kafka-javascript": "^1.8.0-rc2",
     "@opensearch-project/opensearch": "^2.7.0",
     "cassandra-driver": "^4.8.0",
     "etcd3": "^1.1.2",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "ioredis": "^5.8.2",
     "nats": "^2.29.3",
     "pg": "^8.16.3",
@@ -51,7 +51,7 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@types/pg": "^8.15.5",
+    "@types/pg": "^8.16.0",
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
     "jest": "^30.2.0",
